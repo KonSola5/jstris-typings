@@ -32,6 +32,28 @@ type PersonalBestInfo = {
   days: number;
 };
 
+declare type GameData = {
+  lines: number;
+  singles: number;
+  doubles: number;
+  triples: number;
+  tetrises: number;
+  maxCombo: number;
+  linesSent: number;
+  linesReceived: number;
+  PCs: number;
+  lastPC: number;
+  TSD: number;
+  TSD20: number;
+  B2B: number;
+  attack: number;
+  score: number;
+  holds: number;
+  garbageCleared: number;
+  wasted: number;
+  tpieces: number;
+  tspins: number;
+};
 /**
  * Formats time into minutes, seconds and optionally partial seconds.
  * @param timeSec Time in seconds.
@@ -92,7 +114,7 @@ declare function objCopy(object: object | any): object | any;
  * @param value The value to search for.
  * @returns `true` if the given value is in the array, `false` otherwise.
  */
-declare function arrayContains(array: any[], value: any): boolean
+declare function arrayContains(array: any[], value: any): boolean;
 
 /**
  * Turns a hex-formatted RGB value into individual RGB values.
@@ -107,14 +129,14 @@ declare function hexToRgb(rgbHex: string, divisor?: number): [red: number, green
  * @param array The array to strip all duplicate elements from.
  * @returns The array with every value unique.
  */
-declare function arrayUnique(array: any[]): any[]
+declare function arrayUnique(array: any[]): any[];
 
 /**
  * Creates a shallow copy of a 2D matrix.
  * @param matrix The matrix to copy.
  * @returns The matrix copy.
  */
-declare function copyMatrix(matrix: number[][]): number[][]
+declare function copyMatrix(matrix: number[][]): number[][];
 
 /**
  * Escapes all `&`, `<` and `>` characters in order to sanitize input inserted via `innerHTML`.
@@ -171,9 +193,12 @@ declare function toggleElem(element: HTMLElement): boolean;
  */
 declare function selectText(element: HTMLElement): void;
 
-declare function addOption(selectElement: HTMLSelectElement, optionToAdd: {id: number, title: string, description: string}): void;
+declare function addOption(
+  selectElement: HTMLSelectElement,
+  optionToAdd: { id: number; title: string; description: string }
+): void;
 
-declare function CDN_URL(resourceLocation: string): string
+declare function CDN_URL(resourceLocation: string): string;
 
 /**
  * Includes an external script.
@@ -654,28 +679,7 @@ declare class GameCore {
   };
   queue: Block[];
   queueLength: number;
-  gamedata: {
-    lines: number;
-    singles: number;
-    doubles: number;
-    triples: number;
-    tetrises: number;
-    maxCombo: number;
-    linesSent: number;
-    linesReceived: number;
-    PCs: number;
-    lastPC: number;
-    TSD: number;
-    TSD20: number;
-    B2B: number;
-    attack: number;
-    score: number;
-    holds: number;
-    garbageCleared: number;
-    wasted: number;
-    tpieces: number;
-    tspins: number;
-  };
+  gamedata: GameData;
   skins: {
     id: number;
     name: string;
@@ -1120,6 +1124,9 @@ declare class Ctx2DView {
   readonly HOLD: 1;
   readonly QUEUE: 2;
   readonly NAME: "2d";
+  ctx: CanvasRenderingContext2D;
+  hctx: CanvasRenderingContext2D;
+  qctx: CanvasRenderingContext2D;
 
   isAvailable(): true;
   initRenderer(): void;
@@ -2043,7 +2050,160 @@ declare class MapManager {
   prepare(mapID?: number): void;
 }
 
-declare class ModeManager {}
+declare class ModeManager {
+  constructor(game: Game);
+  p: Game;
+  onReady: () => void | null;
+  modeId: number | null;
+  modeData: object;
+  lowestMapLine: number | null;
+  mapLines: number[];
+  goalInfo: HTMLDivElement;
+  modeBtns: HTMLDivElement;
+  timesPlayed: object;
+  soundCache: object;
+  skinCache: object;
+  startingTimeout: number | null;
+  unpauseHandler: () => void | null;
+  nextModeHandler: () => void | null;
+  components: object;
+  vars: object;
+  eventTriggers: object;
+  timeTriggers: any[];
+  initTrigger: ModeTrigger;
+  initTriggerFirst: ModeTrigger;
+  afterTrigger: ModeTrigger;
+  totalRuns: number;
+  preventedKeys: number[];
+  totalTriggers: number;
+  usedTriggers: number;
+  fail: boolean;
+  isFinished: boolean;
+  noQueueRefill: boolean;
+  skinWasChanged: boolean;
+  lastAttackGarbageColumn: number;
+  mathEvaluate: (expression: string | string[]) => any | null;
+  readonly FINISH_STANDARD: 0;
+  readonly FINISH_BY_PC: 1;
+  readonly STATE_NEW: 0;
+  readonly STATE_LOCKED: 1;
+  readonly STATE_PUBLISHED: 2;
+  readonly STATE_PUBLISHED_UNLISTED: 3;
+  readonly BLOCK: 3;
+  readonly LINE: 4;
+  readonly LINECLEAR: 5;
+  readonly KEYDOWN: 12;
+  readonly KEYUP: 13;
+  readonly statID: {
+    blocks: 1;
+    finesse: 2;
+    kpp: 3;
+    sent: 4;
+    tspins: 5;
+    combo: 6;
+    PC: 7;
+    TSD: 8;
+    time: 9;
+    APM: 10;
+    PPS: 11;
+    VS: 12;
+    garbage: 13;
+    hold: 14;
+    B2B: 15;
+    wasted: 16;
+    lines: 17;
+    maxCombo: 18;
+    single: 19;
+    double: 20;
+    triple: 21;
+    jstris: 22;
+    score: 23;
+    redbar: 24;
+    inputs: 25;
+  };
+  /** Piece names used for Queue component. */
+  readonly blockNames: {
+    I: [0, 0];
+    O: [0, 1];
+    T: [0, 2];
+    L: [0, 3];
+    J: [0, 4];
+    S: [0, 5];
+    Z: [0, 6];
+    BI: [2, 0];
+    BO: [2, 1];
+    BT: [2, 2];
+    BL: [2, 3];
+    BJ: [2, 4];
+    BS: [2, 5];
+    BZ: [2, 6];
+    I5: [4, 0];
+    V5: [4, 1];
+    T5: [4, 2];
+    U5: [4, 3];
+    W5: [4, 4];
+    X5: [4, 5];
+    J5: [4, 6];
+    L5: [4, 7];
+    S5: [4, 8];
+    Z5: [4, 9];
+    TL: [4, 10];
+    TJ: [4, 11];
+    OZ: [4, 12];
+    OS: [4, 13];
+    TS: [4, 14];
+    TZ: [4, 15];
+    LL: [4, 16];
+    JJ: [4, 17];
+    I1: [5, 0];
+    I2: [5, 1];
+    I3: [5, 2];
+    L3: [5, 3];
+    "O+": [8, 1];
+    INV: [9, 0];
+    NONE: [9, 0];
+  };
+
+  on(eventID: number, eventName: string): void;
+  clearPause(): void;
+  clearNextModeHandler(): void;
+  clearUnPauseHandler(): void;
+  resetUI(): void;
+  getNamedStatVal(statNameOrID: string | number, gamedata: GameData): [value: number, name: string] | null;
+  initialExecCommands(callback: () => void): void;
+  execCommands(commands: object[] | object): void;
+  sendForfeit(): void;
+  skipToNext(): void;
+  stageCompleted(): void;
+  resolveIdentifier(localCounter: string): [string, string];
+  execCommand(command: object): void;
+  getCurrentVarScope(): object;
+  execByID(ID: string): void;
+  /** Replaces {variable_names} with their values in the text. */
+  replaceTextVars(text: string): string;
+  mapFetchError(usermodeID: number): void;
+  getScoreNamedMetric(metric: string): string;
+  saveScore(unknownParameter: boolean): void;
+  enableSkipButton(): void;
+  getHint(): void;
+  enableHintButton(hintNumber: number): void;
+  loadMode(): void;
+  restoreSkin(): void;
+  parseModeData(): void;
+  /** Loads the MathJS library. */
+  loadMath(): void;
+  loadModeSkins(): void;
+  soundLoaded(sound: object): void;
+  finalLoader(): void;
+  replaceActiveBlock(newPiece: Block): void;
+  getBlockFromTextInput(pieceString: string): Block;
+  addStaticQueueToQueue(replaceActivePiece: boolean): void;
+  registerTimeTrigger(time: number | string): ModeTrigger;
+  registerCommandTrigger(triggerID: number, value: number): ModeTrigger;
+  registerVar(variableName: string): void;
+  prepare(modeID?: number | string): void;
+  isClearMatrix(): boolean;
+}
 
 declare class StatsManager {}
 
@@ -2073,3 +2233,5 @@ declare class ChatAutocomplete {}
 declare class Friends {}
 
 declare class EmoteSelect {}
+
+declare class ModeTrigger {}
