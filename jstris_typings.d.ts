@@ -32,6 +32,32 @@ declare type PersonalBestInfo = {
   days: number;
 };
 
+/**
+ * Specifies options for GIF/video skins.
+ */
+declare type VideoOptions = {
+  /**
+   * **GIF skins**: Turns a single GIF into a complete skin by replicating the GIF 9 times over.
+   *
+   * Discards the original aspect ratio of the GIF.
+   */
+  skinify?: boolean;
+  /** **GIF skins**: If `skinify` option is `true`, the skinified GIF will be tinted with Guideline colors. */
+  colorize?: boolean;
+  /**
+   * **GIF skins**: If `colorize` option is `true`, specifies the tint intensity.
+   *
+   * A number between 0 and 1. Defaults to 0.7 if not provided.
+   */
+  colorAlpha?: number;
+  /**
+   * **Video skins**: Specifies, whether the video plays sounds.
+   *
+   * Defaults to `false` if not provided.
+   */
+  sound?: boolean;
+};
+
 declare type GameData = {
   lines: number;
   singles: number;
@@ -207,6 +233,36 @@ declare function CDN_URL(resourceLocation: string): string;
  */
 declare function includeScript(scriptSource: string, onLoad: (event: Event) => void): void;
 
+/**
+ * Loads an external skin.
+ * @param url Skin URL.
+ * @param size The skin size in pixels.
+ * @param settings Unknown object.
+ */
+declare function loadSkin(url: string, size: number, settings?: object): void;
+
+/**
+ * Loads an external ghost skin.
+ * @param url Skin URL.
+ * @param size The skin size in pixels.
+ */
+declare function loadGhostSkin(url: string, size: number): void;
+
+/**
+ * Loads an external GIF/video skin.
+ * @param url Skin URL.
+ * @param videoOptions Video options.
+ */
+declare function loadVideoSkin(url: string, videoOptions: VideoOptions): void;
+
+/**
+ * Joins a multiplayer room.
+ * @param roomID ID of the room to join.
+ */
+declare function joinRoom(roomID: string): void;
+
+declare function loadSFX(sfx: SFXsets | VSFXsets, useVoice: 0 | 1): void;
+
 declare class Game extends GameCore {
   constructor();
   canvas: HTMLCanvasElement;
@@ -237,7 +293,7 @@ declare class Game extends GameCore {
   tex2: HTMLImageElement;
   drawScale: number;
   skinId: number;
-  ghostTex: HTMLImageElement | null;
+  ghostTex: HTMLImageElement;
   ghostSkinId: number;
   ghostSkins: { id: number; name: string; data: string; w: number }[];
   SFXset: { id: number; name: string; data: () => void } | null;
@@ -446,8 +502,8 @@ declare class Game extends GameCore {
   loadGhostSkin(url: string, size: number): void;
   changeSkin(skinIndex: number): void;
   initSFX(): void;
-  changeSFX(sfx: SFXsets | VSFXsets): void;
-  loadSounds(sfx: SFXsets | VSFXsets): void;
+  changeSFX(sfx: SFXsets | VSFXsets, useVoice: 0 | 1): void;
+  loadSounds(sfx: SFXsets | VSFXsets, prefix: string): void;
   drawGrid(mode: number): void;
   isPmode(doInvert: boolean): number;
   // ? A parameter is not known.
@@ -684,6 +740,7 @@ declare class GameCore {
     id: number;
     name: string;
     data: string;
+    w?: number;
   }[];
   customSkinPath: string | null;
   temporaryBlockSet: number | null;
@@ -694,7 +751,7 @@ declare class GameCore {
   isBack2Back: boolean;
   wasBack2Back: boolean;
   isInvisibleSkin: boolean;
-  monochromeSkin: boolean;
+  monochromeSkin: string | false;
   readonly cids: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
   readonly coffset: [0, 2, 3, 4, 5, 6, 7, 8, 1, 0];
   readonly colors: [
@@ -1101,7 +1158,7 @@ declare class WebGLView {
   clearQueueCanvas(): void;
   drawBlockOnCanvas(x: number, y: number, blockID: number, ctxID: number): void;
   drawBrickOverlayOnCanvas(x: number, y: number, ctxID: number): void;
-  drawBrickOverlay(x: number, y: number, ctxID: number): void;
+  drawBrickOverlay(x: number, y: number, isGhost: boolean): void;
   drawBlock(x: number, y: number, blockID: number, ctxID: number): void;
   drawGhostBlock(x: number, y: number, blockID: number): void;
   redrawRedBar(redBar: number): void;
@@ -1136,7 +1193,7 @@ declare class Ctx2DView {
   clearQueueCanvas(): void;
   drawBlockOnCanvas(x: number, y: number, blockID: number, ctxID: number): void;
   drawBrickOverlayOnCanvas(x: number, y: number, ctxID: number): void;
-  drawBrickOverlay(x: number, y: number, ctxID: number): void;
+  drawBrickOverlay(x: number, y: number, isGhost: boolean): void;
   drawBlock(x: number, y: number, blockID: number): void;
   drawGhostBlock(x: number, y: number, blockID: number): void;
   drawRectangle(
