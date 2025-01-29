@@ -1,6 +1,6 @@
-type AleaPRNG = () => number;
+declare type AleaPRNG = () => number;
 
-type ReplayResponse = {
+declare type ReplayResponse = {
   /** The replay ID. */
   id: number;
   /** The game mode played. */
@@ -17,7 +17,7 @@ type ReplayResponse = {
   pb: PersonalBestInfo | boolean;
 };
 
-type PersonalBestInfo = {
+declare type PersonalBestInfo = {
   /** The new best score/time. */
   new: number;
   /** The previous best score/time. */
@@ -568,9 +568,9 @@ declare class Game extends GameCore {
   setupGameLinks(): void;
 }
 
-type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
+declare type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
 
-type Ruleset = {
+declare interface Ruleset {
   clearDelay: number;
   rnd: number;
   showPreviews: number;
@@ -596,9 +596,9 @@ type Ruleset = {
   solidAttack: boolean;
   ext: number;
   sgProfile: number[];
-};
+}
 
-type RoomConfig = {
+declare type RoomConfig = {
   t?: number;
   p?: boolean;
   n?: string;
@@ -748,7 +748,7 @@ declare class GameCore {
   updateGhostPiece(forceUpdate?: boolean): void;
   checkTSpin(pieceID: number): void;
   checkAllSpinImmobile(): void;
-  checkAllSpin(pieceID: number): number | void;
+  checkAllSpin(pieceID: number): void;
   checkLineClears(timestamp?: number): void;
   countGarbageHeight(heightLimit?: number): number;
   is4W(rowCheckedFor4W: number): boolean;
@@ -1017,7 +1017,7 @@ declare class SlotView {
   afterRedraw(): void;
 }
 
-type GLContextDefinition = {
+declare type GLContextDefinition = {
   elem: HTMLCanvasElement;
   mesh: {
     w: number;
@@ -1046,7 +1046,7 @@ type GLContextDefinition = {
  * Options used for the video skin.
  * All options are optional.
  */
-type VideoOptions = {
+declare type VideoOptions = {
   /** Specifies whether the skin video is muted or not. */
   sound?: boolean;
   /** Makes the skin video visible. */
@@ -1276,7 +1276,7 @@ declare class SlotStats {
   update(PPS: number, APM: number): void;
 }
 
-type SoundDefinition = { id: string; vol: number };
+declare type SoundDefinition = { id: string; vol: number };
 
 declare class SoundQueue {
   constructor();
@@ -1576,7 +1576,7 @@ interface Clients {
   [cid: number]: Client;
 }
 
-type Client = {
+declare type Client = {
   /** Whether the user is registered or not. (?) */
   auth: boolean;
   /** The client's CID. */
@@ -1595,7 +1595,7 @@ type Client = {
   type: number;
 };
 
-type LobbyList = {
+declare type LobbyList = {
   /** Standard rooms. */
   s: object[];
   /** Custom rooms. */
@@ -1610,7 +1610,7 @@ type LobbyList = {
   p: object[];
 };
 
-type RoomDetails = {
+declare type RoomDetails = {
   /** Player count. */
   c: number;
   /** */
@@ -1650,7 +1650,7 @@ type RoomDetails = {
   l?: number;
 };
 
-type RoomFurtherDetails = {
+declare type RoomFurtherDetails = {
   /** */
   p: {
     /** */
@@ -1672,8 +1672,8 @@ type RoomFurtherDetails = {
   };
 };
 // TODO
-type ResultsList = object;
-type TeamResultsList = object;
+declare type ResultsList = object;
+declare type TeamResultsList = object;
 
 declare class Live {
   constructor(game: Game);
