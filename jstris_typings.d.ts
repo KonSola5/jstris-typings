@@ -1,4 +1,6 @@
 declare type AleaPRNG = () => number;
+/** @deprecated Jstris should use {@link KeyboardEvent.code() keyboard codes} instead. Come on, we are in 2025. */
+declare type KeyCode = number;
 
 declare type ReplayResponse = {
   /** The replay ID. */
@@ -80,6 +82,20 @@ declare type GameData = {
   tpieces: number;
   tspins: number;
 };
+
+declare type Controls = [
+  moveLeft: KeyCode,
+  moveRight: KeyCode,
+  softDrop: KeyCode,
+  hardDrop: KeyCode,
+  rotateLeft: KeyCode,
+  rotateRight: KeyCode,
+  rotate180: KeyCode,
+  hold: KeyCode,
+  restartPractice: KeyCode,
+  restartLive: KeyCode
+];
+
 /**
  * Formats time into minutes, seconds and optionally partial seconds.
  * @param timeSec Time in seconds.
@@ -388,6 +404,9 @@ declare class Game extends GameCore {
   solidProfiles: [[0, 3], [0, 3, 2.8, 2.6, 2.4, 2.2, 2, 1.8, 1.6, 1.4, 1.2, 1, 31, 1, 1, 1, 1, 1, 1, 1], null, null];
   garbageCols: number[];
   blockInHold: Block | null;
+  /**
+   * `0` if the game is focused, `1` otherwise.
+   */
   focusState: 0 | 1; // jezevec, why isn't this a boolean?
   statsEnabled: boolean;
   statsMode: number;
@@ -1518,6 +1537,15 @@ declare class Settings {
   gamepadFound: boolean;
   statGameModeSelect: HTMLSelectElement;
   statCheckboxes: HTMLInputElement[];
+
+  // These properties are added later on
+  ARR: number;
+  DAS: number;
+  DAScancel: 0 | 1;
+  DMsound: boolean;
+  SFXsetID: number;
+  VSFSsetID: number;
+  controls: Controls;
 
   init(): void;
   applyDefaults(): void;
