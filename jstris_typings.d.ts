@@ -123,7 +123,7 @@ declare function getKeyByValue(object: object, value: any): any;
 
 /**
  * Turns a byte array into a Base64-encoded string.
- * @param array Byte array to turn into Base64.
+ * @param byteArray Byte array to turn into Base64.
  * @returns Base64-encoded string.
  */
 declare function _simpleArrayBufferToBase64(byteArray: Uint8Array): string;
@@ -1695,6 +1695,15 @@ declare type LobbyList = {
   p: object[];
 };
 
+declare type Limits = {
+  /** 10-game APM minimum and maximum */
+  apm?: [min: number | null, max: number | null];
+  /** Live gametime (in hours) minimum and maximum */
+  gt?: [min: number | null, max: number | null];
+  /** Sprint 40L PB minimum and maximum */
+  sub?: [min: number | null, max: number | null];
+};
+
 declare type RoomDetails = {
   /** Player count. */
   c: number;
@@ -1721,12 +1730,7 @@ declare type RoomDetails = {
     /** The server the given room is on. */
     s: string;
     /** Restrictions that prevent certain users from joining */
-    lock?: {
-      /** 10-game APM minimum and maximum */
-      apm?: [min: number, max: number];
-      /** Live gametime (in hours) minimum and maximum */
-      gt?: [min: number, max: number];
-    };
+    lock?: Limits;
   };
   det: RoomFurtherDetails;
   /** */
@@ -1734,6 +1738,55 @@ declare type RoomDetails = {
   /** Whether the room is locked or not. */
   l?: number;
 };
+
+declare type RoomDetails2 = {
+  /** Information about room join limits. */
+  l?: {
+    /** Whether the player is eligible to play in the room. */
+    r?: boolean;
+    /** Limits imposed on the room. */
+    l?: Limits;
+    /** Player's current stats. */
+    s?: {
+      /** The player's 10-game APM average. */
+      apm: number;
+      /** The player's total Live playtime. */
+      gt: number;
+      /** The player's 40L Sprint PB. */
+      sub: number;
+    };
+  };
+  /** Information about players in the room. */
+  p: {
+    /** Current amount of registered players in the room. */
+    c: number;
+    /** Current amount of guests in the room. */
+    g: number;
+    /** More detailed information about players in the room. */
+    p: PlayerDetails;
+    /** Current amount of spectators in the room. */
+    s: number;
+  };
+  /** Room ID. */
+  r: string;
+  /** Settings modified from defaults. */
+  s: RoomConfig;
+  /** Max amount allowed? */
+  t: number;
+};
+
+declare type PlayerDetails = {
+  /** The player's nickname. */
+  n: string;
+  /** The player's color, if set in Supporter settings. */
+  col?: string;
+  /** The player's Supporter tier. */
+  ti?: number;
+  /** The player's icon set as Supporter. */
+  icn?: number;
+  /** Player role and icon. */
+  type?: number;
+}[]
 
 declare type RoomFurtherDetails = {
   /** */
@@ -2311,7 +2364,167 @@ declare class CP {}
 
 declare class Replayer {}
 
-declare class RoomInfo {}
+declare class RoomInfo {
+  constructor(live: Live);
+  l: Live;
+  roomDetailBox: number | null
+  timeoutRequestDetail:  number | null
+  timeoutRoomDetail: number | null
+  rdParts: {
+    "detail": HTMLDivElement,
+    "title": HTMLDivElement,
+    "spinner": HTMLDivElement,
+    "content": HTMLDivElement,
+    "settings": HTMLDivElement,
+    "settingsTitle": HTMLDivElement,
+    "settingsContent": HTMLDivElement,
+    "limit": HTMLDivElement
+  };
+  roomDetails: {
+    [roomID: string]: RoomDetails2;
+  };
+  /** Internationalized names for On and Off. */
+  readonly ON_OFF: ["Off", "On"];
+  /** Short config names. */
+  readonly CONF_NAMES: {
+    /** Attack Table */
+    at: "Attack table",
+    /** Combo Table */
+    ct: "Combo table",
+    /** Lock Delay */
+    ld: "Lock delay",
+    /** Clear Delay (ms) */
+    cd: {
+      /** Config name. */
+      n: "Clear delay",
+      /** Config unit. */
+      u: "ms",
+    },
+    /** Delayed Auto Shift (ms) */
+    DAS: {
+      /** Config name. */
+      n: "DAS",
+      /** Config unit. */
+      u: "ms",
+    },
+    /** Auto Repeat Rate (ms). */
+    ARR: {
+      /** Config name. */
+      n: "ARR",
+      /** Config unit. */
+      u: "ms",
+    },
+    /** Garbage distribution method. */
+    gdm: {
+      /** Config name. */
+      n: "G-distrib.",
+      /** Config values. */
+      v: [null, "divide", "toAll", null, "toMost", "toSelf", "random", "roulette"],
+    },
+    /** Garbage blocking method. */
+    gblock: {
+      /** Config name. */
+      n: "G-blocking",
+      /** Config values. */
+      v: ["full", "limited", "none", "instant"],
+    },
+    /** Randomizer. */
+    rnd: {
+      /** Config name. */
+      n: "Randomizer",
+      /** Config values. */
+      v: ["7bag", "14bag", "Classic", "1Block", "2Block", "1x7bag", "1x14bag", "C2Sim", "7b-RR", "BSb-7b", "BB-7b"],
+    },
+    /** Amount of previews. */
+    pr: "Previews",
+    /** Hold. */
+    hold: "Hold",
+    /** Piece set. */
+    bbs: {
+      /** Config name. */
+      n: "Blocks",
+      /** Config values. */
+      v: [null, "Big", "Big+", "ARS", "Penta", "M123", "All29", "C2RS", "OSpin"],
+    },
+    /** Gravity level. */
+    grav: "Gravity",
+    /** Garbage messiness. */
+    mess: {
+      /** Config name. */
+      n: "Messiness",
+      /** Config unit. */
+      u: "%",
+    },
+    /** Garbage delay. */
+    gDelay: {
+      /** Config name. */
+      n: "G-delay",
+      /** Config unit. */
+      u: "ms",
+    },
+    /** HostStart. */
+    hostStart: "HostStart",
+    /** Invert garbage. */
+    gInv: "G-invert",
+    /** Garbage hole width. */
+    gapW: "G-gap",
+    /** No 4-wide. */
+    noFW: "noFW",
+    /** Ghost piece. */
+    ghost: {
+      /** Config name. */
+      n: "Ghost",
+      /** Config values. */
+      v: {
+        "-1": "Def",
+        0: "Off",
+        1: "On",
+      },
+    },
+    /** Attack as solid. */
+    sa: "SolidAtk",
+    /** All-spin. */
+    as: {
+      /** Config name. */
+      n: "AllSpin",
+      /** Config values. */
+      v: ["Off", "On - Im.", "On - 4P"],
+    },
+    /** All-spin exclusion list. */
+    asEx: "AS-Excl.",
+    /** Solid garbage profile. */
+    sgp: {
+      /** Config name. */
+      n: "Solid",
+      /** Config values. */
+      v: ["0", "1", "2", "Custom speed"],
+    },
+  };
+  /** Limit names and units. */
+  readonly LIMIT_NAMES: {
+    /** APM. */
+    apm: {
+      /** Name. */
+      n: "APM",
+      /** Unit. */
+      u: "",
+    },
+    /** Sprint 40L time. */
+    sub: {
+      /** Name. */
+      n: "Sprint 40L",
+      /** Unit. */
+      u: "s",
+    },
+    /** Total Live playtime. */
+    gt: {
+      /** Name. */
+      n: "Gametime",
+      /** Unit. */
+      u: "hrs",
+    },
+  };
+}
 
 declare class ChatAutocomplete {}
 
