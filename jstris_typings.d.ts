@@ -96,6 +96,1134 @@ declare type Controls = [
   restartLive: KeyCode
 ];
 
+declare type I18n = {
+  /**
+   * Displayed during the "Ready" state of "Ready? Go!" sequence.
+   *
+   * English: **"READY"**
+   */
+  ready: string;
+  /**
+   * Displayed during the "Go" state of "Ready? Go!" sequence.
+   *
+   * English: **"GO!"**
+   */
+  go: string;
+  /**
+   * Title of the "out of focus" message.
+   *
+   * English: **"Out of focus"**
+   */
+  notFocused: string;
+  /**
+   * Description of the "out of focus" message.
+   *
+   * English: **"Click here to focus the game"**
+   */
+  clickToFocus: string;
+  /**
+   * Title of the "spectator mode" message.
+   *
+   * English: **"Spectator mode"**
+   */
+  specMode: string;
+  /**
+   * Description of the "spectator mode" message.
+   *
+   * English: **"You are in spectator mode now."**
+   */
+  specModeInfo: string;
+  /**
+   * Description of the "spectator mode" message if the game is not ongoing.
+   *
+   * English: **"Type /play to join the game"**
+   */
+  endSpec: string;
+  /**
+   * Displays after the player logs into the game.
+   *
+   * English: **"Type /help for available commands."**
+   */
+  typeHelp: string;
+  /**
+   * Displayed after the place ordinal: 1st, 21st, 31st,...
+   *
+   * English: **"st"**
+   */
+  st: string;
+  /**
+   * Displayed after the place ordinal: 2nd, 22ns, 32nd,...
+   *
+   * English: **"nd"**
+   */
+  nd: string;
+  /**
+   * Displayed after the place ordinal: 3rd, 23rd, 33rd,...
+   *
+   * English: **"rd"**
+   */
+  rd: string;
+  /**
+   * Displayed for remaining ordinals, like: 4th, 11th, etc.
+   *
+   * English: **"th"**
+   */
+  th: string;
+  /**
+   * Title of the "Not playing" message.
+   *
+   * English: **"Not playing"**
+   */
+  notPlaying: string;
+  /**
+   * Description of the "Not playing" message if the game is ongoing.
+   *
+   * English: **"Wait until the round ends"**
+   */
+  waitNext: string;
+  /**
+   * Alternative description of the "Not playing" message if the game is ongoing.
+   *
+   * English: **"Please wait for the next round"**
+   */
+  waitNext2: string;
+  /**
+   * Description of the "Not playing" message if no game is ongoing.
+   *
+   * English: **"Press 'New game' to start"**
+   */
+  pressStart: string;
+  /**
+   * Title of the speed limit warning.
+   *
+   * English: **"SLOW DOWN"**
+   */
+  slowDown: string;
+  /**
+   * Description of the speed limit warning.
+   *
+   * English: **"The speed limit is"**
+   */
+  speedLimitIs: string;
+  /**
+   * Connecting message.
+   *
+   * English: **"Connecting..."**
+   */
+  connecting: string;
+  /**
+   * Signing in message.
+   *
+   * English: **"Signing in"**
+   */
+  signingIn: string;
+  /**
+   * Displays when log in fails.
+   *
+   * English: **"Log in failed!"**
+   */
+  loginFail: string;
+  /**
+   * Displays when the player is not logged in and is playing as a guest instead
+   *
+   * English: **"Not logged in! You're playing as a guest called {name}."**
+   */
+  loginFail2: string;
+  /**
+   * Displays when the map is loading.
+   *
+   * English: **"Map loading..."**
+   */
+  mapLoading: string;
+  /**
+   * General warning title.
+   *
+   * English: **"Warning"**
+   */
+  warning: string;
+  /**
+   * Description of a warning describing that spectator mode will activate soon.
+   *
+   * English: **"Spectator mode will be activated. Type in chat to abort."**
+   */
+  inactive1: string;
+  /**
+   * Description of a warning describing that spectator mode will activate after the next game with no inputs.
+   *
+   * English: **"Inactivity detected, next inactive game will activate spectator mode."**
+   */
+  inactive2: string;
+  /**
+   * 
+   *
+   * English: **"Type your username to be able to chat!"**
+   */
+  nickFill: string;
+  /**
+   * Set
+   *
+   * English: **"Set"**
+   */
+  setButton: string;
+  /**
+   * Text on a button that sends the chat message.
+   *
+   * English: **"Send"**
+   */
+  sendButton: string;
+  /**
+   * 
+   *
+   * English: **"Room name must be filled!"**
+   */
+  rNameReq: string;
+  /**
+   * News user.
+   *
+   * English: **"News"**
+   */
+  newsUser: string;
+  /**
+   * Server user.
+   *
+   * English: **"Server"**
+   */
+  serverUser: string;
+  /**
+   * Guest name, used in places when the auto-generated name is not used.
+   *
+   * English: **"NoNamed"**
+   */
+  noNamed: string;
+  /**
+   * Displays before the list of spectators in the room.
+   *
+   * English: **"Watching"**
+   */
+  watching: string;
+  /**
+   * Displays when someone joins the room.
+   *
+   * English: **"joined the room"**
+   */
+  userJoined: string;
+  /**
+   * Displays in tab title when someone joins the room.
+   *
+   * English: **"joined"**
+   */
+  joined: string;
+  /**
+   * Displays when someone joined as an observer, due to not fulfilling the room requirements.
+   *
+   * English: **"came to watch"**
+   */
+  userCame: string;
+  /**
+   * Displays when someone stops playing and starts spectating.
+   *
+   * English: **"is now spectating"**
+   */
+  isSpectating: string;
+  /**
+   * Spectator.
+   *
+   * English: **"Spectator"**
+   */
+  spectator: string;
+  /**
+   * Displays when someone leaves the room.
+   *
+   * English: **"has left"**
+   */
+  hasLeft: string;
+  /**
+   * Displays in chat when the player logs in.
+   *
+   * English: **"You are signed in as"**
+   */
+  signedAs: string;
+  /**
+   * Greeting message.
+   *
+   * English: **"Welcome,"**
+   */
+  welcome: string;
+  /**
+   * Greeting message for a room.
+   *
+   * English: **"Welcome in"**
+   */
+  welcomeIn: string;
+  /**
+   * There are no spectators in the room.
+   *
+   * English: **"No one is watching right now."**
+   */
+  noSpectators: string;
+  /**
+   * Replay available at.
+   *
+   * English: **"Replay available at"**
+   */
+  replayAvailable: string;
+  /**
+   * Description of a warning about old version of Jstris.
+   *
+   * English: **"You have an old version, use CTRL+F5 to reload to the new version!"**
+   */
+  oldVer: string;
+  /** 
+   * Alternative description of a warning about old version of Jstris.
+   *
+   * English: **"You still have the old version! Use {key} to reload your client"**
+   */
+  oldVer2: string;
+  /**
+   * Displays in chat in private rooms.
+   *
+   * English: **"This is your private room where you won't be disturbed while playing. Check the Lobby to see public rooms."**
+   */
+  privateRoom: string;
+  /**
+   * 
+   *
+   * English: **"Restart by F4 or set a custom key."**
+   */
+  restartInfo: string;
+  /**
+   * Displays in chat in private rooms.
+   *
+   * English: **"This room is private. Only way someone can join it is using this link:"**
+   */
+  joinLinkInfo: string;
+  /**
+   * Garbage received.
+   *
+   * English: **"Received"**
+   */
+  received: string;
+  /**
+   * Number of finesse faults.
+   *
+   * English: **"Finesse"**
+   */
+  finesse: string;
+  /**
+   * Name of the room.
+   *
+   * English: **"Room name"**
+   */
+  roomName: string;
+  /**
+   * Games played in the room.
+   *
+   * English: **"Games"**
+   */
+  games: string;
+  /**
+   * Players in the room.
+   *
+   * English: **"Players"**
+   */
+  players: string;
+  /**
+   * Name
+   *
+   * English: **"Name"**
+   */
+  name: string;
+  /**
+   * Wins
+   *
+   * English: **"Wins"**
+   */
+  wins: string;
+  /**
+   * Time
+   *
+   * English: **"Time"**
+   */
+  time: string;
+  /**
+   * Sent
+   *
+   * English: **"Sent"**
+   */
+  sent: string;
+  /**
+   * Pieces usedd
+   *
+   * English: **"Blocks"**
+   */
+  blocks: string;
+  /**
+   * Combo
+   *
+   * English: **"REN"**
+   */
+  ren: string;
+  /**
+   * Game time
+   *
+   * English: **"time"**
+   */
+  gameTime: string;
+  /**
+   * See... (mode leaderboard.)
+   *
+   * English: **"See"**
+   */
+  see: string;
+  /**
+   * (See mode) ...leaderboard.
+   *
+   * English: **"leaderboard"**
+   */
+  leaderboard: string;
+  /**
+   * 
+   *
+   * English: **"WARNING"**
+   */
+  warning2: string;
+  /**
+   *
+   *
+   * English: **"Connected"**
+   */
+  connected: string;
+  /**
+   *
+   *
+   * English: **"client"**
+   */
+  client: string;
+  /**
+   *
+   *
+   * English: **"NOT CONNECTED"**
+   */
+  notConnected: string;
+  /**
+   *
+   *
+   * English: **"Connection lost!"**
+   */
+  connLost: string;
+  /**
+   *
+   *
+   * English: **"Last game:"**
+   */
+  lastGame: string;
+  /**
+   *
+   *
+   * English: **"Room settings:"**
+   */
+  roomSettings: string;
+  /**
+   *
+   *
+   * English: **"Attack"**
+   */
+  attack: string;
+  /**
+   *
+   *
+   * English: **"Combo"**
+   */
+  combo: string;
+  /**
+   *
+   *
+   * English: **"Solid"**
+   */
+  solid: string;
+  /**
+   *
+   *
+   * English: **"Clear"**
+   */
+  clear: string;
+  /**
+   *
+   *
+   * English: **"Mode"**
+   */
+  mode: string;
+  /**
+   *
+   *
+   * English: **"Garbage"**
+   */
+  garbage: string;
+  /**
+   *
+   *
+   * English: **"GarbageDelay"**
+   */
+  garbageDelay: string;
+  /**
+   *
+   *
+   * English: **"Messiness"**
+   */
+  messiness: string;
+  /**
+   *
+   *
+   * English: **"Replay"**
+   */
+  replay: string;
+  /**
+   *
+   *
+   * English: **"Rep"**
+   */
+  rep: string;
+  /**
+   *
+   *
+   * English: **"Rec."**
+   */
+  rec: string;
+  /**
+   * Displays in an alert prompting user to enter a DAS value in frames (like in NullpoMino)
+   *
+   * English: **"Enter numeric NullpoMino DAS value:"**
+   */
+  enterNullDAS: string;
+  /**
+   *
+   *
+   * English: **"Suggested DAS is"**
+   */
+  suggestedIs: string;
+  /**
+   *
+   *
+   * English: **"Apply?"**
+   */
+  applyConfirm: string;
+  /**
+   *
+   *
+   * English: **"DAS value is invalid, was not changed!"**
+   */
+  invalidDAS: string;
+  /**
+   *
+   *
+   * English: **"Settings changed during the game. Replay invalidated."**
+   */
+  settingsChanged: string;
+  /**
+   *
+   *
+   * English: **"Segment"**
+   */
+  segment: string;
+  /**
+   *
+   *
+   * English: **"Duration"**
+   */
+  duration: string;
+  /**
+   *
+   *
+   * English: **"It seems the room is full."**
+   */
+  roomFull: string;
+  /**
+   *
+   *
+   * English: **"This chat is shared with {discord}."**
+   */
+  lobbyInfo: string;
+  /**
+   *
+   *
+   * English: **"You are now the host of this room."**
+   */
+  newHost: string;
+  /**
+   *
+   *
+   * English: **"This room no longer exists, joining the Default room!"**
+   */
+  badRoom: string;
+  /**
+   *
+   *
+   * English: **"Setting changed by the host"**
+   */
+  stngsChanged: string;
+  /**
+   *
+   *
+   * English: **"Custom settings"**
+   */
+  stngsCustom: string;
+  /**
+   *
+   *
+   * English: **"Already spectating!"**
+   */
+  aSpec: string;
+  /**
+   *
+   *
+   * English: **"Already playing!"**
+   */
+  aPlay: string;
+  /**
+   * Displays when replay either fails to save or user used `/replay`.
+   *
+   * English: **"Replay failed to save."**
+   */
+  repFail: string;
+  /**
+   * Displays when replay either fails to save or user used `/replay`.
+   *
+   * English: **"Replay file dumped into the chat. To preserve it, copy the text in the box and paste into your favourite text editor."**
+   */
+  repInChat: string;
+  /**
+   *
+   *
+   * English: **"The copied replayfile can be then played in the replayer or possibly resubmitted to the site."**
+   */
+  repTxtInfo: string;
+  /**
+   * Displays when a player achieves their new personal best score/time.
+   *
+   * English: **"YOUR NEW PERSONAL BEST"**
+   */
+  newPB: string;
+  /**
+   * Displays when a player finishes a mode for the first time.
+   *
+   * English: **"This was your first game. Get another PB to track the improvement."**
+   */
+  firstPB: string;
+  /**
+   * Displays when a player beats their previous personal best score/time.
+   *
+   * English: **"Your previous record was {prevPB} achieved {prevAgo}. The improvement is {PBdiff}."**
+   */
+  infoPB: string;
+  /**
+   * Specifies how long ago the PB was achieved.
+   *
+   * English: **"days ago"**
+   */
+  daysAgo: string;
+  /**
+   *
+   *
+   * English: **"THE RACE HAS FINISHED"**
+   */
+  raceFin: string;
+  /**
+   *
+   *
+   * English: **"You can complete the run, but the next round can start at any time."**
+   */
+  raceFinInfo: string;
+  /**
+   * Title of a message displayed when a line clear other than a T-spin Double was performed in 20TSD.
+   *
+   * English: **"NOT TSD"**
+   */
+  notTSD: string;
+  /**
+   * Description of a message displayed when a line clear other than a T-spin Double was performed in 20TSD.
+   *
+   * English: **"Only T-Spin Double is allowed"**
+   */
+  notTSDInfo: string;
+  /**
+   * Title of a message displayed when a 4-line Perfect Clear is not possible in PC Mode.
+   *
+   * English: **"NOT a PC"**
+   */
+  notPC: string;
+  /**
+   * Description of a message displayed when a 4-line Perfect Clear is not possible in PC Mode.
+   *
+   * English: **"Do a Perfect Clear every 10 blocks. Your board is not clearable."**
+   */
+  notPCInfo: string;
+  /**
+   * Title of a message the displays when the player performs a 4-wide in a room with NoFW enabled.
+   *
+   * English: **"FOUR WIDE"**
+   */
+  fwDetect: string;
+  /**
+   * Description of a message the displays when the player performs a 4-wide in a room with NoFW enabled.
+   *
+   * English: **"Attacking yourself!"**
+   */
+  fwDetectInfo: string;
+  /**
+   * 
+   *
+   * English: **"Oops!"**
+   */
+  oops: string;
+  /**
+   *
+   *
+   * English: **"Public chatting is not available for guests or users with less than {chReq} hours of gametime."**
+   */
+  chatNA: string;
+  /**
+   *
+   *
+   * English: **"Learn more"**
+   */
+  leMore: string;
+  /**
+   *
+   *
+   * English: **"The maximum amount of open connections for this IP is curently reached. If you need increased limits, contact us via Discord"**
+   */
+  connLimit: string;
+  /**
+   * 
+   *
+   * English: **"Disconnected for inactivity! Spectator section was full."**
+   */
+  idleDC: string;
+  /**
+   *
+   *
+   * English: **"Rate limit reached."**
+   */
+  RLreach: string;
+  /**
+   * Displays when the account's access to Live games is permanetly restricted.
+   *
+   * English: **"Your access to the Live games has been permanently restricted. You can still play singleplayer modes."**
+   */
+  ban1: string;
+  /**
+   * Displays when the account is banned.
+   *
+   * English: **"This user account is BANNED. Relogin to the website for more information."**
+   */
+  ban2: string;
+  /**
+   * Displays when the player fails to connect to the servers.
+   *
+   * English: **"Not connected to the game server, try {refr}."**
+   */
+  ncGS: string;
+  /**
+   * Suggests the user to refresh the page.
+   *
+   * English: **"refreshing the page"**
+   */
+  refr: string;
+  /**
+   * Displays when the player beats an unpublished map.
+   *
+   * English: **"Record not saved, the map is not published."**
+   */
+  nsUnpub: string;
+  /**
+   * Displays in chat when the player achieves no T-spin Doubles in 20TSD.
+   *
+   * English: **"Record not saved, not enough T-Spins."**
+   */
+  nsTspins: string;
+  /**
+   * Displays in chat when the player achieves less than 2 Perfect Clears in PC Mode.
+   *
+   * English: **"Record not saved, at least 2 Perfect Clears needed."**
+   */
+  nsLowPC: string;
+  /**
+   * Title of the message that displays in usermodes when a finite queue is depleted.
+   *
+   * English: **"Out of blocks"**
+   */
+  noBlocks: string;
+  /**
+   * Description of the message that displays in usermodes when a finite queue is depleted.
+   *
+   * English: **"All blocks were used"**
+   */
+  noBlocks2: string;
+  /**
+   *
+   *
+   * English: **"No players"**
+   */
+  noPlayers: string;
+  /**
+   *
+   *
+   * English: **"{cnt} more"**
+   */
+  cntMore: string;
+  /**
+   *
+   *
+   * English: **"{cnt} guests"**
+   */
+  cntGuests: string;
+  /**
+   *
+   *
+   * English: **"{cnt} spectating"**
+   */
+  cntSpec: string;
+  /**
+   *
+   *
+   * English: **"Join possible"**
+   */
+  joinPossible: string;
+  /**
+   *
+   *
+   * English: **"Not eligible"**
+   */
+  notEligible: string;
+  /**
+   *
+   *
+   * English: **"G.time"**
+   */
+  gTimeShort: string;
+  /**
+   *
+   *
+   * English: **"On"**
+   */
+  on: string;
+  /**
+   *
+   *
+   * English: **"Off"**
+   */
+  off: string;
+  /**
+   *
+   *
+   * English: **"Friends"**
+   */
+  fr: string;
+  /**
+   *
+   *
+   * English: **"Loading friend list"**
+   */
+  frLoad: string;
+  /**
+   *
+   *
+   * English: **"Log in first to use friend list"**
+   */
+  frLogin: string;
+  /**
+   *
+   *
+   * English: **"Friend list is empty"**
+   */
+  frEmpty: string;
+  /**
+   *
+   *
+   * English: **"Visit user's profile to send friend request."**
+   */
+  frHowAdd: string;
+  /**
+   *
+   *
+   * English: **"Private"**
+   */
+  frPriv: string;
+  /**
+   *
+   *
+   * English: **"Already in!"**
+   */
+  frIn: string;
+  /**
+   *
+   *
+   * English: **"Open chat"**
+   */
+  frChat: string;
+  /**
+   *
+   *
+   * English: **"Reload"**
+   */
+  frRel: string;
+  /**
+   *
+   *
+   * English: **"Message to {name}"**
+   */
+  frMsgTo: string;
+  /**
+   *
+   *
+   * English: **"Send room invite"**
+   */
+  frInv: string;
+  /**
+   *
+   *
+   * English: **"Invite to join {room}"**
+   */
+  frInvTo: string;
+  /**
+   *
+   *
+   * English: **"You are already in!"**
+   */
+  frInvIn: string;
+  /**
+   *
+   *
+   * English: **"by {user}"**
+   */
+  frInvBy: string;
+  /**
+   *
+   *
+   * English: **"ONLINE"**
+   */
+  frOn: string;
+  /**
+   *
+   *
+   * English: **"OFFLINE"**
+   */
+  frOff: string;
+  /**
+   *
+   *
+   * English: **"This is the beginning of chat history with {name}."**
+   */
+  frNewChatH: string;
+  /**
+   *
+   *
+   * English: **"Welcome to the Friends tab"**
+   */
+  frWelc: string;
+  /**
+   *
+   *
+   * English: **"In this area you can access a list of online friends, private chats, and room invites"**
+   */
+  frIntro: string;
+  /**
+   *
+   *
+   * English: **"To send a friend request, visit a user's profile"**
+   */
+  frIntro2: string;
+  /**
+   *
+   *
+   * English: **"To manage friends, visit the {frPage}"**
+   */
+  frIntro3: string;
+  /**
+   *
+   *
+   * English: **"Friends page"**
+   */
+  frPage: string;
+  /**
+   *
+   *
+   * English: **"Close intro"**
+   */
+  frIntroCl: string;
+  /**
+   *
+   *
+   * English: **"PPS"**
+   */
+  PPS: string;
+  /**
+   *
+   *
+   * English: **"APM"**
+   */
+  APM: string;
+  /**
+   *
+   *
+   * English: **"KPP"**
+   */
+  KPP: string;
+  /**
+   *
+   *
+   * English: **"Score"**
+   */
+  score: string;
+  /**
+   *
+   *
+   * English: **"Time"**
+   */
+  roundTime: string;
+  /**
+   *
+   *
+   * English: **"Apply changes"**
+   */
+  applyCh: string;
+  /**
+   *
+   *
+   * English: **"Create"**
+   */
+  create: string;
+  /**
+   *
+   *
+   * English: **"Sprint"**
+   */
+  sprint: string;
+  /**
+   *
+   *
+   * English: **"s"**
+   */
+  s: string;
+  /**
+   *
+   *
+   * English: **"hrs"**
+   */
+  hrs: string;
+  /**
+   *
+   *
+   * English: **"Show more"**
+   */
+  showMore: string;
+  /**
+   *
+   *
+   * English: **"Show less"**
+   */
+  showLess: string;
+  /**
+   *
+   *
+   * English: **"Cheese race"**
+   */
+  cheese: string;
+  /**
+   *
+   *
+   * English: **"Survival"**
+   */
+  survival: string;
+  /**
+   *
+   *
+   * English: **"Ultra"**
+   */
+  ultra: string;
+  /**
+   *
+   *
+   * English: **"Free play"**
+   */
+  freePlay: string;
+  /**
+   *
+   *
+   * English: **"20TSD"**
+   */
+  "20TSD": string;
+  /**
+   *
+   *
+   * English: **"PC Mode"**
+   */
+  PCmode: string;
+  /**
+   *
+   *
+   * English: **"Close"**
+   */
+  close: string;
+  /**
+   *
+   *
+   * English: **"Report user"**
+   */
+  reportU: string;
+  /**
+   *
+   *
+   * English: **"User"**
+   */
+  user: string;
+  /**
+   *
+   *
+   * English: **"Reason"**
+   */
+  reason: string;
+  /**
+   *
+   *
+   * English: **"Spam or unwanted advertising"**
+   */
+  rr0: string;
+  /**
+   *
+   *
+   * English: **"Sexually explicit content"**
+   */
+  rr1: string;
+  /**
+   *
+   *
+   * English: **"Hate speech"**
+   */
+  rr2: string;
+  /**
+   *
+   *
+   * English: **"Harassment or bullying"**
+   */
+  rr3: string;
+  /**
+   *
+   *
+   * English: **"Other (specify)"**
+   */
+  rr4: string;
+  /**
+   *
+   *
+   * English: **"Send report"**
+   */
+  sendReport: string;
+};
+
+/** Specifies translatable strings throughout the game. */
+declare var i18n: I18n;
+
 /**
  * Formats time into minutes, seconds and optionally partial seconds.
  * @param timeSec Time in seconds.
@@ -1786,7 +2914,7 @@ declare type PlayerDetails = {
   icn?: number;
   /** Player role and icon. */
   type?: number;
-}[]
+}[];
 
 declare type RoomFurtherDetails = {
   /** */
@@ -2367,18 +3495,18 @@ declare class Replayer {}
 declare class RoomInfo {
   constructor(live: Live);
   l: Live;
-  roomDetailBox: number | null
-  timeoutRequestDetail:  number | null
-  timeoutRoomDetail: number | null
+  roomDetailBox: number | null;
+  timeoutRequestDetail: number | null;
+  timeoutRoomDetail: number | null;
   rdParts: {
-    "detail": HTMLDivElement,
-    "title": HTMLDivElement,
-    "spinner": HTMLDivElement,
-    "content": HTMLDivElement,
-    "settings": HTMLDivElement,
-    "settingsTitle": HTMLDivElement,
-    "settingsContent": HTMLDivElement,
-    "limit": HTMLDivElement
+    detail: HTMLDivElement;
+    title: HTMLDivElement;
+    spinner: HTMLDivElement;
+    content: HTMLDivElement;
+    settings: HTMLDivElement;
+    settingsTitle: HTMLDivElement;
+    settingsContent: HTMLDivElement;
+    limit: HTMLDivElement;
   };
   roomDetails: {
     [roomID: string]: RoomDetails2;
@@ -2388,141 +3516,141 @@ declare class RoomInfo {
   /** Short config names. */
   readonly CONF_NAMES: {
     /** Attack Table */
-    at: "Attack table",
+    at: "Attack table";
     /** Combo Table */
-    ct: "Combo table",
+    ct: "Combo table";
     /** Lock Delay */
-    ld: "Lock delay",
+    ld: "Lock delay";
     /** Clear Delay (ms) */
     cd: {
       /** Config name. */
-      n: "Clear delay",
+      n: "Clear delay";
       /** Config unit. */
-      u: "ms",
-    },
+      u: "ms";
+    };
     /** Delayed Auto Shift (ms) */
     DAS: {
       /** Config name. */
-      n: "DAS",
+      n: "DAS";
       /** Config unit. */
-      u: "ms",
-    },
+      u: "ms";
+    };
     /** Auto Repeat Rate (ms). */
     ARR: {
       /** Config name. */
-      n: "ARR",
+      n: "ARR";
       /** Config unit. */
-      u: "ms",
-    },
+      u: "ms";
+    };
     /** Garbage distribution method. */
     gdm: {
       /** Config name. */
-      n: "G-distrib.",
+      n: "G-distrib.";
       /** Config values. */
-      v: [null, "divide", "toAll", null, "toMost", "toSelf", "random", "roulette"],
-    },
+      v: [null, "divide", "toAll", null, "toMost", "toSelf", "random", "roulette"];
+    };
     /** Garbage blocking method. */
     gblock: {
       /** Config name. */
-      n: "G-blocking",
+      n: "G-blocking";
       /** Config values. */
-      v: ["full", "limited", "none", "instant"],
-    },
+      v: ["full", "limited", "none", "instant"];
+    };
     /** Randomizer. */
     rnd: {
       /** Config name. */
-      n: "Randomizer",
+      n: "Randomizer";
       /** Config values. */
-      v: ["7bag", "14bag", "Classic", "1Block", "2Block", "1x7bag", "1x14bag", "C2Sim", "7b-RR", "BSb-7b", "BB-7b"],
-    },
+      v: ["7bag", "14bag", "Classic", "1Block", "2Block", "1x7bag", "1x14bag", "C2Sim", "7b-RR", "BSb-7b", "BB-7b"];
+    };
     /** Amount of previews. */
-    pr: "Previews",
+    pr: "Previews";
     /** Hold. */
-    hold: "Hold",
+    hold: "Hold";
     /** Piece set. */
     bbs: {
       /** Config name. */
-      n: "Blocks",
+      n: "Blocks";
       /** Config values. */
-      v: [null, "Big", "Big+", "ARS", "Penta", "M123", "All29", "C2RS", "OSpin"],
-    },
+      v: [null, "Big", "Big+", "ARS", "Penta", "M123", "All29", "C2RS", "OSpin"];
+    };
     /** Gravity level. */
-    grav: "Gravity",
+    grav: "Gravity";
     /** Garbage messiness. */
     mess: {
       /** Config name. */
-      n: "Messiness",
+      n: "Messiness";
       /** Config unit. */
-      u: "%",
-    },
+      u: "%";
+    };
     /** Garbage delay. */
     gDelay: {
       /** Config name. */
-      n: "G-delay",
+      n: "G-delay";
       /** Config unit. */
-      u: "ms",
-    },
+      u: "ms";
+    };
     /** HostStart. */
-    hostStart: "HostStart",
+    hostStart: "HostStart";
     /** Invert garbage. */
-    gInv: "G-invert",
+    gInv: "G-invert";
     /** Garbage hole width. */
-    gapW: "G-gap",
+    gapW: "G-gap";
     /** No 4-wide. */
-    noFW: "noFW",
+    noFW: "noFW";
     /** Ghost piece. */
     ghost: {
       /** Config name. */
-      n: "Ghost",
+      n: "Ghost";
       /** Config values. */
       v: {
-        "-1": "Def",
-        0: "Off",
-        1: "On",
-      },
-    },
+        "-1": "Def";
+        0: "Off";
+        1: "On";
+      };
+    };
     /** Attack as solid. */
-    sa: "SolidAtk",
+    sa: "SolidAtk";
     /** All-spin. */
     as: {
       /** Config name. */
-      n: "AllSpin",
+      n: "AllSpin";
       /** Config values. */
-      v: ["Off", "On - Im.", "On - 4P"],
-    },
+      v: ["Off", "On - Im.", "On - 4P"];
+    };
     /** All-spin exclusion list. */
-    asEx: "AS-Excl.",
+    asEx: "AS-Excl.";
     /** Solid garbage profile. */
     sgp: {
       /** Config name. */
-      n: "Solid",
+      n: "Solid";
       /** Config values. */
-      v: ["0", "1", "2", "Custom speed"],
-    },
+      v: ["0", "1", "2", "Custom speed"];
+    };
   };
   /** Limit names and units. */
   readonly LIMIT_NAMES: {
     /** APM. */
     apm: {
       /** Name. */
-      n: "APM",
+      n: "APM";
       /** Unit. */
-      u: "",
-    },
+      u: "";
+    };
     /** Sprint 40L time. */
     sub: {
       /** Name. */
-      n: "Sprint 40L",
+      n: "Sprint 40L";
       /** Unit. */
-      u: "s",
-    },
+      u: "s";
+    };
     /** Total Live playtime. */
     gt: {
       /** Name. */
-      n: "Gametime",
+      n: "Gametime";
       /** Unit. */
-      u: "hrs",
-    },
+      u: "hrs";
+    };
   };
 }
 
