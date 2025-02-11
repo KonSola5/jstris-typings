@@ -1,8 +1,10 @@
-declare type AleaPRNG = () => number;
+declare interface AleaPRNG {
+  (): number;
+}
 /** @deprecated Jstris should use {@link KeyboardEvent.code() keyboard codes} instead. Come on, we are in 2025. */
 declare type KeyCode = number;
 
-declare type ReplayResponse = {
+declare interface ReplayResponse {
   /** The replay ID. */
   id: number;
   /** The game mode played. */
@@ -17,9 +19,9 @@ declare type ReplayResponse = {
   rep: true;
   /** Contains personal best info if a PB has been achieved, `true` if that was the first game, `false` if no PB was achieved. */
   pb: PersonalBestInfo | boolean;
-};
+}
 
-declare type PersonalBestInfo = {
+declare interface PersonalBestInfo {
   /** The new best score/time. */
   new: number;
   /** The previous best score/time. */
@@ -32,12 +34,14 @@ declare type PersonalBestInfo = {
   diffS: number;
   /** How long ago the previous PB was achieved. */
   days: number;
-};
+}
 
 /**
  * Specifies options for GIF/video skins.
  */
-declare type VideoOptions = {
+declare interface VideoOptions {
+  /** Makes the skin video visible. */
+  debug?: boolean;
   /**
    * **GIF skins**: Turns a single GIF into a complete skin by replicating the GIF 9 times over.
    *
@@ -58,9 +62,9 @@ declare type VideoOptions = {
    * Defaults to `false` if not provided.
    */
   sound?: boolean;
-};
+}
 
-declare type GameData = {
+declare interface GameData {
   lines: number;
   singles: number;
   doubles: number;
@@ -81,7 +85,7 @@ declare type GameData = {
   wasted: number;
   tpieces: number;
   tspins: number;
-};
+}
 
 declare type Controls = [
   moveLeft: KeyCode,
@@ -96,7 +100,202 @@ declare type Controls = [
   restartLive: KeyCode
 ];
 
-declare type I18n = {
+declare interface GLContextDefinition {
+  elem: HTMLCanvasElement;
+  mesh: {
+    w: number;
+    h: number;
+  };
+  gl: WebGLRenderingContext;
+  globalAlpha: WebGLUniformLocation;
+  m4: Float32Array;
+  matrixLocation: WebGLUniformLocation;
+  positionBuffer: WebGLBuffer;
+  positionLocation: number;
+  program: WebGLProgram;
+  textcoordBuffer: WebGLBuffer;
+  texcoordLocation: 1;
+  textureMatrixLocation: WebGLUniformLocation;
+  textureInfos: {
+    width: number;
+    height: number;
+    texture: WebGLTexture;
+  };
+  boundBuffers: boolean;
+  boundTexture: WebGLTexture | null;
+}
+
+
+interface Servers {
+  [serverID: string]: {
+    /** The server's URL. */
+    h: string;
+    /** The server's name. */
+    n: string;
+    /** The server's port. */
+    p: string;
+    /** The server scheme. */
+    s: string;
+  };
+}
+
+interface Clients {
+  [cid: number]: Client;
+}
+
+declare interface Client {
+  /** Whether the user is registered or not. (?) */
+  auth: boolean;
+  /** The client's CID. */
+  cid: number;
+  /** Nickname color, if set. */
+  color: string | null;
+  /** Openmoji Supporter icon (applied only when `type` is `999`). */
+  icon: string | null;
+  /** Whether the user is a moderator. Potentially only `true` when the player is a moderator. */
+  mod: boolean;
+  /** The client's nickname. */
+  name: string;
+  /** The replay played live, or `null` if the player is not playing. */
+  rep: Replayer | null;
+  /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
+  type: number;
+};
+
+declare interface LobbyList {
+  /** Standard rooms. */
+  s: object[];
+  /** Custom rooms. */
+  c: object[];
+  /** Overflow rooms. */
+  o: object[];
+  /** Guest rooms. */
+  g: object[];
+  /** Spectate only rooms. */
+  l: object[];
+  /** Unknown. Private rooms maybe? */
+  p: object[];
+};
+
+declare interface Limits {
+  /** 10-game APM minimum and maximum */
+  apm?: [min: number | null, max: number | null];
+  /** Live gametime (in hours) minimum and maximum */
+  gt?: [min: number | null, max: number | null];
+  /** Sprint 40L PB minimum and maximum */
+  sub?: [min: number | null, max: number | null];
+};
+
+declare interface RoomDetails {
+  /** Player count. */
+  c: number;
+  /** */
+  s: number;
+  /** Room ID. */
+  id: string;
+  /** Room name. */
+  n: string;
+  /** Room mode (modes not starting with "Live"). */
+  mo: number;
+  /** Room mode (modes starting with "Live"). */
+  pm: number;
+  /** Lifetime games played. */
+  g: number;
+  /** Room speed limit (in PPS) - `0` if no speed limit is set. */
+  sl: number;
+  /** Maximum number of users in a room - `24` or more is treated as no limit. */
+  m: number;
+  /** Waiting, perhaps? */
+  w?: number;
+  /** */
+  d: {
+    /** The server the given room is on. */
+    s: string;
+    /** Restrictions that prevent certain users from joining */
+    lock?: Limits;
+  };
+  det: RoomFurtherDetails;
+  /** */
+  tr?: number;
+  /** Whether the room is locked or not. */
+  l?: number;
+};
+
+declare interface RoomDetails2 {
+  /** Information about room join limits. */
+  l?: {
+    /** Whether the player is eligible to play in the room. */
+    r?: boolean;
+    /** Limits imposed on the room. */
+    l?: Limits;
+    /** Player's current stats. */
+    s?: {
+      /** The player's 10-game APM average. */
+      apm: number;
+      /** The player's total Live playtime. */
+      gt: number;
+      /** The player's 40L Sprint PB. */
+      sub: number;
+    };
+  };
+  /** Information about players in the room. */
+  p: {
+    /** Current amount of registered players in the room. */
+    c: number;
+    /** Current amount of guests in the room. */
+    g: number;
+    /** More detailed information about players in the room. */
+    p: PlayerDetails;
+    /** Current amount of spectators in the room. */
+    s: number;
+  };
+  /** Room ID. */
+  r: string;
+  /** Settings modified from defaults. */
+  s: RoomConfig;
+  /** Max amount allowed? */
+  t: number;
+};
+
+declare interface PlayerDetails {
+  /** The player's nickname. */
+  n: string;
+  /** The player's color, if set in Supporter settings. */
+  col?: string;
+  /** The player's Supporter tier. */
+  ti?: number;
+  /** The player's icon set as Supporter. */
+  icn?: number;
+  /** Player role and icon. */
+  type?: number;
+}[];
+
+declare interface RoomFurtherDetails {
+  /** */
+  p: {
+    /** */
+    c: number;
+    /** */
+    p: {
+      /** Player nickname */
+      n: string;
+      /** Player role and icon */
+      type?: number;
+      /** */
+      ti?: number;
+    };
+    /** */
+    g: number;
+    /** Room config */
+    s: RoomConfig;
+    l: null;
+  };
+};
+// TODO
+declare type ResultsList = object;
+declare type TeamResultsList = object;
+
+declare interface I18n {
   /**
    * Displayed during the "Ready" state of "Ready? Go!" sequence.
    *
@@ -254,7 +453,7 @@ declare type I18n = {
    */
   inactive2: string;
   /**
-   * 
+   *
    *
    * English: **"Type your username to be able to chat!"**
    */
@@ -272,7 +471,7 @@ declare type I18n = {
    */
   sendButton: string;
   /**
-   * 
+   *
    *
    * English: **"Room name must be filled!"**
    */
@@ -373,7 +572,7 @@ declare type I18n = {
    * English: **"You have an old version, use CTRL+F5 to reload to the new version!"**
    */
   oldVer: string;
-  /** 
+  /**
    * Alternative description of a warning about old version of Jstris.
    *
    * English: **"You still have the old version! Use {key} to reload your client"**
@@ -386,7 +585,7 @@ declare type I18n = {
    */
   privateRoom: string;
   /**
-   * 
+   *
    *
    * English: **"Restart by F4 or set a custom key."**
    */
@@ -482,7 +681,7 @@ declare type I18n = {
    */
   leaderboard: string;
   /**
-   * 
+   *
    *
    * English: **"WARNING"**
    */
@@ -770,7 +969,7 @@ declare type I18n = {
    */
   fwDetectInfo: string;
   /**
-   * 
+   *
    *
    * English: **"Oops!"**
    */
@@ -794,7 +993,7 @@ declare type I18n = {
    */
   connLimit: string;
   /**
-   * 
+   *
    *
    * English: **"Disconnected for inactivity! Spectator section was full."**
    */
@@ -1219,7 +1418,71 @@ declare type I18n = {
    * English: **"Send report"**
    */
   sendReport: string;
-};
+}
+
+declare type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
+
+declare interface Ruleset {
+  clearDelay: number;
+  rnd: number;
+  showPreviews: number;
+  holdEnabled: boolean;
+  baseBlockSet: number;
+  gravityLvl: number;
+  lockDelay: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
+  mess: number;
+  gapW: number;
+  gInv: boolean;
+  gDelay: number;
+  gblock: number;
+  tsdOnly: boolean;
+  allSpin: number;
+  speedLimit: number;
+  scoreMult: number;
+  ghost: number;
+  DAS: number;
+  ARR: number;
+  clearLines: boolean;
+  sfx: boolean;
+  vsfx: boolean;
+  solidAttack: boolean;
+  ext: number;
+  sgProfile: number[];
+}
+
+declare interface RoomConfig {
+  t?: number;
+  p?: boolean;
+  n?: string;
+  pl?: number;
+  m?: number;
+  at?: number[];
+  ct?: number[];
+  gdm?: number;
+  gblock?: number;
+  rnd?: number;
+  bset?: number;
+  pr?: number;
+  gDelay?: number;
+  mess?: number;
+  gapW?: number;
+  sg?: number;
+  hold?: boolean;
+  hostStart?: boolean;
+  noFW?: boolean;
+  sa?: boolean;
+  gInv?: boolean;
+  as?: number;
+  ghost?: number;
+  srv?: string;
+  cd?: number;
+  DAS?: number;
+  ARR?: number;
+  sl?: number;
+  grav?: number;
+  ld?: [number, number, number];
+  sgpA?: number[];
+}
 
 /** Specifies translatable strings throughout the game. */
 declare var i18n: I18n;
@@ -1652,7 +1915,11 @@ declare class Game extends GameCore {
   changeSFX(sfx: SFXsets | VSFXsets, useVoice: 0 | 1): void;
   loadSounds(sfx: SFXsets | VSFXsets, prefix: string): void;
   drawGrid(mode: number): void;
-  isPmode(doInvert: boolean): number;
+  /**
+   * Returns the currently played game mode.
+   * @param isLive Seems to toggle the check for live race game mode.
+   */
+  isPmode(isLive: boolean): number;
   // ? A parameter is not known.
   startPractice(
     mode: number,
@@ -1770,70 +2037,6 @@ declare class Game extends GameCore {
   setSpeedLimit(PPSlimit: number): void;
   setupGameLinks(): void;
 }
-
-declare type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
-
-declare interface Ruleset {
-  clearDelay: number;
-  rnd: number;
-  showPreviews: number;
-  holdEnabled: boolean;
-  baseBlockSet: number;
-  gravityLvl: number;
-  lockDelay: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
-  mess: number;
-  gapW: number;
-  gInv: boolean;
-  gDelay: number;
-  gblock: number;
-  tsdOnly: boolean;
-  allSpin: number;
-  speedLimit: number;
-  scoreMult: number;
-  ghost: number;
-  DAS: number;
-  ARR: number;
-  clearLines: boolean;
-  sfx: boolean;
-  vsfx: boolean;
-  solidAttack: boolean;
-  ext: number;
-  sgProfile: number[];
-}
-
-declare type RoomConfig = {
-  t?: number;
-  p?: boolean;
-  n?: string;
-  pl?: number;
-  m?: number;
-  at?: number[];
-  ct?: number[];
-  gdm?: number;
-  gblock?: number;
-  rnd?: number;
-  bset?: number;
-  pr?: number;
-  gDelay?: number;
-  mess?: number;
-  gapW?: number;
-  sg?: number;
-  hold?: boolean;
-  hostStart?: boolean;
-  noFW?: boolean;
-  sa?: boolean;
-  gInv?: boolean;
-  as?: number;
-  ghost?: number;
-  srv?: string;
-  cd?: number;
-  DAS?: number;
-  ARR?: number;
-  sl?: number;
-  grav?: number;
-  ld?: [number, number, number];
-  sgpA?: number[];
-};
 
 declare class GameCore {
   constructor(isGame: boolean);
@@ -2220,48 +2423,6 @@ declare class SlotView {
   printSlotKO(): void;
   afterRedraw(): void;
 }
-
-declare type GLContextDefinition = {
-  elem: HTMLCanvasElement;
-  mesh: {
-    w: number;
-    h: number;
-  };
-  gl: WebGLRenderingContext;
-  globalAlpha: WebGLUniformLocation;
-  m4: Float32Array;
-  matrixLocation: WebGLUniformLocation;
-  positionBuffer: WebGLBuffer;
-  positionLocation: number;
-  program: WebGLProgram;
-  textcoordBuffer: WebGLBuffer;
-  texcoordLocation: 1;
-  textureMatrixLocation: WebGLUniformLocation;
-  textureInfos: {
-    width: number;
-    height: number;
-    texture: WebGLTexture;
-  };
-  boundBuffers: boolean;
-  boundTexture: WebGLTexture | null;
-};
-
-/**
- * Options used for the video skin.
- * All options are optional.
- */
-declare type VideoOptions = {
-  /** Specifies whether the skin video is muted or not. */
-  sound?: boolean;
-  /** Makes the skin video visible. */
-  debug?: boolean;
-  /** Turns a video into a fully-fledged skin. */
-  skinify?: boolean;
-  /** Whether the video will be tinted to match guideline block colors or not. */
-  colorize?: boolean;
-  /** Specifies the intensity of video tint. */
-  colorAlpha?: number;
-};
 
 declare class WebGLView {
   constructor(game: Game);
@@ -2771,175 +2932,6 @@ declare class GameCaption {
   liveRaceFinished(): void;
   gameWarning(warningTitle: string, warningDescription?: string, options?: { fade_after?: number }): void;
 }
-
-interface Servers {
-  [serverID: string]: {
-    /** The server's URL. */
-    h: string;
-    /** The server's name. */
-    n: string;
-    /** The server's port. */
-    p: string;
-    /** The server scheme. */
-    s: string;
-  };
-}
-
-interface Clients {
-  [cid: number]: Client;
-}
-
-declare type Client = {
-  /** Whether the user is registered or not. (?) */
-  auth: boolean;
-  /** The client's CID. */
-  cid: number;
-  /** Nickname color, if set. */
-  color: string | null;
-  /** Openmoji Supporter icon (applied only when `type` is `999`). */
-  icon: string | null;
-  /** Whether the user is a moderator. Potentially only `true` when the player is a moderator. */
-  mod: boolean;
-  /** The client's nickname. */
-  name: string;
-  /** The replay played live, or `null` if the player is not playing. */
-  rep: Replayer | null;
-  /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
-  type: number;
-};
-
-declare type LobbyList = {
-  /** Standard rooms. */
-  s: object[];
-  /** Custom rooms. */
-  c: object[];
-  /** Overflow rooms. */
-  o: object[];
-  /** Guest rooms. */
-  g: object[];
-  /** Spectate only rooms. */
-  l: object[];
-  /** Unknown. Private rooms maybe? */
-  p: object[];
-};
-
-declare type Limits = {
-  /** 10-game APM minimum and maximum */
-  apm?: [min: number | null, max: number | null];
-  /** Live gametime (in hours) minimum and maximum */
-  gt?: [min: number | null, max: number | null];
-  /** Sprint 40L PB minimum and maximum */
-  sub?: [min: number | null, max: number | null];
-};
-
-declare type RoomDetails = {
-  /** Player count. */
-  c: number;
-  /** */
-  s: number;
-  /** Room ID. */
-  id: string;
-  /** Room name. */
-  n: string;
-  /** Room mode (modes not starting with "Live"). */
-  mo: number;
-  /** Room mode (modes starting with "Live"). */
-  pm: number;
-  /** Lifetime games played. */
-  g: number;
-  /** Room speed limit (in PPS) - `0` if no speed limit is set. */
-  sl: number;
-  /** Maximum number of users in a room - `24` or more is treated as no limit. */
-  m: number;
-  /** Waiting, perhaps? */
-  w?: number;
-  /** */
-  d: {
-    /** The server the given room is on. */
-    s: string;
-    /** Restrictions that prevent certain users from joining */
-    lock?: Limits;
-  };
-  det: RoomFurtherDetails;
-  /** */
-  tr?: number;
-  /** Whether the room is locked or not. */
-  l?: number;
-};
-
-declare type RoomDetails2 = {
-  /** Information about room join limits. */
-  l?: {
-    /** Whether the player is eligible to play in the room. */
-    r?: boolean;
-    /** Limits imposed on the room. */
-    l?: Limits;
-    /** Player's current stats. */
-    s?: {
-      /** The player's 10-game APM average. */
-      apm: number;
-      /** The player's total Live playtime. */
-      gt: number;
-      /** The player's 40L Sprint PB. */
-      sub: number;
-    };
-  };
-  /** Information about players in the room. */
-  p: {
-    /** Current amount of registered players in the room. */
-    c: number;
-    /** Current amount of guests in the room. */
-    g: number;
-    /** More detailed information about players in the room. */
-    p: PlayerDetails;
-    /** Current amount of spectators in the room. */
-    s: number;
-  };
-  /** Room ID. */
-  r: string;
-  /** Settings modified from defaults. */
-  s: RoomConfig;
-  /** Max amount allowed? */
-  t: number;
-};
-
-declare type PlayerDetails = {
-  /** The player's nickname. */
-  n: string;
-  /** The player's color, if set in Supporter settings. */
-  col?: string;
-  /** The player's Supporter tier. */
-  ti?: number;
-  /** The player's icon set as Supporter. */
-  icn?: number;
-  /** Player role and icon. */
-  type?: number;
-}[];
-
-declare type RoomFurtherDetails = {
-  /** */
-  p: {
-    /** */
-    c: number;
-    /** */
-    p: {
-      /** Player nickname */
-      n: string;
-      /** Player role and icon */
-      type?: number;
-      /** */
-      ti?: number;
-    };
-    /** */
-    g: number;
-    /** Room config */
-    s: RoomConfig;
-    l: null;
-  };
-};
-// TODO
-declare type ResultsList = object;
-declare type TeamResultsList = object;
 
 declare class Live {
   constructor(game: Game);
