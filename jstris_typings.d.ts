@@ -125,7 +125,6 @@ declare interface GLContextDefinition {
   boundTexture: WebGLTexture | null;
 }
 
-
 interface Servers {
   [serverID: string]: {
     /** The server's URL. */
@@ -160,7 +159,7 @@ declare interface Client {
   rep: Replayer | null;
   /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
   type: number;
-};
+}
 
 declare interface LobbyList {
   /** Standard rooms. */
@@ -175,7 +174,7 @@ declare interface LobbyList {
   l: object[];
   /** Unknown. Private rooms maybe? */
   p: object[];
-};
+}
 
 declare interface Limits {
   /** 10-game APM minimum and maximum */
@@ -184,7 +183,7 @@ declare interface Limits {
   gt?: [min: number | null, max: number | null];
   /** Sprint 40L PB minimum and maximum */
   sub?: [min: number | null, max: number | null];
-};
+}
 
 declare interface RoomDetails {
   /** Player count. */
@@ -219,7 +218,7 @@ declare interface RoomDetails {
   tr?: number;
   /** Whether the room is locked or not. */
   l?: number;
-};
+}
 
 declare interface RoomDetails2 {
   /** Information about room join limits. */
@@ -255,9 +254,9 @@ declare interface RoomDetails2 {
   s: RoomConfig;
   /** Max amount allowed? */
   t: number;
-};
+}
 
-declare interface PlayerDetails {
+declare type PlayerDetails = {
   /** The player's nickname. */
   n: string;
   /** The player's color, if set in Supporter settings. */
@@ -290,7 +289,7 @@ declare interface RoomFurtherDetails {
     s: RoomConfig;
     l: null;
   };
-};
+}
 // TODO
 declare type ResultsList = object;
 declare type TeamResultsList = object;
@@ -1485,7 +1484,7 @@ declare interface RoomConfig {
 }
 
 /** Specifies translatable strings throughout the game. */
-declare var i18n: I18n;
+declare const i18n: I18n;
 
 /**
  * Formats time into minutes, seconds and optionally partial seconds.
@@ -1510,7 +1509,7 @@ declare function getParameterByName(parameterName: string): string;
  * @param value The value to find.
  * @returns The found key.
  */
-declare function getKeyByValue(object: object, value: any): any;
+declare function getKeyByValue<T>(object: object, value: T): keyof typeof object;
 
 /**
  * Turns a byte array into a Base64-encoded string.
@@ -1538,7 +1537,7 @@ declare function objSize(object: object): number;
  * @param object The object to copy (or any value).
  * @returns Shallow copy of an object, if object has been provided, the input parameter otherwise.
  */
-declare function objCopy(object: object | any): object | any;
+declare function objCopy(object: object): object;
 
 /**
  * Determines whether an array includes a certain element.
@@ -1547,7 +1546,7 @@ declare function objCopy(object: object | any): object | any;
  * @param value The value to search for.
  * @returns `true` if the given value is in the array, `false` otherwise.
  */
-declare function arrayContains(array: any[], value: any): boolean;
+declare function arrayContains<T>(array: T[], value: T): boolean;
 
 /**
  * Turns a hex-formatted RGB value into individual RGB values.
@@ -1562,7 +1561,7 @@ declare function hexToRgb(rgbHex: string, divisor?: number): [red: number, green
  * @param array The array to strip all duplicate elements from.
  * @returns The array with every value unique.
  */
-declare function arrayUnique(array: any[]): any[];
+declare function arrayUnique<T>(array: T[]): T[];
 
 /**
  * Creates a shallow copy of a 2D matrix.
@@ -2259,8 +2258,8 @@ declare class C2Sim {
 
 declare class Repeated {
   constructor(bag: Bag, n: number);
-  nextSegment(unusedParameter?: any): void;
-  getBlock(unusedParameter?: any): Block;
+  nextSegment(unusedParameter?: unknown): void;
+  getBlock(unusedParameter?: unknown): Block;
 }
 
 declare class BsBlock {
@@ -2404,7 +2403,7 @@ declare class SlotView {
   onReady(): void;
   onRestart(): void;
   onBlockHold(): void;
-  onBlockMove(unusedParameter?: any): void;
+  onBlockMove(unusedParameter?: unknown): void;
   /** Empty function. */
   onFinesseChange(): void;
   onGameOver(): void;
@@ -2543,7 +2542,7 @@ declare class GameSlots {
   isFullscreen: boolean;
   forceExtended: boolean;
   slotStats: boolean;
-  cidSlots: {};
+  cidSlots: object;
   nameFontSize: number;
   nameHeight: number;
   redBarWidth: number;
@@ -2737,7 +2736,7 @@ declare class RulesetManager {
     /** The mode description. */
     desc: string;
     /** Extra rules applied to the ruleset. Keys used here are from `PRESET_KEYS` property. */
-    c: {};
+    c: object;
   }[];
   readonly MODES: {
     id: number;
@@ -2969,7 +2968,7 @@ declare class Live {
   /** Array of CIDs of players. */
   players: number[];
   /** Unkown - this is empty even in a bot match. */
-  bots: any[];
+  bots: unknown[];
   /** Array of CIDs of **registered** players. */
   authList: number[];
   places: {
@@ -3236,7 +3235,7 @@ declare class Replay {
   md5: string;
   mode: number;
   isAfkMode: boolean;
-  afkQueue: any[];
+  afkQueue: unknown[];
   stream: ReplayStream;
   /** Bound to {@link Live.onReplaySaved | `Live.onReplaySaved(replayResponse)`} with `this` object being the `Live` instance. */
   onSaved: (replayResponse: ReplayResponse) => void | null;
@@ -3302,7 +3301,7 @@ declare class MapManager {
   mapFetchError(message: string): void;
   parseMatrix(matrixBase64: string): void;
   lineCleared(row: number): void;
-  getLowestMapLine(unusedParameter?: any): void;
+  getLowestMapLine(unusedParameter?: unknown): void;
   parseMapData(): void;
   loadMap(): void;
   prepare(mapID?: number): void;
@@ -3327,7 +3326,7 @@ declare class ModeManager {
   components: object;
   vars: object;
   eventTriggers: object;
-  timeTriggers: any[];
+  timeTriggers: unknown[];
   initTrigger: ModeTrigger;
   initTriggerFirst: ModeTrigger;
   afterTrigger: ModeTrigger;
@@ -3340,7 +3339,7 @@ declare class ModeManager {
   noQueueRefill: boolean;
   skinWasChanged: boolean;
   lastAttackGarbageColumn: number;
-  mathEvaluate: (expression: string | string[]) => any | null;
+  mathEvaluate: (expression: string | string[]) => unknown | null;
   readonly FINISH_STANDARD: 0;
   readonly FINISH_BY_PC: 1;
   readonly STATE_NEW: 0;
@@ -3653,3 +3652,5 @@ declare class Friends {}
 declare class EmoteSelect {}
 
 declare class ModeTrigger {}
+
+declare class ReplayController {}
