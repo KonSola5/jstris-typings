@@ -3481,7 +3481,44 @@ declare class ModeManager {
   isClearMatrix(): boolean;
 }
 
-declare class StatsManager {}
+declare class StatsManager {
+  stats: { [statName: string]: StatLine };
+  ordered: StatLine[];
+  dirty: boolean;
+  labelsElem: HTMLDivElement;
+  shown: number;
+
+  setView(view: WebGLView | Ctx2DView): void;
+  adjustToGameMode(): void;
+  initDefault(unusedParameter: unknown): void;
+  applyShownStats(shown: number): void;
+  get(stat: string): StatLine;
+  render(): void;
+  addStat(statLine: StatLine, shouldReorder: boolean): void;
+  reorder(): void;
+  resetAll(): void;
+}
+
+declare class StatLine {
+  id: string;
+  order: number;
+  manager: StatsManager;
+  enabled: boolean;
+  label: HTMLSpanElement;
+  initialVal: "0";
+  value: string | number;
+  resets: true;
+  locked: boolean;
+
+  constructor(id: string, name: string, order: number);
+
+  set(value: string | number): this;
+  enable(): this;
+  disable(): this;
+  reset(): this;
+  setLock(lockState: boolean): this;
+  setOrder(order: number): this;
+}
 
 declare class Mobile {}
 
@@ -3668,20 +3705,20 @@ declare class ChatAutocomplete {
   inp: HTMLInputElement;
   hintParent: HTMLDivElement;
   prfx: string;
-  hints?: () => void | string[];
-  /** 
+  hints: (() => string[]) | string[];
+  /**
    * Object containing possible hints.
    * Keys of this object are emote names wrapped in `:`.
    * Values of this object are emote URLs.
    */
-  hintsImg: {[wrappedEmoteString: string]: string};
+  hintsImg: { [wrappedEmoteString: string]: string };
   prefixInSearch: true;
   maxPerHint: 10;
   minimalLengthForHint: 1;
   addEmoteSurrounder: ":";
   wipePrevious: boolean;
-  onWiped?: (domStringMap: DOMStringMap) => void;
-  preProcessEmotes?: (emoteList: EmoteList) => void;
+  onWiped?: (string: string) => void;
+  preProcessEmotes?: (emoteList: EmoteList) => EmoteList;
   onEmoteObjectReady?: (emoteList: EmoteList) => void;
   moreEmotesAdded: boolean;
   selectedIndex: number;
@@ -3689,12 +3726,12 @@ declare class ChatAutocomplete {
 
   constructor(inp: HTMLInputElement, hintParent: HTMLDivElement, prfx: string, hints?: () => void);
 
-  clearEmotes(): void
+  clearEmotes(): void;
   initEmoteHints(): void;
   addEmotes(emoteList: EmoteList): void;
   loadEmotesIndex(versionSupporterParam: string): void;
   init(): void;
-  moveSelected(moveAmount: number): void
+  moveSelected(moveAmount: number): void;
   setSelected(index: number): void;
   processHint(currentWord: CurrentWord): void;
   ReturnWord(text: string, caretPositio0: number): string;
@@ -3707,7 +3744,7 @@ declare class Friends {}
 
 /**
  * Emote selector.
- * 
+ *
  * This class has source available at https://github.com/jezevec10/JstrisEmotePicker/.
  */
 declare class EmoteSelect {
@@ -3753,8 +3790,7 @@ declare class EmoteSelect {
   lastUsedWrapper: HTMLDivElement;
   groupLink: HTMLImageElement;
   // Declared in updateLastUsed()
-  usedImage:HTMLImageElement;
-
+  usedImage: HTMLImageElement;
 
   constructor(
     element: HTMLInputElement,
@@ -3771,7 +3807,7 @@ declare class EmoteSelect {
   createGroups(groups: string[]): Promise<void>;
   donateInfo(groups: string[]): void;
   getEmoteSource(emoteObj: Emote): string;
-  createImages(emotes: EmoteList, target: EventTarget): Promise<void>
+  createImages(emotes: EmoteList, target: EventTarget): Promise<void>;
   selectGroup(): void;
   showName(target: EventTarget): void;
   searchFunction(list: EmoteList): void;
@@ -3782,8 +3818,8 @@ declare class EmoteSelect {
   lastUsed(): void;
   updateLastUsed(): void;
   setStoredEmotes(target: EventTarget): void;
-  hideElem(): void
-  openButtonLogic(): void 
+  hideElem(): void;
+  openButtonLogic(): void;
 }
 
 declare class ModeTrigger {}
