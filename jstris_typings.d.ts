@@ -294,6 +294,25 @@ declare interface RoomFurtherDetails {
 declare type ResultsList = object;
 declare type TeamResultsList = object;
 
+declare interface Emote {
+  /** Category to which the emote belongs. */
+  g: string;
+  /** Emote name. */
+  n: string;
+  /** Tags separated by spaces to which the emote belongs. */
+  t?: string;
+  /** Emote URL. */
+  u?: string;
+  /** */
+  c?: "uee" | "oee";
+  /** Never used, but called by the code. */
+  p?: unknown;
+}
+
+declare type CurrentWord = [lastWord: string, caretPosition: number];
+
+declare type EmoteList = Emote[];
+
 declare interface I18n {
   /**
    * Displayed during the "Ready" state of "Ready? Go!" sequence.
@@ -3645,11 +3664,127 @@ declare class RoomInfo {
   };
 }
 
-declare class ChatAutocomplete {}
+declare class ChatAutocomplete {
+  inp: HTMLInputElement;
+  hintParent: HTMLDivElement;
+  prfx: string;
+  hints?: () => void | string[];
+  /** 
+   * Object containing possible hints.
+   * Keys of this object are emote names wrapped in `:`.
+   * Values of this object are emote URLs.
+   */
+  hintsImg: {[wrappedEmoteString: string]: string};
+  prefixInSearch: true;
+  maxPerHint: 10;
+  minimalLengthForHint: 1;
+  addEmoteSurrounder: ":";
+  wipePrevious: boolean;
+  onWiped?: (domStringMap: DOMStringMap) => void;
+  preProcessEmotes?: (emoteList: EmoteList) => void;
+  onEmoteObjectReady?: (emoteList: EmoteList) => void;
+  moreEmotesAdded: boolean;
+  selectedIndex: number;
+  hintsElem: HTMLDivElement;
+
+  constructor(inp: HTMLInputElement, hintParent: HTMLDivElement, prfx: string, hints?: () => void);
+
+  clearEmotes(): void
+  initEmoteHints(): void;
+  addEmotes(emoteList: EmoteList): void;
+  loadEmotesIndex(versionSupporterParam: string): void;
+  init(): void;
+  moveSelected(moveAmount: number): void
+  setSelected(index: number): void;
+  processHint(currentWord: CurrentWord): void;
+  ReturnWord(text: string, caretPositio0: number): string;
+  getCurrentWord(): CurrentWord;
+  GetCaretPosition(inputElement: HTMLInputElement): number;
+  setCaretPosition(position: number): void;
+}
 
 declare class Friends {}
 
-declare class EmoteSelect {}
+/**
+ * Emote selector.
+ * 
+ * This class has source available at https://github.com/jezevec10/JstrisEmotePicker/.
+ */
+declare class EmoteSelect {
+  // Declared in constructor
+  input: HTMLInputElement;
+  emoteIndex: string | object[];
+  container: HTMLDivElement;
+  openBtn: SVGElement;
+  path: string;
+  groupEmotes: { [categoryName: string]: string };
+  // Declared in init()
+  emoteElem: HTMLDivElement;
+  comment: Comment;
+  emoteList: EmoteList;
+  // Declared in initializeContainers()
+  searchElem: HTMLFormElement;
+  searchBar: HTMLInputElement;
+  optionsContainer: HTMLDivElement;
+  emotesWrapper: HTMLDivElement;
+  // Declared in initializeEmotes()
+  groupList: string[];
+  // Declared in createGroups()
+  emojis: EmoteList;
+  groupsFragment: DocumentFragment;
+  groupDiv: HTMLDivElement;
+  groupName: HTMLHeadingElement;
+  // Declared in donateInfo()
+  donateLink: HTMLAnchorElement;
+  icon: HTMLElement;
+  span: HTMLSpanElement;
+  // Declared in createImages()
+  emotesFragment: DocumentFragment;
+  emoteImg: HTMLImageElement;
+  // Declared in selectGroup()
+  selectionDiv: HTMLDivElement;
+  groupImage: HTMLImageElement;
+  // Declared in searchFunction()
+  resultsFragment: DocumentFragment;
+  searchResults: HTMLDivElement;
+  emoteResult: HTMLImageElement;
+  // Declared in lastUsed()
+  recent: HTMLDivElement;
+  lastUsedWrapper: HTMLDivElement;
+  groupLink: HTMLImageElement;
+  // Declared in updateLastUsed()
+  usedImage:HTMLImageElement;
+
+
+  constructor(
+    element: HTMLInputElement,
+    emoteIndex: string | object[],
+    container: HTMLDivElement,
+    openBtn: SVGElement,
+    path: string,
+    groupsEmote: { [categoryName: string]: string }
+  );
+
+  init(): Promise<void>;
+  initializeContainers(): void;
+  initializeEmotes(): void;
+  createGroups(groups: string[]): Promise<void>;
+  donateInfo(groups: string[]): void;
+  getEmoteSource(emoteObj: Emote): string;
+  createImages(emotes: EmoteList, target: EventTarget): Promise<void>
+  selectGroup(): void;
+  showName(target: EventTarget): void;
+  searchFunction(list: EmoteList): void;
+  setSource(changes: IntersectionObserverEntry[], observer: IntersectionObserver): void;
+  chatEmote(target: EventTarget): void;
+  getCaretPosition(): number;
+  setCaretPosition(pos: number): void;
+  lastUsed(): void;
+  updateLastUsed(): void;
+  setStoredEmotes(target: EventTarget): void;
+  hideElem(): void
+  openButtonLogic(): void 
+}
 
 declare class ModeTrigger {}
 
