@@ -313,6 +313,16 @@ declare type CurrentWord = [lastWord: string, caretPosition: number];
 
 declare type EmoteList = Emote[];
 
+declare interface ViewNameDefinition {
+  hold: "holdCanvas";
+  bg: "bgLayer";
+  main: "myCanvas";
+  queue: "queueCanvas";
+  statTable: "statTable";
+  si: "sprintInfo";
+  lrem: "lrem";
+}
+
 declare interface I18n {
   /**
    * Displayed during the "Ready" state of "Ready? Go!" sequence.
@@ -1855,7 +1865,7 @@ declare class Game extends GameCore {
   ];
   cheeseHeight: number;
   ghostEnabled: boolean;
-  // getPPS: this.getCumulativePPS;
+  getPPS: () => number;
   comboAttackDef: [
     combo0: number,
     combo1: number,
@@ -2157,6 +2167,240 @@ declare class GameCore {
   R: Ruleset;
   DEF: Ruleset;
 
+  canvas: HTMLCanvasElement;
+  holdCanvas: HTMLCanvasElement;
+  queueCanvas: HTMLCanvasElement;
+  v: WebGLView | Ctx2DView | View;
+  bgCanvas: HTMLCanvasElement;
+  bgctx: CanvasRenderingContext2D;
+  GS: GameSlots;
+  roomCapacity: number;
+  connectStatusElement: HTMLDivElement;
+  rInfoBox: HTMLDivElement;
+  practiceMenu: HTMLDivElement;
+  practiceMenuBig: HTMLDivElement;
+  teamInfo: HTMLDivElement;
+  sprintInfo: HTMLDivElement;
+  botMenu: HTMLDivElement;
+  lrem: HTMLDivElement;
+  fpsElement: HTMLDivElement;
+  block_size: number;
+  debug: boolean;
+  SEenabled: boolean;
+  VSEenabled: boolean;
+  SEStartEnabled: boolean;
+  SEFaultEnabled: boolean;
+  SErotate: boolean;
+  tex: HTMLImageElement;
+  tex2: HTMLImageElement;
+  drawScale: number;
+  skinId: number;
+  ghostTex: HTMLImageElement;
+  ghostSkinId: number;
+  ghostSkins: { id: number; name: string; data: string; w: number }[];
+  SFXset: { id: number; name: string; data: () => void } | null;
+  VSFXset: { id: number; name: string; data: () => void } | null;
+  play: boolean;
+  gameEnded: boolean;
+  hdAbort: boolean;
+  lastSeen: number | null;
+  isTabFocused: boolean;
+  pmode: number;
+  livePmode: number;
+  selectedPmode: number;
+  sprintMode: number;
+  sprintModeToRun: number;
+  cheeseLevel: number | undefined;
+  maxCheeseHeight: number;
+  minCheeseHeight: number;
+  lastHolePos: number | null;
+  starting: boolean;
+  activeBlock: Block;
+  ghostPiece: {
+    pos: {
+      x: number;
+      y: number;
+    };
+  };
+  timer: number;
+  lastSnapshot: number;
+  clock: number;
+  frames: number;
+  baseGravity: number;
+  currentGravity: [timeToDrop: number, extraSpaces: number];
+  softDrop: boolean;
+  softDropId: number;
+  holdPressed: boolean;
+  hardDropPressed: boolean;
+  lastDAS: number;
+  firstDAS: boolean;
+  DASdebug: boolean;
+  ARRtime: number;
+  pressedDir: {
+    "-1": number | boolean;
+    1: number | boolean;
+  };
+  ARRon: {
+    "-1": boolean;
+    1: boolean;
+  };
+  DASto: {
+    "-1": number | null;
+    1: number | null;
+  };
+  /**
+   * Specifies the method of evaluating DAS:
+   *
+   * 0. Based on FPS
+   * 1. Based on time.
+   */
+  DASmethod: 0 | 1; // Why isn't this a boolean?
+  lockDelayActive: number;
+  lockDelayActivated: number | undefined;
+  lastAction: number;
+  lastGeneration: number;
+  /** Specifies, for how long the piece can stay on ground without locking. */
+  lockDelay: number;
+  /** Specifies, for how long the piece can stay on ground while moving left/right without locking. */
+  maxLockDelayWithoutLock: number;
+  /** Specifies, for how long the piece can be active. */
+  maxWithoutLock: number;
+  holdUsedAlready: boolean;
+  redBar: number;
+  incomingGarbage: [garbageInSegment: number, timestamp: number][];
+  solidHeight: number;
+  solidToAdd: number;
+  solidInterval: number | null;
+  solidProfiles: [[0, 3], [0, 3, 2.8, 2.6, 2.4, 2.2, 2, 1.8, 1.6, 1.4, 1.2, 1, 31, 1, 1, 1, 1, 1, 1, 1], null, null];
+  garbageCols: number[];
+  /**
+   * `0` if the game is focused, `1` otherwise.
+   */
+  focusState: 0 | 1; // jezevec, why isn't this a boolean?
+  statsEnabled: boolean;
+  statsMode: number;
+  placedBlocks: number;
+  lastPlacements: number[];
+  finesse: number;
+  used180: number;
+  totalFinesse: number;
+  totalKeyPresses: number;
+  place: number | null;
+  redrawBlocked: boolean;
+  linesAttackDef: [
+    zero: number,
+    single: number,
+    double: number,
+    triple: number,
+    jstris: number,
+    TSD: number,
+    TST: number,
+    TSS: number,
+    MTSS: number,
+    PC: number,
+    B2B: number
+  ];
+  linesAttack: [
+    zero: number,
+    single: number,
+    double: number,
+    triple: number,
+    jstris: number,
+    TSD: number,
+    TST: number,
+    TSS: number,
+    MTSS: number,
+    PC: number,
+    B2B: number
+  ];
+  cheeseHeight: number;
+  ghostEnabled: boolean;
+  getPPS: () => number;
+  comboAttackDef: [
+    combo0: number,
+    combo1: number,
+    combo2: number,
+    combo3: number,
+    combo4: number,
+    combo5: number,
+    combo6: number,
+    combo7: number,
+    combo8: number,
+    combo9: number,
+    combo10: number,
+    combo11: number,
+    combo12plus: number
+  ];
+  comboAttack: [
+    combo0: number,
+    combo1: number,
+    combo2: number,
+    combo3: number,
+    combo4: number,
+    combo5: number,
+    combo6: number,
+    combo7: number,
+    combo8: number,
+    combo9: number,
+    combo10: number,
+    combo11: number,
+    combo12plus: number
+  ];
+  comboCounter: number;
+  fourWideFlag: boolean;
+  PCdata: {
+    blocks: number;
+    lines: number;
+  };
+  linesRemaining: number;
+  inactiveGamesCount: number;
+  xbuffMask: number;
+  replayPartsSent: number;
+  transmitMode: number;
+  fragmentCounter: number;
+  liveSnapRate: number;
+  snapRate: number;
+  soundQ: SoundQueue;
+  /** A generator function that generates pseudo-random values between 0 and 1. */
+  RNG: AleaPRNG;
+  /** A generator function that generates pseudo-random values between 0 and 1. */
+  blockRNG: AleaPRNG;
+  /** Last 6 digits of a base-36 encoded RNG value. */
+  blockSeed: string;
+  bigTriggered: boolean;
+  bigChance: number;
+  interval: number | null;
+  animator: LineClearAnimator | null;
+  RulesetManager: RulesetManager;
+  conf: [object, object];
+  /** Refers to `this.conf[0]`. */
+  Settings: Settings;
+  Caption: GameCaption;
+  Live: Live;
+  Replay: Replay;
+  Scoring: Scoring;
+  MapManager: MapManager;
+  ModeManager: ModeManager;
+  GameStats: StatsManager | SimpleStatsManager;
+  Mobile: Mobile;
+  Bots: object[];
+  readonly sprintModes: {
+    1: 40;
+    2: 20;
+    3: 100;
+    4: 1000;
+  };
+  readonly cheeseModes: {
+    1: 10;
+    2: 18;
+    3: 100;
+    100: 1000000;
+  };
+  readonly ultraModes: {
+    1: 120;
+  };
+  last: number;
+
   randomizerFactory(randomizerID: number, pre_seed: AleaPRNG): Randomizer;
   initRandomizer(randomizerID: number): void;
   getRandomizerBlock(randomizer?: Randomizer): Block;
@@ -2201,6 +2445,85 @@ declare class GameCore {
   random(rangeStart: number, rangeEnd: number): number;
   randomExcept(rangeStart: number, rangeEnd: number, excludedNumber: number): number;
   getGravityLevel(gravityLevel: number): [number, number];
+}
+
+declare class Replayer extends GameCore {
+  v: View;
+  // temporaryBlockSet = null;
+  reachedEnd: boolean
+  pmode: number
+  subMode: number
+  activeBlock: Block
+  ghostPiece: {
+    pos: {
+      x: number;
+      y: number;
+    };
+  };
+  timer: number
+  frames: number
+  gameStep: number
+  softDrop: boolean
+  softDropId: number
+  holdPressed: boolean
+  holdUsedAlready: boolean
+  redBar: number
+  solidHeight: number
+  solidToAdd: number
+  solidInterval: number | null;
+  blockInHold: Block | null
+  ghostEnabled: boolean
+  placedBlocks: number
+  finesse: number
+  used180: number
+  totalFinesse: number
+  totalKeyPresses: number
+  // finFaults = null;
+  // scoreStamps
+  linesAttack: [
+    zero: number,
+    single: number,
+    double: number,
+    triple: number,
+    jstris: number,
+    TSD: number,
+    TST: number,
+    TSS: number,
+    MTSS: number,
+    PC: number,
+    B2B: number
+  ];
+  comboAttack: [
+    combo0: number,
+    combo1: number,
+    combo2: number,
+    combo3: number,
+    combo4: number,
+    combo5: number,
+    combo6: number,
+    combo7: number,
+    combo8: number,
+    combo9: number,
+    combo10: number,
+    combo11: number,
+    combo12plus: number
+  ];
+  timeRemaining: number;
+  linesRemaining: number;
+  RNG: AleaPRNG;
+  blockRNG: AleaPRNG;
+  r: object
+  // actions: any[]
+  debug: boolean; // Actually a 0 (number), but nothing sets this property in replayer.js, and 0 is falsy.
+  // Analytics = null;
+  Scoring: Scoring;
+  // data = null;
+  byte: number;
+  bitpos: number;
+  timeout: number | null;
+  playingLive: boolean;
+  frameId: number;
+  GameStats: SimpleStatsManager;
 }
 
 /** Defines a playable piece. */
@@ -2536,6 +2859,81 @@ declare class Ctx2DView {
   setAlpha(alpha: number): void;
   clearRect(startX: number, startY: number, endX: number, endY: number): void;
   createFastFont(): FastFont2D;
+}
+
+declare class View {
+  g: Game;
+  readonly MAIN: 0;
+  readonly HOLD: 1;
+  readonly QUEUE: 2;
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  bgCanvas: HTMLCanvasElement;
+  bgctx: CanvasRenderingContext2D;
+  holdCanvas: HTMLCanvasElement;
+  hctx: CanvasRenderingContext2D;
+  queueCanvas: HTMLCanvasElement;
+  qctx: CanvasRenderingContext2D;
+  sprintInfo: HTMLDivElement;
+  lrem: HTMLDivElement;
+  statTable: HTMLTableSectionElement;
+  block_size: number;
+  drawScale: number;
+  SEenabled: boolean;
+  replaySEset: number;
+  SFXset: SFXsets | null;
+  tex: HTMLImageElement;
+  skinId: number;
+  ghostSkinId: number;
+  redrawBlocked: boolean;
+  ghostEnabled: boolean;
+  QueueHoldEnabled: boolean;
+
+  constructor(nameDefinition: ViewNameDefinition);
+  changeSkin(skinID: number): void;
+  changeSFX(sfxSet: SFXsets): void;
+  loadSounds(): void;
+  loadSounds2(sfxSet: SFXsets, prefix: string): void;
+  drawBgGrid(unusedParameter?: unknown): void;
+  drawGhostAndCurrent(): void;
+  redraw(): void;
+  clearMainCanvas(): void;
+  clearHoldCanvas(): void;
+  clearQueueCanvas(): void;
+  drawBlockOnCanvas(x: number, y: number, blockID: number, ctxID: number): void;
+  drawBlock(x: number, y: number, blockID: number): void;
+  drawGhostBlock(x: number, y: number, blockID: number): void;
+  drawRectangle(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    fillStyle: string | CanvasGradient | CanvasPattern
+  ): void;
+  drawLine(ctx: CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number): void;
+  paintMatrixWithColor(blockID: number): void;
+  updateTextBar(): void;
+  onCreate(): void;
+  setupMode(): void;
+  /**
+   * Shows the appropriate sprint info element.
+   * @param mode Stat to show:
+   * - 0: Lines remaining,
+   * - 1: Time remaining,
+   * - 2: T-spin Doubles,
+   * - 3: Perfect Clears.
+   */
+  sprintInfoLineContent(mode: 0 | 1 | 2 | 3): void;
+  onReady(): void;
+  onRestart(): void;
+  onBlockHold(): void;
+  onBlockMove(): void;
+  onGameOver(): void;
+  onBlockLocked():void;
+  onLinesCleared(): void;
+  onTimeRemainingChanged(): void;
+  onScoreChanged(): void;
 }
 
 interface TeamData {
@@ -3537,8 +3935,6 @@ declare class Hammer {}
  */
 declare class CP {}
 
-declare class Replayer {}
-
 declare class RoomInfo {
   constructor(live: Live);
   l: Live;
@@ -3825,3 +4221,5 @@ declare class EmoteSelect {
 declare class ModeTrigger {}
 
 declare class ReplayController {}
+
+declare class SimpleStatsManager {}
