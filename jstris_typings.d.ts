@@ -323,6 +323,113 @@ declare interface ViewNameDefinition {
   lrem: "lrem";
 }
 
+declare interface ReplayMeta {
+  /** Replay version. */
+  v: number;
+  /** Soft drop ID used. */
+  softDropId: number;
+  /** Timestamp of the start of the game. */
+  gameStart: number;
+  /** Timestamp of the end of the game. */
+  gameEnd: number;
+  /** Seed used in the replay. */
+  seed: string;
+  /**
+   * 32-bit integer representing the mode and submode of the replay.
+   *
+   * First 16 bits represent the mode.
+   *
+   * Last 16 bits represent the submode.
+   */
+  m: 393216;
+  /** Piece set used. */
+  bs: 1;
+  /** Sound effect set used. */
+  se: 2;
+  /** DAS used (in milliseconds) */
+  das: 140;
+  /**
+   * Ruleset used:
+   * - `0` - Standard
+   * - `1` - Big Mode
+   * - `2` - Pentomino
+   * - `3` - MPH
+   */
+  r: 0;
+  /** Map ID used. */
+  map?: string;
+}
+
+declare interface ReplayInfo {
+  /**  */
+  c: ReplayMeta;
+  /** Replay data as a Base64-encoded string. */
+  d: string;
+  /** Map info. */
+  map: {
+    /** Map ID. */
+    id: number;
+    /** Map state: `0` if the map is not published, `1` if it is. */
+    state: 0 | 1;
+    /** Name of the map. */
+    name: string;
+    /** Static queue consisting of tetrominoes (`I`,`O`,`T`,`L`,`J`,`S`,`Z`), or `null` if not provided. */
+    queue: string | null;
+    /**
+     * Type of finish:
+     * - `0` if all map blocks need to be cleared,
+     * - `1` if a Perfect Clear must be achieved.
+     */
+    finish: 0 | 1;
+    /** Map data. */
+    data: string;
+    /** Map MD5 hash. */
+    boardMD5: string;
+  };
+}
+
+declare interface Action {
+  /** Action timestamp (milliseconds since the game started) */
+  t: number;
+  /** Action performed. */
+  a: number;
+  /** Hard drop ordinal, if the action is a hard drop. */
+  hdId?: number;
+}
+
+declare interface HardDrop {
+  frame: number;
+  deltat: number;
+}
+
+declare interface ReplayData {
+  c: ReplayMeta;
+  d: string;
+  a: Action[];
+}
+
+declare type Segment = [duration: number, index: number, frame: number, deltat: number];
+
+declare enum ScoringActions {
+  SOFT_DROP = 0,
+  HARD_DROP = 1,
+  CLEAR1 = 2,
+  CLEAR2 = 3,
+  CLEAR3 = 4,
+  CLEAR4 = 5,
+  TSPIN_MINI = 6,
+  TSPIN = 7,
+  TSPIN_MINI_SINGLE = 8,
+  TSPIN_SINGLE = 9,
+  TSPIN_DOUBLE = 10,
+  TSPIN_TRIPLE = 11,
+  PERFECT_CLEAR = 12,
+  COMBO = 13,
+  CLEAR5 = 14,
+}
+
+declare type ScoreStamp = [timestamp: number, scoring: ScoringActions, scoreAdded: number, multiplier: number, alwaysZero: 0];
+
 declare interface I18n {
   /**
    * Displayed during the "Ready" state of "Ready? Go!" sequence.
@@ -2448,36 +2555,37 @@ declare class GameCore {
 }
 
 declare class Replayer extends GameCore {
+  constructor(view: View);
   v: View;
   // temporaryBlockSet = null;
-  reachedEnd: boolean
-  pmode: number
-  subMode: number
-  activeBlock: Block
+  reachedEnd: boolean;
+  pmode: number;
+  subMode: number;
+  activeBlock: Block;
   ghostPiece: {
     pos: {
       x: number;
       y: number;
     };
   };
-  timer: number
-  frames: number
-  gameStep: number
-  softDrop: boolean
-  softDropId: number
-  holdPressed: boolean
-  holdUsedAlready: boolean
-  redBar: number
-  solidHeight: number
-  solidToAdd: number
+  timer: number;
+  frames: number;
+  gameStep: number;
+  softDrop: boolean;
+  softDropId: number;
+  holdPressed: boolean;
+  holdUsedAlready: boolean;
+  redBar: number;
+  solidHeight: number;
+  solidToAdd: number;
   solidInterval: number | null;
-  blockInHold: Block | null
-  ghostEnabled: boolean
-  placedBlocks: number
-  finesse: number
-  used180: number
-  totalFinesse: number
-  totalKeyPresses: number
+  blockInHold: Block | null;
+  ghostEnabled: boolean;
+  placedBlocks: number;
+  finesse: number;
+  used180: number;
+  totalFinesse: number;
+  totalKeyPresses: number;
   // finFaults = null;
   // scoreStamps
   linesAttack: [
@@ -2512,10 +2620,10 @@ declare class Replayer extends GameCore {
   linesRemaining: number;
   RNG: AleaPRNG;
   blockRNG: AleaPRNG;
-  r: object
+  r: ReplayInfo;
   // actions: any[]
   debug: boolean; // Actually a 0 (number), but nothing sets this property in replayer.js, and 0 is falsy.
-  // Analytics = null;
+  Analytics: Analytics;
   Scoring: Scoring;
   // data = null;
   byte: number;
@@ -2524,6 +2632,12 @@ declare class Replayer extends GameCore {
   playingLive: boolean;
   frameId: number;
   GameStats: SimpleStatsManager;
+
+  ptr: number;
+
+  getRandomizer(replayVersion: number, seed: string): void;
+  initReplay(): void;
+  loadMap(matrix: number[][], staticQueue: string | null): void;
 }
 
 /** Defines a playable piece. */
@@ -2930,7 +3044,7 @@ declare class View {
   onBlockHold(): void;
   onBlockMove(): void;
   onGameOver(): void;
-  onBlockLocked():void;
+  onBlockLocked(): void;
   onLinesCleared(): void;
   onTimeRemainingChanged(): void;
   onScoreChanged(): void;
@@ -4223,3 +4337,28 @@ declare class ModeTrigger {}
 declare class ReplayController {}
 
 declare class SimpleStatsManager {}
+
+// TODO
+declare class Analytics {
+  constructor(i: number);
+
+  i: 0 | 1;
+  controller: ReplayController;
+  r: ReplayData;
+  actions: Action[];
+  harddrops: HardDrop[];
+  readonly segSize: 10;
+  showGlobalAvg: boolean;
+  showLocalSpeed: boolean;
+  showCurrentPos: boolean;
+  showRelAtk: boolean;
+  scLayer0: HTMLCanvasElement;
+  ctx0: CanvasRenderingContext2D;
+  scLayer1: HTMLCanvasElement;
+  ctx1: CanvasRenderingContext2D;
+  tb: HTMLTableSectionElement;
+  data: { finesse: number[]; scoreStamps: ScoreStamp[] };
+  // scoreFilter = [];
+
+  segments: Segment[];
+}
