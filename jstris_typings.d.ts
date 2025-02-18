@@ -4,6 +4,10 @@ declare interface AleaPRNG {
 /** @deprecated Jstris should use {@link KeyboardEvent.code() keyboard codes} instead. Come on, we are in 2025. */
 declare type KeyCode = number;
 
+type GrowToSize<T, N extends number, A extends T[]> = A["length"] extends N ? A : GrowToSize<T, N, [...A, T]>;
+
+type FixedArray<T, N extends number> = GrowToSize<T, N, []>;
+
 declare interface ReplayResponse {
   /** The replay ID. */
   id: number;
@@ -428,7 +432,417 @@ declare enum ScoringActions {
   CLEAR5 = 14,
 }
 
-declare type ScoreStamp = [timestamp: number, scoring: ScoringActions, scoreAdded: number, multiplier: number, alwaysZero: 0];
+declare type ScoreStamp = [
+  timestamp: number,
+  scoring: ScoringActions,
+  scoreAdded: number,
+  multiplier: number,
+  alwaysZero: 0
+];
+
+type FinesseArray = [stateSpawn: number[], stateCW: number[], state180: number[], stateCCW: number[]];
+
+type FullPointDefinition = [fullPoint1_X: number, fullPoint1_Y: number, fullPoint2_X: number, fullPoint2_Y: number];
+
+type MiniPointDefinition = [miniPoint1_X: number, miniPoint1_Y: number, miniPoint2_X: number, miniPoint2_Y: number];
+
+/** Specifies 4-point all-spin points for L, J, S and Z pieces. T piece is handled differently. */
+type AllSpin4Point = [fullPoints: FullPointDefinition, miniPoints: MiniPointDefinition];
+
+/** Specifies 4-point all-spin for the I piece. The I piece has two sets of mini points. */
+type IPiece_AllSpin4Point = [
+  fullPoints: FullPointDefinition,
+  miniPoints: [primary: MiniPointDefinition, alternative: MiniPointDefinition]
+];
+
+type PieceBoundingBoxes<N extends number> = [
+  stateSpawn: FixedArray<FixedArray<number, N>, N>,
+  stateCW: FixedArray<FixedArray<number, N>, N>,
+  state180: FixedArray<FixedArray<number, N>, N>,
+  stateCCW: FixedArray<FixedArray<number, N>, N>
+];
+
+/** Interface used internally to type kicks. */
+interface Kicks {
+  None: [
+    stateSpawn: {
+      "-1": FixedArray<[x: number, y: number], 1>;
+      1: FixedArray<[x: number, y: number], 1>;
+      2: FixedArray<[x: number, y: number], 1>;
+    },
+    stateCW: {
+      "-1": FixedArray<[x: number, y: number], 1>;
+      1: FixedArray<[x: number, y: number], 1>;
+      2: FixedArray<[x: number, y: number], 1>;
+    },
+    state180: {
+      "-1": FixedArray<[x: number, y: number], 1>;
+      1: FixedArray<[x: number, y: number], 1>;
+      2: FixedArray<[x: number, y: number], 1>;
+    },
+    stateCCW: {
+      "-1": FixedArray<[x: number, y: number], 1>;
+      1: FixedArray<[x: number, y: number], 1>;
+      2: FixedArray<[x: number, y: number], 1>;
+    }
+  ];
+  SRS: [
+    stateSpawn: {
+      "-1": FixedArray<[x: number, y: number], 5>;
+      1: FixedArray<[x: number, y: number], 5>;
+      2: FixedArray<[x: number, y: number], 2>;
+    },
+    stateCW: {
+      "-1": FixedArray<[x: number, y: number], 5>;
+      1: FixedArray<[x: number, y: number], 5>;
+      2: FixedArray<[x: number, y: number], 2>;
+    },
+    state180: {
+      "-1": FixedArray<[x: number, y: number], 5>;
+      1: FixedArray<[x: number, y: number], 5>;
+      2: FixedArray<[x: number, y: number], 2>;
+    },
+    stateCCW: {
+      "-1": FixedArray<[x: number, y: number], 5>;
+      1: FixedArray<[x: number, y: number], 5>;
+      2: FixedArray<[x: number, y: number], 2>;
+    }
+  ];
+  ARS: [
+    stateSpawn: {
+      "-1": FixedArray<[x: number, y: number], 3>;
+      1: FixedArray<[x: number, y: number], 3>;
+      2: FixedArray<[x: number, y: number], 3>;
+    },
+    stateCW: {
+      "-1": FixedArray<[x: number, y: number], 3>;
+      1: FixedArray<[x: number, y: number], 3>;
+      2: FixedArray<[x: number, y: number], 3>;
+    },
+    state180: {
+      "-1": FixedArray<[x: number, y: number], 3>;
+      1: FixedArray<[x: number, y: number], 3>;
+      2: FixedArray<[x: number, y: number], 3>;
+    },
+    stateCCW: {
+      "-1": FixedArray<[x: number, y: number], 3>;
+      1: FixedArray<[x: number, y: number], 3>;
+      2: FixedArray<[x: number, y: number], 3>;
+    }
+  ];
+  C2: [
+    stateSpawn: {
+      "-1": FixedArray<[x: number, y: number], 8>;
+      1: FixedArray<[x: number, y: number], 8>;
+      2: FixedArray<[x: number, y: number], 8>;
+    },
+    stateCW: {
+      "-1": FixedArray<[x: number, y: number], 8>;
+      1: FixedArray<[x: number, y: number], 8>;
+      2: FixedArray<[x: number, y: number], 8>;
+    },
+    state180: {
+      "-1": FixedArray<[x: number, y: number], 8>;
+      1: FixedArray<[x: number, y: number], 8>;
+      2: FixedArray<[x: number, y: number], 8>;
+    },
+    stateCCW: {
+      "-1": FixedArray<[x: number, y: number], 8>;
+      1: FixedArray<[x: number, y: number], 8>;
+      2: FixedArray<[x: number, y: number], 8>;
+    }
+  ];
+  OSpin: [
+    stateSpawn: {
+      "-1": FixedArray<[x: number, y: number], 16>;
+      1: FixedArray<[x: number, y: number], 16>;
+      2: FixedArray<[x: number, y: number], 16>;
+    },
+    stateCW: {
+      "-1": FixedArray<[x: number, y: number], 16>;
+      1: FixedArray<[x: number, y: number], 16>;
+      2: FixedArray<[x: number, y: number], 16>;
+    },
+    state180: {
+      "-1": FixedArray<[x: number, y: number], 16>;
+      1: FixedArray<[x: number, y: number], 16>;
+      2: FixedArray<[x: number, y: number], 16>;
+    },
+    stateCCW: {
+      "-1": FixedArray<[x: number, y: number], 16>;
+      1: FixedArray<[x: number, y: number], 16>;
+      2: FixedArray<[x: number, y: number], 16>;
+    }
+  ];
+}
+
+interface PieceDefintion<RotSys extends keyof Kicks, N extends number> {
+  /** Specifies bounding boxes of the pieces. */
+  blocks: PieceBoundingBoxes<N>;
+  /** Unknown. */
+  cc: FixedArray<number, 4>;
+  /** Presumably the rotation center of the piece? */
+  center: FixedArray<FixedArray<number, 2>, 4>;
+  /** The piece's color. An integer between 0 and 9 inclusive. */
+  color: number;
+  /** No idea. */
+  h: FixedArray<number, 4>;
+  /** The ID of the piece. */
+  id: number;
+  /** Kicks of the piece. */
+  kicks: Kicks[RotSys];
+  /** The name of the piece. */
+  name: string;
+  /** Spawn offset of the piece. */
+  spawn: [x: number, y: number];
+  xp?: [x: number, y: number];
+  yp: [x: number, y: number];
+}
+
+interface PieceSetStandard {
+  /** Specifies points for 4-point all-spin. */
+  allspin: [IPiece_AllSpin4Point, null, null, AllSpin4Point, AllSpin4Point, AllSpin4Point, AllSpin4Point];
+  /** Specifies pieces contained in a piece set. */
+  blocks: [
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"None", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>
+  ];
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: true;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: true;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: FixedArray<FinesseArray, 7>;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetStandard;
+}
+
+interface PieceSetBig {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: [
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"None", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>
+  ];
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: true;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 2;
+  /** Specifies the rendering scale of the piece. */
+  scale: 2;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetStandard;
+}
+interface PieceSetBigPlus {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: [
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"None", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>,
+    PieceDefintion<"SRS", 8>
+  ];
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: true;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 2;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetStandard;
+}
+interface PieceSetARS {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: [
+    PieceDefintion<"None", 4>,
+    PieceDefintion<"ARS", 4>,
+    PieceDefintion<"ARS", 4>,
+    PieceDefintion<"ARS", 4>,
+    PieceDefintion<"ARS", 4>,
+    PieceDefintion<"ARS", 4>,
+    PieceDefintion<"ARS", 4>
+  ];
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: true;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetARS;
+}
+interface PieceSetPentomino {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: FixedArray<PieceDefintion<"SRS", 5>, 18>;
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: false;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetPentomino;
+}
+interface PieceSetM123 {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: [PieceDefintion<"SRS", 1>, PieceDefintion<"SRS", 2>, PieceDefintion<"SRS", 3>, PieceDefintion<"SRS", 3>];
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: false;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetM123;
+}
+interface PieceSetAll29 {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: [
+    // Tetrominoes
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"None", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    PieceDefintion<"SRS", 4>,
+    // M123
+    PieceDefintion<"SRS", 1>,
+    PieceDefintion<"SRS", 2>,
+    PieceDefintion<"SRS", 3>,
+    PieceDefintion<"SRS", 3>,
+    // Pentominoes
+    ...FixedArray<PieceDefintion<"SRS", 5>, 18>
+  ];
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: false;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetAll29;
+}
+interface PieceSetCultris2RS {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: FixedArray<PieceDefintion<"C2", 4>, 7>;
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: true;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetCultris2RS;
+}
+interface PieceSetOSpin {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: FixedArray<PieceDefintion<"OSpin", 4>, 7>;
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: true;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetOSpin;
+}
+interface PieceSetNone {
+  /** Specifies points for 4-point all-spin. */
+  allspin: null;
+  /** Specifies pieces contained in a piece set. */
+  blocks: FixedArray<PieceDefintion<"SRS", 1>, 1>;
+  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+  equidist: false;
+  /** Specifies, how many blocks does the piece move at a time. */
+  step: 1;
+  /** Specifies the rendering scale of the piece. */
+  scale: 1;
+  /** Specifies, whether April Fools items appear in this piece set or not. */
+  items: true;
+  /** Specifies, whether ghost pieces should be rendered for this piece set. */
+  ghost: false;
+  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+  finesse: null;
+  /** Specifies, how should pieces look like in the NEXT queue. */
+  previewAs: PieceSetNone;
+}
+
+/** Specifies piece sets used in the game. */
+declare type BlockSets = [
+  PieceSetStandard,
+  PieceSetBig,
+  PieceSetBigPlus,
+  PieceSetARS,
+  PieceSetPentomino,
+  PieceSetM123,
+  PieceSetCultris2RS,
+  PieceSetOSpin,
+  PieceSetNone
+];
 
 declare interface I18n {
   /**
@@ -2181,7 +2595,8 @@ declare class GameCore {
   matrix: number[][];
   /** A 1 x 10 array specifying blocks in the hidden row. */
   deadline: number[];
-  blockSets: object[];
+  /** Specifies piece sets used in the game. */
+  blockSets: BlockSets;
   readonly softDropSpeeds: [
     {
       id: 0;
