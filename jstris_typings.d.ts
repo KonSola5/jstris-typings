@@ -392,6 +392,34 @@ declare interface ReplayInfo {
   };
 }
 
+declare enum Actions {
+  MOVE_LEFT = 0,
+  MOVE_RIGHT = 1,
+  DAS_LEFT = 2,
+  DAS_RIGHT = 3,
+  ROTATE_LEFT = 4,
+  ROTATE_RIGHT = 5,
+  ROTATE_180 = 6,
+  HARD_DROP = 7,
+  SOFT_DROP_BEGIN_END = 8,
+  GRAVITY_STEP = 9,
+  HOLD_BLOCK = 10,
+  GARBAGE_ADD = 11,
+  SGARBAGE_ADD = 12,
+  REDBAR_SET = 13,
+  ARR_MOVE = 14,
+  AUX = 15,
+}
+
+declare enum AuxActions {
+  AFK = 0,
+  BLOCK_SET = 1,
+  MOVE_TO = 2,
+  RANDOMIZER = 3,
+  MATRIX_MOD = 4,
+  WIDE_GARBAGE_ADD = 5,
+}
+
 declare interface Action {
   /** Action timestamp (milliseconds since the game started) */
   t: number;
@@ -2386,7 +2414,7 @@ declare class Game extends GameCore {
   ];
   cheeseHeight: number;
   ghostEnabled: boolean;
-  getPPS: () => number;
+  getPPS(): number;
   comboAttackDef: [
     combo0: number,
     combo1: number,
@@ -2837,7 +2865,7 @@ declare class GameCore {
   ];
   cheeseHeight: number;
   ghostEnabled: boolean;
-  getPPS: () => number;
+  getPPS(): number;
   comboAttackDef: [
     combo0: number,
     combo1: number,
@@ -3036,7 +3064,7 @@ declare class Replayer extends GameCore {
   RNG: AleaPRNG;
   blockRNG: AleaPRNG;
   r: ReplayInfo;
-  // actions: any[]
+  actions: Action[];
   debug: boolean; // Actually a 0 (number), but nothing sets this property in replayer.js, and 0 is falsy.
   Analytics: Analytics;
   Scoring: Scoring;
@@ -3053,6 +3081,32 @@ declare class Replayer extends GameCore {
   getRandomizer(replayVersion: number, seed: string): void;
   initReplay(): void;
   loadMap(matrix: number[][], staticQueue: string | null): void;
+  pullBits(amountOfBits: number): number | null;
+  loadBinaryActionsV3(): void;
+  initSetOnce(): void;
+  restart(): void;
+  moveCurrentBlock(direction: number, timestamp: number): void;
+  hardDrop(): void;
+  GameOver(): void;
+  /** Fills the map queue with pieces set by the randomizer if the game mode is set to Maps and the map has no static queue set. */
+  refillQueue(): void;
+  redraw(): void;
+  getNextBlock(): void;
+  /** Returns the currently played game mode. */
+  isPmode(): number;
+  getComboAttack(combo: number): number;
+  /** Adds garbage from the queue. */
+  // @ts-expect-error This method breaks the Liskov's substitution principle.
+  addGarbage(amountOfLines: number, selectedColumn: number, garbageWidth: number, invertGarbage: boolean): void;
+  garbage_add_adv(amountOfLines: number, selectedColumn: number, garbageWidth: number, invertGarbage: boolean): void;
+  processAction(replayAction: ReplayAction): void;
+  applyGravitySteps(): void;
+  playLive(replayActions: ReplayAction[]): void;
+  playByTimeouts(): void;
+  playUntilTime(timestamp: number): void;
+  getPPS(): number;
+  timestamp(): number;
+  score(scoring: number, multipier: number): void;
 }
 
 /** Defines a playable piece. */
