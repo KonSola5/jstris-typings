@@ -3216,8 +3216,8 @@ declare class SlotView {
     queue: HTMLCanvasElement;
   });
 
-  g: Game | null;
-  slot: Slot | null;
+  g: Game;
+  slot: Slot;
   readonly MAIN: 0;
   readonly HOLD: 1;
   readonly QUEUE: 2;
