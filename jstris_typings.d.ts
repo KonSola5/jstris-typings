@@ -38,6 +38,8 @@ declare interface PersonalBestInfo {
   diffS: number;
   /** How long ago the previous PB was achieved. */
   days: number;
+  /** The mode title. */
+  modeTitle: string;
 }
 
 /**
@@ -163,6 +165,7 @@ declare interface Client {
   rep: Replayer | null;
   /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
   type: number;
+  bold?: boolean;
 }
 
 declare interface LobbyList {
@@ -189,73 +192,79 @@ declare interface Limits {
   sub?: [min: number | null, max: number | null];
 }
 
-declare interface RoomDetails {
-  /** Player count. */
-  c: number;
-  /** */
-  s: number;
-  /** Room ID. */
-  id: string;
-  /** Room name. */
-  n: string;
-  /** Room mode (modes not starting with "Live"). */
-  mo: number;
-  /** Room mode (modes starting with "Live"). */
-  pm: number;
-  /** Lifetime games played. */
-  g: number;
-  /** Room speed limit (in PPS) - `0` if no speed limit is set. */
-  sl: number;
-  /** Maximum number of users in a room - `24` or more is treated as no limit. */
-  m: number;
-  /** Waiting, perhaps? */
-  w?: number;
-  /** */
-  d: {
-    /** The server the given room is on. */
-    s: string;
-    /** Restrictions that prevent certain users from joining */
-    lock?: Limits;
-  };
-  det: RoomFurtherDetails;
-  /** */
-  tr?: number;
-  /** Whether the room is locked or not. */
-  l?: number;
+// declare interface RoomDetails {
+//   /** Player count. */
+//   c: number;
+//   /** */
+//   s: number;
+//   /** Room ID. */
+//   id: string;
+//   /** Room name. */
+//   n: string;
+//   /** Room mode (modes not starting with "Live"). */
+//   mo: number;
+//   /** Room mode (modes starting with "Live"). */
+//   pm: number;
+//   /** Lifetime games played. */
+//   g: number;
+//   /** Room speed limit (in PPS) - `0` if no speed limit is set. */
+//   sl: number;
+//   /** Maximum number of users in a room - `24` or more is treated as no limit. */
+//   m: number;
+//   /** Waiting, perhaps? */
+//   w?: number;
+//   /** */
+//   d: {
+//     /** The server the given room is on. */
+//     s: string;
+//     /** Restrictions that prevent certain users from joining */
+//     lock?: Limits;
+//   };
+//   det: RoomFurtherDetails;
+//   /** */
+//   tr?: number;
+//   /** Whether the room is locked or not. */
+//   l?: number;
+// }
+
+declare interface RoomJoinLimits {
+  /** Whether the player is eligible to play in the room. */
+  r?: boolean;
+  /** Limits imposed on the room. */
+  l?: Limits;
+  /** Player's current stats. */
+  s?: CurrentStats;
 }
 
-declare interface RoomDetails2 {
+declare interface CurrentStats {
+  /** The player's 10-game APM average. */
+  apm: number;
+  /** The player's total Live playtime. */
+  gt: number;
+  /** The player's 40L Sprint PB. */
+  sub: number;
+}
+
+declare interface PlayerInformation {
+  /** Current amount of registered players in the room. */
+  c: number;
+  /** Current amount of guests in the room. */
+  g: number;
+  /** More detailed information about players in the room. */
+  p: PlayerDetails;
+  /** Current amount of spectators in the room. */
+  s: number;
+}
+
+declare interface RoomDetails {
   /** Information about room join limits. */
-  l?: {
-    /** Whether the player is eligible to play in the room. */
-    r?: boolean;
-    /** Limits imposed on the room. */
-    l?: Limits;
-    /** Player's current stats. */
-    s?: {
-      /** The player's 10-game APM average. */
-      apm: number;
-      /** The player's total Live playtime. */
-      gt: number;
-      /** The player's 40L Sprint PB. */
-      sub: number;
-    };
-  };
+  l?: RoomJoinLimits;
   /** Information about players in the room. */
-  p: {
-    /** Current amount of registered players in the room. */
-    c: number;
-    /** Current amount of guests in the room. */
-    g: number;
-    /** More detailed information about players in the room. */
-    p: PlayerDetails;
-    /** Current amount of spectators in the room. */
-    s: number;
-  };
+  p: PlayerInformation;
   /** Room ID. */
   r: string;
   /** Settings modified from defaults. */
-  s: RoomConfig;
+  s: RoomModifiedConfig;
   /** Max amount allowed? */
   t: number;
 }
@@ -345,13 +354,13 @@ declare interface ReplayMeta {
    *
    * Last 16 bits represent the submode.
    */
-  m: 393216;
+  m: number;
   /** Piece set used. */
-  bs: 1;
+  bs: number;
   /** Sound effect set used. */
-  se: 2;
+  se: number;
   /** DAS used (in milliseconds) */
-  das: 140;
+  das: number;
   /**
    * Ruleset used:
    * - `0` - Standard
@@ -359,7 +368,7 @@ declare interface ReplayMeta {
    * - `2` - Pentomino
    * - `3` - MPH
    */
-  r: 0;
+  r: number;
   /** Map ID used. */
   map?: string;
 }
@@ -2061,6 +2070,60 @@ declare interface RoomConfig {
   sgpA?: number[];
 }
 
+declare interface RoomModifiedConfig {
+  at?: [
+    zero: number,
+    single: number,
+    double: number,
+    triple: number,
+    jstris: number,
+    TSD: number,
+    TST: number,
+    TSS: number,
+    MTSS: number,
+    PC: number,
+    B2B: number
+  ];
+  ct?: [
+    combo0: number,
+    combo1: number,
+    combo2: number,
+    combo3: number,
+    combo4: number,
+    combo5: number,
+    combo6: number,
+    combo7: number,
+    combo8: number,
+    combo9: number,
+    combo10: number,
+    combo11: number,
+    combo12plus: number
+  ];
+  ld?: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
+  cd?: number;
+  gdm?: number;
+  gblock?: number;
+  ghost?: number;
+  DAS?: number;
+  ARR?: number;
+  rnd?: number;
+  pr?: number;
+  hold?: boolean;
+  bbs?: number;
+  grav?: number;
+  mess?: number;
+  gDelay?: number;
+  hostStart?: boolean;
+  noFW?: boolean;
+  sa?: boolean;
+  gInv?: boolean;
+  gapW?: number;
+  as?: number;
+  asEx?: string;
+  sgp?: number;
+  sgpA?: number[];
+}
+
 /** Specifies translatable strings throughout the game. */
 declare const i18n: I18n;
 
@@ -2512,7 +2575,7 @@ declare class Game extends GameCore {
   startReadyGo(): void;
   // ? Parameters not known.
   getPlace(unknownParameter1: boolean, unknownParameter2: boolean): number;
-  getPlaceColor(place: number): string;
+  getPlaceColor(place: number): { str: string; color: string };
   start(): void;
   restart(): void;
   setFocusState(newFocusState: 0 | 1): void; // Again, why isn't this a boolean?
@@ -3890,7 +3953,36 @@ declare class Settings {
 declare class GameCaption {
   constructor(stage: HTMLDivElement);
   parent: HTMLDivElement;
-  captions: object;
+  captions: {
+    /** Spectator Mode caption. */
+    "1"?: HTMLDivElement;
+    /** Out of focus caption. */
+    "2"?: HTMLDivElement;
+    /** Ready? Go! caption. */
+    "3"?: HTMLDivElement;
+    /** Placement caption. */
+    "4"?: HTMLDivElement;
+    /** Speed limit caption. */
+    "5"?: HTMLDivElement;
+    /** Map/Usermode loading caption. */
+    "6"?: HTMLDivElement;
+    /** New personal best caption. */
+    "7"?: HTMLDivElement;
+    /** Loading caption. */
+    "8"?: HTMLDivElement;
+    /** Race finished caption. */
+    "9"?: HTMLDivElement;
+    /** Game warning caption. */
+    "10"?: HTMLDivElement;
+    /** Usermode task caption. */
+    "11"?: HTMLDivElement;
+    /** Usermode completed caption. */
+    "12"?: HTMLDivElement;
+    /** Usermode paused "caption". */
+    "13"?: HTMLDivElement;
+    /** Usermode button "caption". */
+    "14"?: HTMLDivElement;
+  };
   readonly SPECTATOR_MODE: 1;
   readonly OUT_OF_FOCUS: 2;
   readonly READY_GO: 3;
@@ -3908,7 +4000,7 @@ declare class GameCaption {
   speedTimout: number | null;
 
   create(): HTMLDivElement;
-  hide(captionType: number): void;
+  hide(captionType?: number): void;
   hideExcept(captionType: number): void;
   spectatorMode(): void;
   outOfFocus(topOffsetOverride?: number): void;
@@ -3920,14 +4012,14 @@ declare class GameCaption {
   button(options: { handler: VoidFunction }): void;
   gamePlace(game: Game): void;
   speedWarning(PPSlimit: number): void;
-  private _fadeOut(caption: HTMLDivElement, timeoutMs: number, transitionTimerSec?: number, opacity?: number): void;
+  _fadeOut(caption: HTMLDivElement, timeoutMs: number, transitionTimerSec?: number, opacity?: number): void;
   newPB(PBinfo: PersonalBestInfo | boolean): void;
   /**
    * Displays a loading caption.
    * @param captionText Caption text.
    * @param imageType Image type: `1` for a cross, `2` for a trollface, animated spinner if not provided.
    */
-  loading(captionText: string, imageType?: undefined | 1 | 2): void;
+  loading(captionText: string, imageType?: undefined | 0 | 1 | 2): void;
   liveRaceFinished(): void;
   gameWarning(warningTitle: string, warningDescription?: string, options?: { fade_after?: number }): void;
 }
@@ -4511,6 +4603,7 @@ declare class FastFont {}
 
 declare class FastFont2D {}
 
+/** https://github.com/hammerjs/hammer.js*/
 declare class Hammer {}
 
 /**
@@ -4521,7 +4614,7 @@ declare class CP {}
 declare class RoomInfo {
   constructor(live: Live);
   l: Live;
-  roomDetailBox: number | null;
+  roomDetailBox: HTMLDivElement | null;
   timeoutRequestDetail: number | null;
   timeoutRoomDetail: number | null;
   rdParts: {
@@ -4535,123 +4628,123 @@ declare class RoomInfo {
     limit: HTMLDivElement;
   };
   roomDetails: {
-    [roomID: string]: RoomDetails2;
+    [roomID: string]: RoomDetails;
   };
   /** Internationalized names for On and Off. */
-  readonly ON_OFF: ["Off", "On"];
+  readonly ON_OFF: [string, string];
   /** Short config names. */
   readonly CONF_NAMES: {
     /** Attack Table */
-    at: "Attack table";
+    at: string;
     /** Combo Table */
-    ct: "Combo table";
+    ct: string;
     /** Lock Delay */
-    ld: "Lock delay";
+    ld: string;
     /** Clear Delay (ms) */
     cd: {
       /** Config name. */
-      n: "Clear delay";
+      n: string;
       /** Config unit. */
-      u: "ms";
+      u: string;
     };
     /** Delayed Auto Shift (ms) */
     DAS: {
       /** Config name. */
-      n: "DAS";
+      n: string;
       /** Config unit. */
-      u: "ms";
+      u: string;
     };
     /** Auto Repeat Rate (ms). */
     ARR: {
       /** Config name. */
-      n: "ARR";
+      n: string;
       /** Config unit. */
-      u: "ms";
+      u: string;
     };
     /** Garbage distribution method. */
     gdm: {
       /** Config name. */
-      n: "G-distrib.";
+      n: string;
       /** Config values. */
-      v: [null, "divide", "toAll", null, "toMost", "toSelf", "random", "roulette"];
+      v: [null, string, string, null, string, string, string, string];
     };
     /** Garbage blocking method. */
     gblock: {
       /** Config name. */
-      n: "G-blocking";
+      n: string;
       /** Config values. */
-      v: ["full", "limited", "none", "instant"];
+      v: [string, string, string, string];
     };
     /** Randomizer. */
     rnd: {
       /** Config name. */
-      n: "Randomizer";
+      n: string;
       /** Config values. */
-      v: ["7bag", "14bag", "Classic", "1Block", "2Block", "1x7bag", "1x14bag", "C2Sim", "7b-RR", "BSb-7b", "BB-7b"];
+      v: [string, string, string, string, string, string, string, string, string, string, string];
     };
     /** Amount of previews. */
-    pr: "Previews";
+    pr: string;
     /** Hold. */
-    hold: "Hold";
+    hold: string;
     /** Piece set. */
     bbs: {
       /** Config name. */
-      n: "Blocks";
+      n: string;
       /** Config values. */
-      v: [null, "Big", "Big+", "ARS", "Penta", "M123", "All29", "C2RS", "OSpin"];
+      v: [null, string, string, string, string, string, string, string, string];
     };
     /** Gravity level. */
-    grav: "Gravity";
-    /** Garbage messiness. */
+    grav: string;
+    /** Garbage messiness (%). */
     mess: {
       /** Config name. */
-      n: "Messiness";
+      n: string;
       /** Config unit. */
-      u: "%";
+      u: string;
     };
-    /** Garbage delay. */
+    /** Garbage delay (ms). */
     gDelay: {
       /** Config name. */
-      n: "G-delay";
+      n: string;
       /** Config unit. */
-      u: "ms";
+      u: string;
     };
     /** HostStart. */
-    hostStart: "HostStart";
+    hostStart: string;
     /** Invert garbage. */
-    gInv: "G-invert";
+    gInv: string;
     /** Garbage hole width. */
-    gapW: "G-gap";
+    gapW: string;
     /** No 4-wide. */
-    noFW: "noFW";
+    noFW: string;
     /** Ghost piece. */
     ghost: {
       /** Config name. */
-      n: "Ghost";
+      n: string;
       /** Config values. */
       v: {
-        "-1": "Def";
-        0: "Off";
-        1: "On";
+        "-1": string;
+        0: string;
+        1: string;
       };
     };
     /** Attack as solid. */
-    sa: "SolidAtk";
+    sa: string;
     /** All-spin. */
     as: {
       /** Config name. */
-      n: "AllSpin";
+      n: string;
       /** Config values. */
-      v: ["Off", "On - Im.", "On - 4P"];
+      v: [string, string, string];
     };
     /** All-spin exclusion list. */
-    asEx: "AS-Excl.";
+    asEx: string;
     /** Solid garbage profile. */
     sgp: {
       /** Config name. */
-      n: "Solid";
+      n: string;
       /** Config values. */
-      v: ["0", "1", "2", "Custom speed"];
+      v: [string, string, string, string];
     };
   };
   /** Limit names and units. */
@@ -4659,25 +4752,43 @@ declare class RoomInfo {
     /** APM. */
     apm: {
       /** Name. */
-      n: "APM";
+      n: string;
       /** Unit. */
-      u: "";
+      u: string;
     };
     /** Sprint 40L time. */
     sub: {
       /** Name. */
-      n: "Sprint 40L";
+      n: string;
       /** Unit. */
-      u: "s";
+      u: string;
     };
     /** Total Live playtime. */
     gt: {
       /** Name. */
-      n: "Gametime";
+      n: string;
       /** Unit. */
-      u: "hrs";
+      u: string;
     };
   };
+
+  onLobbyRefresh(): void;
+  onLobbyClosed(): void;
+  detailBoxEntered(unusedParameter: unknown): void;
+  detailBoxLeft(unusedParameter: unknown): void;
+  createElement<K extends keyof HTMLElementTagNameMap>(
+    tagName: K,
+    CSSclasses: string[],
+    elementToAppendTo: Node | null
+  ): HTMLElementTagNameMap[K];
+  requestRoomDetail(roomID: string): void;
+  acceptRoomDetail(response: object): void;
+  displayRoomDetail(id: string): void;
+  displayLimit(roomDetails: RoomDetails): void;
+  displayConfig(roomDetails: RoomDetails): void;
+  displayPlayers(roomDetails: RoomDetails): void;
+  openRoomDetails(event: MouseEvent): void;
+  closeRoomDetails(event: MouseEvent): void;
 }
 
 declare class ChatAutocomplete {
