@@ -4915,7 +4915,7 @@ declare class EmoteSelect {
 declare class ModeTrigger {}
 
 declare class ReplayController {
-  g: Replayer;
+  g: Replayer[];
   playSpeed: number;
   clock: number;
   listeners: { [eventName: string]: (() => void)[] };
