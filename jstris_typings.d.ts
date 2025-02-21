@@ -2534,7 +2534,7 @@ declare class Game extends GameCore {
   interval: number | null;
   animator: LineClearAnimator | null;
   RulesetManager: RulesetManager;
-  conf: [object, object];
+  conf: [Ruleset, Ruleset];
   /** Refers to `this.conf[0]`. */
   R: Ruleset;
   Settings: Settings;
@@ -5000,3 +5000,9 @@ declare const LZString: {
   decompressFromUTF16: (compressed: string | null) => string | null | undefined;
   decompressFromUint8Array: (compressed: Uint8Array | null) => string | null | undefined;
 };
+
+declare function alea(seed: string): () => number & {
+  int32: () => number;
+  double: () => number;
+  quick: () => number;
+}
