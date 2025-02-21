@@ -4914,7 +4914,52 @@ declare class EmoteSelect {
 
 declare class ModeTrigger {}
 
-declare class ReplayController {}
+declare class ReplayController {
+  g: Replayer;
+  playSpeed: number;
+  clock: number;
+  listeners: { [eventName: string]: (() => void)[] };
+  debug: boolean;
+
+  constructor(replayer: Replayer);
+
+  toggleRepControls(): void;
+  addListener(eventName: string, listener: () => void): void;
+  trigger(eventName: string): void;
+  frame(): void;
+  run(): void;
+  update(timeDelta_ms: number): void;
+  loadReplay(): false | void;
+  allReplaysEnded(unusedParameter: unknown): boolean;
+  pauseReplay(shouldPlay?: boolean): boolean;
+  nextFrame(): void;
+  prevFrame(): void;
+  loadAtFrame(pointer: number): void;
+  loadAtTime(timestamp: number): void;
+  changeSpeed(): void;
+  timestamp(): number;
+  toggleAnalytics(show?: 1): void;
+  keyInput(event: KeyboardEvent): void;
+  getFinesse(): { finesse: number[]; scoreStamps: ScoreStamp[] };
+  fixUltraClockPrecision(): void;
+  startDownloaders(): void;
+}
+
+declare class ReplayDownloader {
+  id: number;
+  elemID: string;
+  elem: HTMLTextAreaElement;
+  live: number;
+  isDownloading: boolean;
+  controller: ReplayController | null;
+  spin?: HTMLImageElement;
+
+  constructor(id: number, live: number, elementID: string, replayController?: ReplayController);
+
+  onData(data: object): void;
+  download(id: string, type: string): void;
+  onError(errorMessage: string): void;
+}
 
 declare class SimpleStatsManager {}
 
@@ -4942,3 +4987,16 @@ declare class Analytics {
 
   segments: Segment[];
 }
+
+declare const LZString: {
+  compress: (input: string | null) => string;
+  compressToBase64: (input: string | null) => string;
+  compressToEncodedURIComponent: (input: string | null) => string;
+  compressToUTF16: (input: string | null) => string;
+  compressToUint8Array: (uncompressed: string | null) => Uint8Array;
+  decompress: (compressed: string | null) => string | null | undefined;
+  decompressFromBase64: (compressed: string | null) => string | null | undefined;
+  decompressFromEncodedURIComponent: (input: string | null) => string | null | undefined;
+  decompressFromUTF16: (compressed: string | null) => string | null | undefined;
+  decompressFromUint8Array: (compressed: Uint8Array | null) => string | null | undefined;
+};
