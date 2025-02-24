@@ -1,2131 +1,2186 @@
 declare interface AleaPRNG {
   (): number;
+  int32: () => number;
+  double: () => number;
+  quick: () => number;
 }
-/** @deprecated Jstris should use {@link KeyboardEvent.code() keyboard codes} instead. Come on, we are in 2025. */
-declare type KeyCode = number;
 
-type GrowToSize<T, N extends number, A extends T[]> = A["length"] extends N ? A : GrowToSize<T, N, [...A, T]>;
+declare interface LZString {
+  compress: (input: string | null) => string;
+  compressToBase64: (input: string | null) => string;
+  compressToEncodedURIComponent: (input: string | null) => string;
+  compressToUTF16: (input: string | null) => string;
+  compressToUint8Array: (uncompressed: string | null) => Uint8Array;
+  decompress: (compressed: string | null) => string | null | undefined;
+  decompressFromBase64: (compressed: string | null) => string | null | undefined;
+  decompressFromEncodedURIComponent: (input: string | null) => string | null | undefined;
+  decompressFromUTF16: (compressed: string | null) => string | null | undefined;
+  decompressFromUint8Array: (compressed: Uint8Array | null) => string | null | undefined;
+}
 
-type FixedArray<T, N extends number> = GrowToSize<T, N, []>;
+  type GrowToSize<T, N extends number, A extends T[]> = A["length"] extends N ? A : GrowToSize<T, N, [...A, T]>;
 
-declare interface ReplayResponse {
-  /** The replay ID. */
-  id: number;
-  /** The game mode played. */
-  gm: number;
+  type FixedArray<T, N extends number> = GrowToSize<T, N, []>;
+
+/** Stores types used throughout Jstris. */
+declare namespace Jstris {
+  /** @deprecated Jstris should use {@link KeyboardEvent.code() keyboard codes} instead. Come on, we are in 2025. */
+  type KeyCode = number;
+
+  /** An array of 10 numbers, which defines a row of a Jstris board. */
+   type MatrixRow = FixedArray<number, 10>;
+
+  /** A 20x10 matrix, which is a visible part of the Jstris board. */
+  type Matrix = FixedArray<MatrixRow, 20>;
+
+  interface ReplayResponse {
+    /** The replay ID. */
+    id: number;
+    /** The game mode played. */
+    gm: number;
+    /**
+     * Map ID or a number that is composed like this:
+     *
+     * `ruleset * 10 + submode`.
+     */
+    m: number;
+    /** Whether a replay has been generated for the game. */
+    rep: true;
+    /** Contains personal best info if a PB has been achieved, `true` if that was the first game, `false` if no PB was achieved. */
+    pb: PersonalBestInfo | boolean;
+  }
+
+  interface PersonalBestInfo {
+    /** The new best score/time. */
+    new: number;
+    /** The previous best score/time. */
+    prev: number;
+    /** The new best score/time. */
+    newS: number;
+    /** The previous best score/time. */
+    prevS: number;
+    /** The improvement from the previous best score/time. */
+    diffS: number;
+    /** How long ago the previous PB was achieved. */
+    days: number;
+    /** The mode title. */
+    modeTitle: string;
+  }
+
   /**
-   * Map ID or a number that is composed like this:
-   *
-   * `ruleset * 10 + submode`.
+   * Specifies options for GIF/video skins.
    */
-  m: number;
-  /** Whether a replay has been generated for the game. */
-  rep: true;
-  /** Contains personal best info if a PB has been achieved, `true` if that was the first game, `false` if no PB was achieved. */
-  pb: PersonalBestInfo | boolean;
-}
+  interface VideoOptions {
+    /** Makes the skin video visible. */
+    debug?: boolean;
+    /**
+     * **GIF skins**: Turns a single GIF into a complete skin by replicating the GIF 9 times over.
+     *
+     * Discards the original aspect ratio of the GIF.
+     */
+    skinify?: boolean;
+    /** **GIF skins**: If `skinify` option is `true`, the skinified GIF will be tinted with Guideline colors. */
+    colorize?: boolean;
+    /**
+     * **GIF skins**: If `colorize` option is `true`, specifies the tint intensity.
+     *
+     * A number between 0 and 1. Defaults to 0.7 if not provided.
+     */
+    colorAlpha?: number;
+    /**
+     * **Video skins**: Specifies, whether the video plays sounds.
+     *
+     * Defaults to `false` if not provided.
+     */
+    sound?: boolean;
+  }
 
-declare interface PersonalBestInfo {
-  /** The new best score/time. */
-  new: number;
-  /** The previous best score/time. */
-  prev: number;
-  /** The new best score/time. */
-  newS: number;
-  /** The previous best score/time. */
-  prevS: number;
-  /** The improvement from the previous best score/time. */
-  diffS: number;
-  /** How long ago the previous PB was achieved. */
-  days: number;
-  /** The mode title. */
-  modeTitle: string;
-}
+  interface GameData {
+    lines: number;
+    singles: number;
+    doubles: number;
+    triples: number;
+    tetrises: number;
+    maxCombo: number;
+    linesSent: number;
+    linesReceived: number;
+    PCs: number;
+    lastPC: number;
+    TSD: number;
+    TSD20: number;
+    B2B: number;
+    attack: number;
+    score: number;
+    holds: number;
+    garbageCleared: number;
+    wasted: number;
+    tpieces: number;
+    tspins: number;
+  }
 
-/**
- * Specifies options for GIF/video skins.
- */
-declare interface VideoOptions {
-  /** Makes the skin video visible. */
-  debug?: boolean;
-  /**
-   * **GIF skins**: Turns a single GIF into a complete skin by replicating the GIF 9 times over.
-   *
-   * Discards the original aspect ratio of the GIF.
-   */
-  skinify?: boolean;
-  /** **GIF skins**: If `skinify` option is `true`, the skinified GIF will be tinted with Guideline colors. */
-  colorize?: boolean;
-  /**
-   * **GIF skins**: If `colorize` option is `true`, specifies the tint intensity.
-   *
-   * A number between 0 and 1. Defaults to 0.7 if not provided.
-   */
-  colorAlpha?: number;
-  /**
-   * **Video skins**: Specifies, whether the video plays sounds.
-   *
-   * Defaults to `false` if not provided.
-   */
-  sound?: boolean;
-}
+  type Controls = [
+    moveLeft: KeyCode,
+    moveRight: KeyCode,
+    softDrop: KeyCode,
+    hardDrop: KeyCode,
+    rotateLeft: KeyCode,
+    rotateRight: KeyCode,
+    rotate180: KeyCode,
+    hold: KeyCode,
+    restartPractice: KeyCode,
+    restartLive: KeyCode
+  ];
 
-declare interface GameData {
-  lines: number;
-  singles: number;
-  doubles: number;
-  triples: number;
-  tetrises: number;
-  maxCombo: number;
-  linesSent: number;
-  linesReceived: number;
-  PCs: number;
-  lastPC: number;
-  TSD: number;
-  TSD20: number;
-  B2B: number;
-  attack: number;
-  score: number;
-  holds: number;
-  garbageCleared: number;
-  wasted: number;
-  tpieces: number;
-  tspins: number;
-}
+  interface GLContextDefinition {
+    elem: HTMLCanvasElement;
+    mesh: {
+      w: number;
+      h: number;
+    };
+    gl: WebGLRenderingContext;
+    globalAlpha: WebGLUniformLocation;
+    m4: Float32Array;
+    matrixLocation: WebGLUniformLocation;
+    positionBuffer: WebGLBuffer;
+    positionLocation: number;
+    program: WebGLProgram;
+    textcoordBuffer: WebGLBuffer;
+    texcoordLocation: 1;
+    textureMatrixLocation: WebGLUniformLocation;
+    textureInfos: {
+      width: number;
+      height: number;
+      texture: WebGLTexture;
+    }[];
+    boundBuffers: boolean;
+    boundTexture: WebGLTexture | null;
+  }
 
-declare type Controls = [
-  moveLeft: KeyCode,
-  moveRight: KeyCode,
-  softDrop: KeyCode,
-  hardDrop: KeyCode,
-  rotateLeft: KeyCode,
-  rotateRight: KeyCode,
-  rotate180: KeyCode,
-  hold: KeyCode,
-  restartPractice: KeyCode,
-  restartLive: KeyCode
-];
+  interface Servers {
+    [serverID: string]: {
+      /** The server's URL. */
+      h: string;
+      /** The server's name. */
+      n: string;
+      /** The server's port. */
+      p: string;
+      /** The server scheme. */
+      s: string;
+    };
+  }
 
-declare interface GLContextDefinition {
-  elem: HTMLCanvasElement;
-  mesh: {
-    w: number;
-    h: number;
-  };
-  gl: WebGLRenderingContext;
-  globalAlpha: WebGLUniformLocation;
-  m4: Float32Array;
-  matrixLocation: WebGLUniformLocation;
-  positionBuffer: WebGLBuffer;
-  positionLocation: number;
-  program: WebGLProgram;
-  textcoordBuffer: WebGLBuffer;
-  texcoordLocation: 1;
-  textureMatrixLocation: WebGLUniformLocation;
-  textureInfos: {
-    width: number;
-    height: number;
-    texture: WebGLTexture;
-  };
-  boundBuffers: boolean;
-  boundTexture: WebGLTexture | null;
-}
+  interface Clients {
+    [cid: number]: Client;
+  }
 
-interface Servers {
-  [serverID: string]: {
-    /** The server's URL. */
-    h: string;
-    /** The server's name. */
-    n: string;
-    /** The server's port. */
-    p: string;
-    /** The server scheme. */
-    s: string;
-  };
-}
+  interface Client {
+    /** Whether the user is registered or not. (?) */
+    auth: boolean;
+    /** The client's CID. */
+    cid: number;
+    /** Nickname color, if set. */
+    color: string | null;
+    /** Openmoji Supporter icon (applied only when `type` is `999`). */
+    icon: string | null;
+    /** Whether the user is a moderator. Potentially only `true` when the player is a moderator. */
+    mod: boolean;
+    /** The client's nickname. */
+    name: string;
+    /** The replay played live, or `null` if the player is not playing. */
+    rep: Replayer | null;
+    /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
+    type: number;
+    bold?: boolean;
+  }
 
-interface Clients {
-  [cid: number]: Client;
-}
+  interface LobbyList {
+    /** Standard rooms. */
+    s: object[];
+    /** Custom rooms. */
+    c: object[];
+    /** Overflow rooms. */
+    o: object[];
+    /** Guest rooms. */
+    g: object[];
+    /** Spectate only rooms. */
+    l: object[];
+    /** Unknown. Private rooms maybe? */
+    p: object[];
+  }
 
-declare interface Client {
-  /** Whether the user is registered or not. (?) */
-  auth: boolean;
-  /** The client's CID. */
-  cid: number;
-  /** Nickname color, if set. */
-  color: string | null;
-  /** Openmoji Supporter icon (applied only when `type` is `999`). */
-  icon: string | null;
-  /** Whether the user is a moderator. Potentially only `true` when the player is a moderator. */
-  mod: boolean;
-  /** The client's nickname. */
-  name: string;
-  /** The replay played live, or `null` if the player is not playing. */
-  rep: Replayer | null;
-  /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
-  type: number;
-  bold?: boolean;
-}
+  interface Limits {
+    /** 10-game APM minimum and maximum */
+    apm?: [min: number | null, max: number | null];
+    /** Live gametime (in hours) minimum and maximum */
+    gt?: [min: number | null, max: number | null];
+    /** Sprint 40L PB minimum and maximum */
+    sub?: [min: number | null, max: number | null];
+  }
 
-declare interface LobbyList {
-  /** Standard rooms. */
-  s: object[];
-  /** Custom rooms. */
-  c: object[];
-  /** Overflow rooms. */
-  o: object[];
-  /** Guest rooms. */
-  g: object[];
-  /** Spectate only rooms. */
-  l: object[];
-  /** Unknown. Private rooms maybe? */
-  p: object[];
-}
+  // interface RoomDetails {
+  //   /** Player count. */
+  //   c: number;
+  //   /** */
+  //   s: number;
+  //   /** Room ID. */
+  //   id: string;
+  //   /** Room name. */
+  //   n: string;
+  //   /** Room mode (modes not starting with "Live"). */
+  //   mo: number;
+  //   /** Room mode (modes starting with "Live"). */
+  //   pm: number;
+  //   /** Lifetime games played. */
+  //   g: number;
+  //   /** Room speed limit (in PPS) - `0` if no speed limit is set. */
+  //   sl: number;
+  //   /** Maximum number of users in a room - `24` or more is treated as no limit. */
+  //   m: number;
+  //   /** Waiting, perhaps? */
+  //   w?: number;
+  //   /** */
+  //   d: {
+  //     /** The server the given room is on. */
+  //     s: string;
+  //     /** Restrictions that prevent certain users from joining */
+  //     lock?: Limits;
+  //   };
+  //   det: RoomFurtherDetails;
+  //   /** */
+  //   tr?: number;
+  //   /** Whether the room is locked or not. */
+  //   l?: number;
+  // }
 
-declare interface Limits {
-  /** 10-game APM minimum and maximum */
-  apm?: [min: number | null, max: number | null];
-  /** Live gametime (in hours) minimum and maximum */
-  gt?: [min: number | null, max: number | null];
-  /** Sprint 40L PB minimum and maximum */
-  sub?: [min: number | null, max: number | null];
-}
+  interface RoomJoinLimits {
+    /** Whether the player is eligible to play in the room. */
+    r?: boolean;
+    /** Limits imposed on the room. */
+    l?: Limits;
+    /** Player's current stats. */
+    s?: CurrentStats;
+  }
 
-// declare interface RoomDetails {
-//   /** Player count. */
-//   c: number;
-//   /** */
-//   s: number;
-//   /** Room ID. */
-//   id: string;
-//   /** Room name. */
-//   n: string;
-//   /** Room mode (modes not starting with "Live"). */
-//   mo: number;
-//   /** Room mode (modes starting with "Live"). */
-//   pm: number;
-//   /** Lifetime games played. */
-//   g: number;
-//   /** Room speed limit (in PPS) - `0` if no speed limit is set. */
-//   sl: number;
-//   /** Maximum number of users in a room - `24` or more is treated as no limit. */
-//   m: number;
-//   /** Waiting, perhaps? */
-//   w?: number;
-//   /** */
-//   d: {
-//     /** The server the given room is on. */
-//     s: string;
-//     /** Restrictions that prevent certain users from joining */
-//     lock?: Limits;
-//   };
-//   det: RoomFurtherDetails;
-//   /** */
-//   tr?: number;
-//   /** Whether the room is locked or not. */
-//   l?: number;
-// }
+  interface CurrentStats {
+    /** The player's 10-game APM average. */
+    apm: number;
+    /** The player's total Live playtime. */
+    gt: number;
+    /** The player's 40L Sprint PB. */
+    sub: number;
+  }
 
-declare interface RoomJoinLimits {
-  /** Whether the player is eligible to play in the room. */
-  r?: boolean;
-  /** Limits imposed on the room. */
-  l?: Limits;
-  /** Player's current stats. */
-  s?: CurrentStats;
-}
-
-declare interface CurrentStats {
-  /** The player's 10-game APM average. */
-  apm: number;
-  /** The player's total Live playtime. */
-  gt: number;
-  /** The player's 40L Sprint PB. */
-  sub: number;
-}
-
-declare interface PlayerInformation {
-  /** Current amount of registered players in the room. */
-  c: number;
-  /** Current amount of guests in the room. */
-  g: number;
-  /** More detailed information about players in the room. */
-  p: PlayerDetails;
-  /** Current amount of spectators in the room. */
-  s: number;
-}
-
-declare interface RoomDetails {
-  /** Information about room join limits. */
-  l?: RoomJoinLimits;
-  /** Information about players in the room. */
-  p: PlayerInformation;
-  /** Room ID. */
-  r: string;
-  /** Settings modified from defaults. */
-  s: RoomModifiedConfig;
-  /** Max amount allowed? */
-  t: number;
-}
-
-declare type PlayerDetails = {
-  /** The player's nickname. */
-  n: string;
-  /** The player's color, if set in Supporter settings. */
-  col?: string;
-  /** The player's Supporter tier. */
-  ti?: number;
-  /** The player's icon set as Supporter. */
-  icn?: number;
-  /** Player role and icon. */
-  type?: number;
-}[];
-
-declare interface RoomFurtherDetails {
-  /** */
-  p: {
-    /** */
+  interface PlayerInformation {
+    /** Current amount of registered players in the room. */
     c: number;
+    /** Current amount of guests in the room. */
+    g: number;
+    /** More detailed information about players in the room. */
+    p: PlayerDetails;
+    /** Current amount of spectators in the room. */
+    s: number;
+  }
+
+  interface RoomDetails {
+    /** Information about room join limits. */
+    l?: RoomJoinLimits;
+    /** Information about players in the room. */
+    p: PlayerInformation;
+    /** Room ID. */
+    r: string;
+    /** Settings modified from defaults. */
+    s: RoomModifiedConfig;
+    /** Max amount allowed? */
+    t: number;
+  }
+
+  type PlayerDetails = {
+    /** The player's nickname. */
+    n: string;
+    /** The player's color, if set in Supporter settings. */
+    col?: string;
+    /** The player's Supporter tier. */
+    ti?: number;
+    /** The player's icon set as Supporter. */
+    icn?: number;
+    /** Player role and icon. */
+    type?: number;
+  }[];
+
+  interface RoomFurtherDetails {
     /** */
     p: {
-      /** Player nickname */
-      n: string;
-      /** Player role and icon */
-      type?: number;
       /** */
-      ti?: number;
+      c: number;
+      /** */
+      p: {
+        /** Player nickname */
+        n: string;
+        /** Player role and icon */
+        type?: number;
+        /** */
+        ti?: number;
+      };
+      /** */
+      g: number;
+      /** Room config */
+      s: RoomConfig;
+      l: null;
     };
+  }
+  // TODO
+  type ResultsList = object;
+  type TeamResultsList = object;
+
+  interface Emote {
+    /** Category to which the emote belongs. */
+    g: string;
+    /** Emote name. */
+    n: string;
+    /** Tags separated by spaces to which the emote belongs. */
+    t?: string;
+    /** Emote URL. */
+    u?: string;
     /** */
-    g: number;
-    /** Room config */
-    s: RoomConfig;
-    l: null;
-  };
-}
-// TODO
-declare type ResultsList = object;
-declare type TeamResultsList = object;
+    c?: "uee" | "oee";
+    /** Never used, but called by the code. */
+    p?: unknown;
+  }
 
-declare interface Emote {
-  /** Category to which the emote belongs. */
-  g: string;
-  /** Emote name. */
-  n: string;
-  /** Tags separated by spaces to which the emote belongs. */
-  t?: string;
-  /** Emote URL. */
-  u?: string;
-  /** */
-  c?: "uee" | "oee";
-  /** Never used, but called by the code. */
-  p?: unknown;
-}
+  type CurrentWord = [lastWord: string, caretPosition: number];
 
-declare type CurrentWord = [lastWord: string, caretPosition: number];
+  type EmoteList = Emote[];
 
-declare type EmoteList = Emote[];
+  interface ViewNameDefinition {
+    hold: "holdCanvas";
+    bg: "bgLayer";
+    main: "myCanvas";
+    queue: "queueCanvas";
+    statTable: "statTable";
+    si: "sprintInfo";
+    lrem: "lrem";
+  }
 
-declare interface ViewNameDefinition {
-  hold: "holdCanvas";
-  bg: "bgLayer";
-  main: "myCanvas";
-  queue: "queueCanvas";
-  statTable: "statTable";
-  si: "sprintInfo";
-  lrem: "lrem";
-}
-
-declare interface ReplayMeta {
-  /** Replay version. */
-  v: number;
-  /** Soft drop ID used. */
-  softDropId: number;
-  /** Timestamp of the start of the game. */
-  gameStart: number;
-  /** Timestamp of the end of the game. */
-  gameEnd: number;
-  /** Seed used in the replay. */
-  seed: string;
-  /**
-   * 32-bit integer representing the mode and submode of the replay.
-   *
-   * First 16 bits represent the mode.
-   *
-   * Last 16 bits represent the submode.
-   */
-  m: number;
-  /** Piece set used. */
-  bs: number;
-  /** Sound effect set used. */
-  se: number;
-  /** DAS used (in milliseconds) */
-  das: number;
-  /**
-   * Ruleset used:
-   * - `0` - Standard
-   * - `1` - Big Mode
-   * - `2` - Pentomino
-   * - `3` - MPH
-   */
-  r: number;
-  /** Map ID used. */
-  map?: string;
-}
-
-declare interface ReplayInfo {
-  /**  */
-  c: ReplayMeta;
-  /** Replay data as a Base64-encoded string. */
-  d: string;
-  /** Map info. */
-  map: {
-    /** Map ID. */
-    id: number;
-    /** Map state: `0` if the map is not published, `1` if it is. */
-    state: 0 | 1;
-    /** Name of the map. */
-    name: string;
-    /** Static queue consisting of tetrominoes (`I`,`O`,`T`,`L`,`J`,`S`,`Z`), or `null` if not provided. */
-    queue: string | null;
+  interface ReplayMeta {
+    /** Replay version. */
+    v: number;
+    /** Soft drop ID used. */
+    softDropId: number;
+    /** Timestamp of the start of the game. */
+    gameStart: number;
+    /** Timestamp of the end of the game. */
+    gameEnd: number;
+    /** Seed used in the replay. */
+    seed: string;
     /**
-     * Type of finish:
-     * - `0` if all map blocks need to be cleared,
-     * - `1` if a Perfect Clear must be achieved.
+     * 32-bit integer representing the mode and submode of the replay.
+     *
+     * First 16 bits represent the mode.
+     *
+     * Last 16 bits represent the submode.
      */
-    finish: 0 | 1;
-    /** Map data. */
-    data: string;
-    /** Map MD5 hash. */
-    boardMD5: string;
-  };
-}
+    m: number;
+    /** Piece set used. */
+    bs: number;
+    /** Sound effect set used. */
+    se: number;
+    /** DAS used (in milliseconds) */
+    das: number;
+    /**
+     * Ruleset used:
+     * - `0` - Standard
+     * - `1` - Big Mode
+     * - `2` - Pentomino
+     * - `3` - MPH
+     */
+    r: number;
+    /** Map ID used. */
+    map?: string;
+  }
 
-declare enum Actions {
-  MOVE_LEFT = 0,
-  MOVE_RIGHT = 1,
-  DAS_LEFT = 2,
-  DAS_RIGHT = 3,
-  ROTATE_LEFT = 4,
-  ROTATE_RIGHT = 5,
-  ROTATE_180 = 6,
-  HARD_DROP = 7,
-  SOFT_DROP_BEGIN_END = 8,
-  GRAVITY_STEP = 9,
-  HOLD_BLOCK = 10,
-  GARBAGE_ADD = 11,
-  SGARBAGE_ADD = 12,
-  REDBAR_SET = 13,
-  ARR_MOVE = 14,
-  AUX = 15,
-}
+  interface ReplayInfo {
+    /**  */
+    c: ReplayMeta;
+    /** Replay data as a Base64-encoded string. */
+    d: string;
+    /** Map info. */
+    map: {
+      /** Map ID. */
+      id: number;
+      /** Map state: `0` if the map is not published, `1` if it is. */
+      state: 0 | 1;
+      /** Name of the map. */
+      name: string;
+      /** Static queue consisting of tetrominoes (`I`,`O`,`T`,`L`,`J`,`S`,`Z`), or `null` if not provided. */
+      queue: string | null;
+      /**
+       * Type of finish:
+       * - `0` if all map blocks need to be cleared,
+       * - `1` if a Perfect Clear must be achieved.
+       */
+      finish: 0 | 1;
+      /** Map data. */
+      data: string;
+      /** Map MD5 hash. */
+      boardMD5: string;
+    };
+  }
 
-declare enum AuxActions {
-  AFK = 0,
-  BLOCK_SET = 1,
-  MOVE_TO = 2,
-  RANDOMIZER = 3,
-  MATRIX_MOD = 4,
-  WIDE_GARBAGE_ADD = 5,
-}
+  enum Actions {
+    MOVE_LEFT = 0,
+    MOVE_RIGHT = 1,
+    DAS_LEFT = 2,
+    DAS_RIGHT = 3,
+    ROTATE_LEFT = 4,
+    ROTATE_RIGHT = 5,
+    ROTATE_180 = 6,
+    HARD_DROP = 7,
+    SOFT_DROP_BEGIN_END = 8,
+    GRAVITY_STEP = 9,
+    HOLD_BLOCK = 10,
+    GARBAGE_ADD = 11,
+    SGARBAGE_ADD = 12,
+    REDBAR_SET = 13,
+    ARR_MOVE = 14,
+    AUX = 15,
+  }
 
-declare interface Action {
-  /** Action timestamp (milliseconds since the game started) */
-  t: number;
-  /** Action performed. */
-  a: number;
-  /** Hard drop ordinal, if the action is a hard drop. */
-  hdId?: number;
-}
+  enum AuxActions {
+    AFK = 0,
+    BLOCK_SET = 1,
+    MOVE_TO = 2,
+    RANDOMIZER = 3,
+    MATRIX_MOD = 4,
+    WIDE_GARBAGE_ADD = 5,
+  }
 
-declare interface HardDrop {
-  frame: number;
-  deltat: number;
-}
+  interface Action {
+    /** Action timestamp (milliseconds since the game started) */
+    t: number;
+    /** Action performed. */
+    a: number;
+    /** Hard drop ordinal, if the action is a hard drop. */
+    hdId?: number;
+  }
 
-declare interface ReplayData {
-  c: ReplayMeta;
-  d: string;
-  a: Action[];
-}
+  interface HardDrop {
+    frame: number;
+    deltat: number;
+  }
 
-declare type Segment = [duration: number, index: number, frame: number, deltat: number];
+  interface ReplayData {
+    c: ReplayMeta;
+    d: string;
+    a: Action[];
+  }
 
-declare enum ScoringActions {
-  SOFT_DROP = 0,
-  HARD_DROP = 1,
-  CLEAR1 = 2,
-  CLEAR2 = 3,
-  CLEAR3 = 4,
-  CLEAR4 = 5,
-  TSPIN_MINI = 6,
-  TSPIN = 7,
-  TSPIN_MINI_SINGLE = 8,
-  TSPIN_SINGLE = 9,
-  TSPIN_DOUBLE = 10,
-  TSPIN_TRIPLE = 11,
-  PERFECT_CLEAR = 12,
-  COMBO = 13,
-  CLEAR5 = 14,
-}
+  type Segment = [duration: number, index: number, frame: number, deltat: number];
 
-declare type ScoreStamp = [
-  timestamp: number,
-  scoring: ScoringActions,
-  scoreAdded: number,
-  multiplier: number,
-  alwaysZero: 0
-];
+  enum ScoringActions {
+    SOFT_DROP = 0,
+    HARD_DROP = 1,
+    CLEAR1 = 2,
+    CLEAR2 = 3,
+    CLEAR3 = 4,
+    CLEAR4 = 5,
+    TSPIN_MINI = 6,
+    TSPIN = 7,
+    TSPIN_MINI_SINGLE = 8,
+    TSPIN_SINGLE = 9,
+    TSPIN_DOUBLE = 10,
+    TSPIN_TRIPLE = 11,
+    PERFECT_CLEAR = 12,
+    COMBO = 13,
+    CLEAR5 = 14,
+  }
 
-type FinesseArray = [stateSpawn: number[], stateCW: number[], state180: number[], stateCCW: number[]];
-
-type FullPointDefinition = [fullPoint1_X: number, fullPoint1_Y: number, fullPoint2_X: number, fullPoint2_Y: number];
-
-type MiniPointDefinition = [miniPoint1_X: number, miniPoint1_Y: number, miniPoint2_X: number, miniPoint2_Y: number];
-
-/** Specifies 4-point all-spin points for L, J, S and Z pieces. T piece is handled differently. */
-type AllSpin4Point = [fullPoints: FullPointDefinition, miniPoints: MiniPointDefinition];
-
-/** Specifies 4-point all-spin for the I piece. The I piece has two sets of mini points. */
-type IPiece_AllSpin4Point = [
-  fullPoints: FullPointDefinition,
-  miniPoints: [primary: MiniPointDefinition, alternative: MiniPointDefinition]
-];
-
-type PieceBoundingBoxes<N extends number> = [
-  stateSpawn: FixedArray<FixedArray<number, N>, N>,
-  stateCW: FixedArray<FixedArray<number, N>, N>,
-  state180: FixedArray<FixedArray<number, N>, N>,
-  stateCCW: FixedArray<FixedArray<number, N>, N>
-];
-
-/** Interface used internally to type kicks. */
-interface Kicks {
-  None: [
-    stateSpawn: {
-      "-1": FixedArray<[x: number, y: number], 1>;
-      1: FixedArray<[x: number, y: number], 1>;
-      2: FixedArray<[x: number, y: number], 1>;
-    },
-    stateCW: {
-      "-1": FixedArray<[x: number, y: number], 1>;
-      1: FixedArray<[x: number, y: number], 1>;
-      2: FixedArray<[x: number, y: number], 1>;
-    },
-    state180: {
-      "-1": FixedArray<[x: number, y: number], 1>;
-      1: FixedArray<[x: number, y: number], 1>;
-      2: FixedArray<[x: number, y: number], 1>;
-    },
-    stateCCW: {
-      "-1": FixedArray<[x: number, y: number], 1>;
-      1: FixedArray<[x: number, y: number], 1>;
-      2: FixedArray<[x: number, y: number], 1>;
-    }
+  type ScoreStamp = [
+    timestamp: number,
+    scoring: ScoringActions,
+    scoreAdded: number,
+    multiplier: number,
+    alwaysZero: 0
   ];
-  SRS: [
-    stateSpawn: {
-      "-1": FixedArray<[x: number, y: number], 5>;
-      1: FixedArray<[x: number, y: number], 5>;
-      2: FixedArray<[x: number, y: number], 2>;
-    },
-    stateCW: {
-      "-1": FixedArray<[x: number, y: number], 5>;
-      1: FixedArray<[x: number, y: number], 5>;
-      2: FixedArray<[x: number, y: number], 2>;
-    },
-    state180: {
-      "-1": FixedArray<[x: number, y: number], 5>;
-      1: FixedArray<[x: number, y: number], 5>;
-      2: FixedArray<[x: number, y: number], 2>;
-    },
-    stateCCW: {
-      "-1": FixedArray<[x: number, y: number], 5>;
-      1: FixedArray<[x: number, y: number], 5>;
-      2: FixedArray<[x: number, y: number], 2>;
-    }
-  ];
-  ARS: [
-    stateSpawn: {
-      "-1": FixedArray<[x: number, y: number], 3>;
-      1: FixedArray<[x: number, y: number], 3>;
-      2: FixedArray<[x: number, y: number], 3>;
-    },
-    stateCW: {
-      "-1": FixedArray<[x: number, y: number], 3>;
-      1: FixedArray<[x: number, y: number], 3>;
-      2: FixedArray<[x: number, y: number], 3>;
-    },
-    state180: {
-      "-1": FixedArray<[x: number, y: number], 3>;
-      1: FixedArray<[x: number, y: number], 3>;
-      2: FixedArray<[x: number, y: number], 3>;
-    },
-    stateCCW: {
-      "-1": FixedArray<[x: number, y: number], 3>;
-      1: FixedArray<[x: number, y: number], 3>;
-      2: FixedArray<[x: number, y: number], 3>;
-    }
-  ];
-  C2: [
-    stateSpawn: {
-      "-1": FixedArray<[x: number, y: number], 8>;
-      1: FixedArray<[x: number, y: number], 8>;
-      2: FixedArray<[x: number, y: number], 8>;
-    },
-    stateCW: {
-      "-1": FixedArray<[x: number, y: number], 8>;
-      1: FixedArray<[x: number, y: number], 8>;
-      2: FixedArray<[x: number, y: number], 8>;
-    },
-    state180: {
-      "-1": FixedArray<[x: number, y: number], 8>;
-      1: FixedArray<[x: number, y: number], 8>;
-      2: FixedArray<[x: number, y: number], 8>;
-    },
-    stateCCW: {
-      "-1": FixedArray<[x: number, y: number], 8>;
-      1: FixedArray<[x: number, y: number], 8>;
-      2: FixedArray<[x: number, y: number], 8>;
-    }
-  ];
-  OSpin: [
-    stateSpawn: {
-      "-1": FixedArray<[x: number, y: number], 16>;
-      1: FixedArray<[x: number, y: number], 16>;
-      2: FixedArray<[x: number, y: number], 16>;
-    },
-    stateCW: {
-      "-1": FixedArray<[x: number, y: number], 16>;
-      1: FixedArray<[x: number, y: number], 16>;
-      2: FixedArray<[x: number, y: number], 16>;
-    },
-    state180: {
-      "-1": FixedArray<[x: number, y: number], 16>;
-      1: FixedArray<[x: number, y: number], 16>;
-      2: FixedArray<[x: number, y: number], 16>;
-    },
-    stateCCW: {
-      "-1": FixedArray<[x: number, y: number], 16>;
-      1: FixedArray<[x: number, y: number], 16>;
-      2: FixedArray<[x: number, y: number], 16>;
-    }
-  ];
-}
 
-interface PieceDefintion<RotSys extends keyof Kicks, N extends number> {
-  /** Specifies bounding boxes of the pieces. */
-  blocks: PieceBoundingBoxes<N>;
-  /** Unknown. */
-  cc: FixedArray<number, 4>;
-  /** Presumably the rotation center of the piece? */
-  center: FixedArray<FixedArray<number, 2>, 4>;
-  /** The piece's color. An integer between 0 and 9 inclusive. */
-  color: number;
-  /** No idea. */
-  h: FixedArray<number, 4>;
-  /** The ID of the piece. */
-  id: number;
-  /** Kicks of the piece. */
-  kicks: Kicks[RotSys];
-  /** The name of the piece. */
-  name: string;
-  /** Spawn offset of the piece. */
-  spawn: [x: number, y: number];
-  xp?: [x: number, y: number];
-  yp: [x: number, y: number];
-}
+  type FinesseArray = [stateSpawn: number[], stateCW: number[], state180: number[], stateCCW: number[]];
 
-interface PieceSetStandard {
-  /** Specifies points for 4-point all-spin. */
-  allspin: [IPiece_AllSpin4Point, null, null, AllSpin4Point, AllSpin4Point, AllSpin4Point, AllSpin4Point];
-  /** Specifies pieces contained in a piece set. */
-  blocks: [
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"None", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>
+  type FullPointDefinition = [fullPoint1_X: number, fullPoint1_Y: number, fullPoint2_X: number, fullPoint2_Y: number];
+
+  type MiniPointDefinition = [miniPoint1_X: number, miniPoint1_Y: number, miniPoint2_X: number, miniPoint2_Y: number];
+
+  /** Specifies 4-point all-spin points for L, J, S and Z pieces. T piece is handled differently. */
+  type AllSpin4Point = [fullPoints: FullPointDefinition, miniPoints: MiniPointDefinition];
+
+  /** Specifies 4-point all-spin for the I piece. The I piece has two sets of mini points. */
+  type IPiece_AllSpin4Point = [
+    fullPoints: FullPointDefinition,
+    miniPoints: [primary: MiniPointDefinition, alternative: MiniPointDefinition]
   ];
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: true;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: true;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: FixedArray<FinesseArray, 7>;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetStandard;
-}
 
-interface PieceSetBig {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: [
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"None", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>
+  type PieceBoundingBoxes<N extends number> = [
+    stateSpawn: FixedArray<FixedArray<number, N>, N>,
+    stateCW: FixedArray<FixedArray<number, N>, N>,
+    state180: FixedArray<FixedArray<number, N>, N>,
+    stateCCW: FixedArray<FixedArray<number, N>, N>
   ];
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: true;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 2;
-  /** Specifies the rendering scale of the piece. */
-  scale: 2;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetStandard;
-}
-interface PieceSetBigPlus {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: [
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"None", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>,
-    PieceDefintion<"SRS", 8>
+
+  /** Interface used internally to type kicks. */
+  interface Kicks {
+    None: [
+      stateSpawn: {
+        "-1": FixedArray<[x: number, y: number], 1>;
+        1: FixedArray<[x: number, y: number], 1>;
+        2: FixedArray<[x: number, y: number], 1>;
+      },
+      stateCW: {
+        "-1": FixedArray<[x: number, y: number], 1>;
+        1: FixedArray<[x: number, y: number], 1>;
+        2: FixedArray<[x: number, y: number], 1>;
+      },
+      state180: {
+        "-1": FixedArray<[x: number, y: number], 1>;
+        1: FixedArray<[x: number, y: number], 1>;
+        2: FixedArray<[x: number, y: number], 1>;
+      },
+      stateCCW: {
+        "-1": FixedArray<[x: number, y: number], 1>;
+        1: FixedArray<[x: number, y: number], 1>;
+        2: FixedArray<[x: number, y: number], 1>;
+      }
+    ];
+    SRS: [
+      stateSpawn: {
+        "-1": FixedArray<[x: number, y: number], 5>;
+        1: FixedArray<[x: number, y: number], 5>;
+        2: FixedArray<[x: number, y: number], 2>;
+      },
+      stateCW: {
+        "-1": FixedArray<[x: number, y: number], 5>;
+        1: FixedArray<[x: number, y: number], 5>;
+        2: FixedArray<[x: number, y: number], 2>;
+      },
+      state180: {
+        "-1": FixedArray<[x: number, y: number], 5>;
+        1: FixedArray<[x: number, y: number], 5>;
+        2: FixedArray<[x: number, y: number], 2>;
+      },
+      stateCCW: {
+        "-1": FixedArray<[x: number, y: number], 5>;
+        1: FixedArray<[x: number, y: number], 5>;
+        2: FixedArray<[x: number, y: number], 2>;
+      }
+    ];
+    ARS: [
+      stateSpawn: {
+        "-1": FixedArray<[x: number, y: number], 3>;
+        1: FixedArray<[x: number, y: number], 3>;
+        2: FixedArray<[x: number, y: number], 3>;
+      },
+      stateCW: {
+        "-1": FixedArray<[x: number, y: number], 3>;
+        1: FixedArray<[x: number, y: number], 3>;
+        2: FixedArray<[x: number, y: number], 3>;
+      },
+      state180: {
+        "-1": FixedArray<[x: number, y: number], 3>;
+        1: FixedArray<[x: number, y: number], 3>;
+        2: FixedArray<[x: number, y: number], 3>;
+      },
+      stateCCW: {
+        "-1": FixedArray<[x: number, y: number], 3>;
+        1: FixedArray<[x: number, y: number], 3>;
+        2: FixedArray<[x: number, y: number], 3>;
+      }
+    ];
+    C2: [
+      stateSpawn: {
+        "-1": FixedArray<[x: number, y: number], 8>;
+        1: FixedArray<[x: number, y: number], 8>;
+        2: FixedArray<[x: number, y: number], 8>;
+      },
+      stateCW: {
+        "-1": FixedArray<[x: number, y: number], 8>;
+        1: FixedArray<[x: number, y: number], 8>;
+        2: FixedArray<[x: number, y: number], 8>;
+      },
+      state180: {
+        "-1": FixedArray<[x: number, y: number], 8>;
+        1: FixedArray<[x: number, y: number], 8>;
+        2: FixedArray<[x: number, y: number], 8>;
+      },
+      stateCCW: {
+        "-1": FixedArray<[x: number, y: number], 8>;
+        1: FixedArray<[x: number, y: number], 8>;
+        2: FixedArray<[x: number, y: number], 8>;
+      }
+    ];
+    OSpin: [
+      stateSpawn: {
+        "-1": FixedArray<[x: number, y: number], 16>;
+        1: FixedArray<[x: number, y: number], 16>;
+        2: FixedArray<[x: number, y: number], 16>;
+      },
+      stateCW: {
+        "-1": FixedArray<[x: number, y: number], 16>;
+        1: FixedArray<[x: number, y: number], 16>;
+        2: FixedArray<[x: number, y: number], 16>;
+      },
+      state180: {
+        "-1": FixedArray<[x: number, y: number], 16>;
+        1: FixedArray<[x: number, y: number], 16>;
+        2: FixedArray<[x: number, y: number], 16>;
+      },
+      stateCCW: {
+        "-1": FixedArray<[x: number, y: number], 16>;
+        1: FixedArray<[x: number, y: number], 16>;
+        2: FixedArray<[x: number, y: number], 16>;
+      }
+    ];
+  }
+
+  interface PieceDefintion<RotSys extends keyof Kicks, N extends number> {
+    /** Specifies bounding boxes of the pieces. */
+    blocks: PieceBoundingBoxes<N>;
+    /** Unknown. */
+    cc: FixedArray<number, 4>;
+    /** Presumably the rotation center of the piece? */
+    center: FixedArray<FixedArray<number, 2>, 4>;
+    /** The piece's color. An integer between 0 and 9 inclusive. */
+    color: number;
+    /** No idea. */
+    h: FixedArray<number, 4>;
+    /** The ID of the piece. */
+    id: number;
+    /** Kicks of the piece. */
+    kicks: Kicks[RotSys];
+    /** The name of the piece. */
+    name: string;
+    /** Spawn offset of the piece. */
+    spawn: [x: number, y: number];
+    xp?: [x: number, y: number];
+    yp: [x: number, y: number];
+  }
+
+  interface PieceSetStandard {
+    /** Specifies points for 4-point all-spin. */
+    allspin: [IPiece_AllSpin4Point, null, null, AllSpin4Point, AllSpin4Point, AllSpin4Point, AllSpin4Point];
+    /** Specifies pieces contained in a piece set. */
+    blocks: [
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"None", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>
+    ];
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: true;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: true;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: FixedArray<FinesseArray, 7>;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetStandard;
+  }
+
+  interface PieceSetBig {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: [
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"None", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>
+    ];
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: true;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 2;
+    /** Specifies the rendering scale of the piece. */
+    scale: 2;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetStandard;
+  }
+  interface PieceSetBigPlus {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: [
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"None", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>,
+      PieceDefintion<"SRS", 8>
+    ];
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: true;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 2;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetStandard;
+  }
+  interface PieceSetARS {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: [
+      PieceDefintion<"None", 4>,
+      PieceDefintion<"ARS", 4>,
+      PieceDefintion<"ARS", 4>,
+      PieceDefintion<"ARS", 4>,
+      PieceDefintion<"ARS", 4>,
+      PieceDefintion<"ARS", 4>,
+      PieceDefintion<"ARS", 4>
+    ];
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: true;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetARS;
+  }
+  interface PieceSetPentomino {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: FixedArray<PieceDefintion<"SRS", 5>, 18>;
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: false;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetPentomino;
+  }
+  interface PieceSetM123 {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: [PieceDefintion<"SRS", 1>, PieceDefintion<"SRS", 2>, PieceDefintion<"SRS", 3>, PieceDefintion<"SRS", 3>];
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: false;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetM123;
+  }
+  interface PieceSetAll29 {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: [
+      // Tetrominoes
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"None", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      PieceDefintion<"SRS", 4>,
+      // M123
+      PieceDefintion<"SRS", 1>,
+      PieceDefintion<"SRS", 2>,
+      PieceDefintion<"SRS", 3>,
+      PieceDefintion<"SRS", 3>,
+      // Pentominoes
+      ...FixedArray<PieceDefintion<"SRS", 5>, 18>
+    ];
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: false;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetAll29;
+  }
+  interface PieceSetCultris2RS {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: FixedArray<PieceDefintion<"C2", 4>, 7>;
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: true;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetCultris2RS;
+  }
+  interface PieceSetOSpin {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: FixedArray<PieceDefintion<"OSpin", 4>, 7>;
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: true;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetOSpin;
+  }
+  interface PieceSetNone {
+    /** Specifies points for 4-point all-spin. */
+    allspin: null;
+    /** Specifies pieces contained in a piece set. */
+    blocks: FixedArray<PieceDefintion<"SRS", 1>, 1>;
+    /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
+    equidist: false;
+    /** Specifies, how many blocks does the piece move at a time. */
+    step: 1;
+    /** Specifies the rendering scale of the piece. */
+    scale: 1;
+    /** Specifies, whether April Fools items appear in this piece set or not. */
+    items: true;
+    /** Specifies, whether ghost pieces should be rendered for this piece set. */
+    ghost: false;
+    /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
+    finesse: null;
+    /** Specifies, how should pieces look like in the NEXT queue. */
+    previewAs: PieceSetNone;
+  }
+
+  /** Specifies piece sets used in the game. */
+  type BlockSets = [
+    PieceSetStandard,
+    PieceSetBig,
+    PieceSetBigPlus,
+    PieceSetARS,
+    PieceSetPentomino,
+    PieceSetM123,
+    PieceSetCultris2RS,
+    PieceSetOSpin,
+    PieceSetNone
   ];
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: true;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 2;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetStandard;
-}
-interface PieceSetARS {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: [
-    PieceDefintion<"None", 4>,
-    PieceDefintion<"ARS", 4>,
-    PieceDefintion<"ARS", 4>,
-    PieceDefintion<"ARS", 4>,
-    PieceDefintion<"ARS", 4>,
-    PieceDefintion<"ARS", 4>,
-    PieceDefintion<"ARS", 4>
-  ];
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: true;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetARS;
-}
-interface PieceSetPentomino {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: FixedArray<PieceDefintion<"SRS", 5>, 18>;
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: false;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetPentomino;
-}
-interface PieceSetM123 {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: [PieceDefintion<"SRS", 1>, PieceDefintion<"SRS", 2>, PieceDefintion<"SRS", 3>, PieceDefintion<"SRS", 3>];
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: false;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetM123;
-}
-interface PieceSetAll29 {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: [
-    // Tetrominoes
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"None", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    PieceDefintion<"SRS", 4>,
-    // M123
-    PieceDefintion<"SRS", 1>,
-    PieceDefintion<"SRS", 2>,
-    PieceDefintion<"SRS", 3>,
-    PieceDefintion<"SRS", 3>,
-    // Pentominoes
-    ...FixedArray<PieceDefintion<"SRS", 5>, 18>
-  ];
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: false;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetAll29;
-}
-interface PieceSetCultris2RS {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: FixedArray<PieceDefintion<"C2", 4>, 7>;
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: true;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetCultris2RS;
-}
-interface PieceSetOSpin {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: FixedArray<PieceDefintion<"OSpin", 4>, 7>;
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: true;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetOSpin;
-}
-interface PieceSetNone {
-  /** Specifies points for 4-point all-spin. */
-  allspin: null;
-  /** Specifies pieces contained in a piece set. */
-  blocks: FixedArray<PieceDefintion<"SRS", 1>, 1>;
-  /** Specifies whether the pieces are distributed equally on the NEXT queue or not. */
-  equidist: false;
-  /** Specifies, how many blocks does the piece move at a time. */
-  step: 1;
-  /** Specifies the rendering scale of the piece. */
-  scale: 1;
-  /** Specifies, whether April Fools items appear in this piece set or not. */
-  items: true;
-  /** Specifies, whether ghost pieces should be rendered for this piece set. */
-  ghost: false;
-  /** Specifies finesse data for pieces in this piece set, or `null` if not available. */
-  finesse: null;
-  /** Specifies, how should pieces look like in the NEXT queue. */
-  previewAs: PieceSetNone;
-}
 
-/** Specifies piece sets used in the game. */
-declare type BlockSets = [
-  PieceSetStandard,
-  PieceSetBig,
-  PieceSetBigPlus,
-  PieceSetARS,
-  PieceSetPentomino,
-  PieceSetM123,
-  PieceSetCultris2RS,
-  PieceSetOSpin,
-  PieceSetNone
-];
+  interface ExportBackgroundDefinition {
+    id: number;
+    name: string;
+    data: string | null;
+    h?: number;
+    w?: number;
+    w0?: number;
+    l: {
+      titleColor: string;
+      statTitleColor: string;
+      statValColor: string;
+    };
+  }
 
-declare interface I18n {
-  /**
-   * Displayed during the "Ready" state of "Ready? Go!" sequence.
-   *
-   * English: **"READY"**
-   */
-  ready: string;
-  /**
-   * Displayed during the "Go" state of "Ready? Go!" sequence.
-   *
-   * English: **"GO!"**
-   */
-  go: string;
-  /**
-   * Title of the "out of focus" message.
-   *
-   * English: **"Out of focus"**
-   */
-  notFocused: string;
-  /**
-   * Description of the "out of focus" message.
-   *
-   * English: **"Click here to focus the game"**
-   */
-  clickToFocus: string;
-  /**
-   * Title of the "spectator mode" message.
-   *
-   * English: **"Spectator mode"**
-   */
-  specMode: string;
-  /**
-   * Description of the "spectator mode" message.
-   *
-   * English: **"You are in spectator mode now."**
-   */
-  specModeInfo: string;
-  /**
-   * Description of the "spectator mode" message if the game is not ongoing.
-   *
-   * English: **"Type /play to join the game"**
-   */
-  endSpec: string;
-  /**
-   * Displays after the player logs into the game.
-   *
-   * English: **"Type /help for available commands."**
-   */
-  typeHelp: string;
-  /**
-   * Displayed after the place ordinal: 1st, 21st, 31st,...
-   *
-   * English: **"st"**
-   */
-  st: string;
-  /**
-   * Displayed after the place ordinal: 2nd, 22ns, 32nd,...
-   *
-   * English: **"nd"**
-   */
-  nd: string;
-  /**
-   * Displayed after the place ordinal: 3rd, 23rd, 33rd,...
-   *
-   * English: **"rd"**
-   */
-  rd: string;
-  /**
-   * Displayed for remaining ordinals, like: 4th, 11th, etc.
-   *
-   * English: **"th"**
-   */
-  th: string;
-  /**
-   * Title of the "Not playing" message.
-   *
-   * English: **"Not playing"**
-   */
-  notPlaying: string;
-  /**
-   * Description of the "Not playing" message if the game is ongoing.
-   *
-   * English: **"Wait until the round ends"**
-   */
-  waitNext: string;
-  /**
-   * Alternative description of the "Not playing" message if the game is ongoing.
-   *
-   * English: **"Please wait for the next round"**
-   */
-  waitNext2: string;
-  /**
-   * Description of the "Not playing" message if no game is ongoing.
-   *
-   * English: **"Press 'New game' to start"**
-   */
-  pressStart: string;
-  /**
-   * Title of the speed limit warning.
-   *
-   * English: **"SLOW DOWN"**
-   */
-  slowDown: string;
-  /**
-   * Description of the speed limit warning.
-   *
-   * English: **"The speed limit is"**
-   */
-  speedLimitIs: string;
-  /**
-   * Connecting message.
-   *
-   * English: **"Connecting..."**
-   */
-  connecting: string;
-  /**
-   * Signing in message.
-   *
-   * English: **"Signing in"**
-   */
-  signingIn: string;
-  /**
-   * Displays when log in fails.
-   *
-   * English: **"Log in failed!"**
-   */
-  loginFail: string;
-  /**
-   * Displays when the player is not logged in and is playing as a guest instead
-   *
-   * English: **"Not logged in! You're playing as a guest called {name}."**
-   */
-  loginFail2: string;
-  /**
-   * Displays when the map is loading.
-   *
-   * English: **"Map loading..."**
-   */
-  mapLoading: string;
-  /**
-   * General warning title.
-   *
-   * English: **"Warning"**
-   */
-  warning: string;
-  /**
-   * Description of a warning describing that spectator mode will activate soon.
-   *
-   * English: **"Spectator mode will be activated. Type in chat to abort."**
-   */
-  inactive1: string;
-  /**
-   * Description of a warning describing that spectator mode will activate after the next game with no inputs.
-   *
-   * English: **"Inactivity detected, next inactive game will activate spectator mode."**
-   */
-  inactive2: string;
-  /**
-   *
-   *
-   * English: **"Type your username to be able to chat!"**
-   */
-  nickFill: string;
-  /**
-   * Set
-   *
-   * English: **"Set"**
-   */
-  setButton: string;
-  /**
-   * Text on a button that sends the chat message.
-   *
-   * English: **"Send"**
-   */
-  sendButton: string;
-  /**
-   *
-   *
-   * English: **"Room name must be filled!"**
-   */
-  rNameReq: string;
-  /**
-   * News user.
-   *
-   * English: **"News"**
-   */
-  newsUser: string;
-  /**
-   * Server user.
-   *
-   * English: **"Server"**
-   */
-  serverUser: string;
-  /**
-   * Guest name, used in places when the auto-generated name is not used.
-   *
-   * English: **"NoNamed"**
-   */
-  noNamed: string;
-  /**
-   * Displays before the list of spectators in the room.
-   *
-   * English: **"Watching"**
-   */
-  watching: string;
-  /**
-   * Displays when someone joins the room.
-   *
-   * English: **"joined the room"**
-   */
-  userJoined: string;
-  /**
-   * Displays in tab title when someone joins the room.
-   *
-   * English: **"joined"**
-   */
-  joined: string;
-  /**
-   * Displays when someone joined as an observer, due to not fulfilling the room requirements.
-   *
-   * English: **"came to watch"**
-   */
-  userCame: string;
-  /**
-   * Displays when someone stops playing and starts spectating.
-   *
-   * English: **"is now spectating"**
-   */
-  isSpectating: string;
-  /**
-   * Spectator.
-   *
-   * English: **"Spectator"**
-   */
-  spectator: string;
-  /**
-   * Displays when someone leaves the room.
-   *
-   * English: **"has left"**
-   */
-  hasLeft: string;
-  /**
-   * Displays in chat when the player logs in.
-   *
-   * English: **"You are signed in as"**
-   */
-  signedAs: string;
-  /**
-   * Greeting message.
-   *
-   * English: **"Welcome,"**
-   */
-  welcome: string;
-  /**
-   * Greeting message for a room.
-   *
-   * English: **"Welcome in"**
-   */
-  welcomeIn: string;
-  /**
-   * There are no spectators in the room.
-   *
-   * English: **"No one is watching right now."**
-   */
-  noSpectators: string;
-  /**
-   * Replay available at.
-   *
-   * English: **"Replay available at"**
-   */
-  replayAvailable: string;
-  /**
-   * Description of a warning about old version of Jstris.
-   *
-   * English: **"You have an old version, use CTRL+F5 to reload to the new version!"**
-   */
-  oldVer: string;
-  /**
-   * Alternative description of a warning about old version of Jstris.
-   *
-   * English: **"You still have the old version! Use {key} to reload your client"**
-   */
-  oldVer2: string;
-  /**
-   * Displays in chat in private rooms.
-   *
-   * English: **"This is your private room where you won't be disturbed while playing. Check the Lobby to see public rooms."**
-   */
-  privateRoom: string;
-  /**
-   *
-   *
-   * English: **"Restart by F4 or set a custom key."**
-   */
-  restartInfo: string;
-  /**
-   * Displays in chat in private rooms.
-   *
-   * English: **"This room is private. Only way someone can join it is using this link:"**
-   */
-  joinLinkInfo: string;
-  /**
-   * Garbage received.
-   *
-   * English: **"Received"**
-   */
-  received: string;
-  /**
-   * Number of finesse faults.
-   *
-   * English: **"Finesse"**
-   */
-  finesse: string;
-  /**
-   * Name of the room.
-   *
-   * English: **"Room name"**
-   */
-  roomName: string;
-  /**
-   * Games played in the room.
-   *
-   * English: **"Games"**
-   */
-  games: string;
-  /**
-   * Players in the room.
-   *
-   * English: **"Players"**
-   */
-  players: string;
-  /**
-   * Name
-   *
-   * English: **"Name"**
-   */
-  name: string;
-  /**
-   * Wins
-   *
-   * English: **"Wins"**
-   */
-  wins: string;
-  /**
-   * Time
-   *
-   * English: **"Time"**
-   */
-  time: string;
-  /**
-   * Sent
-   *
-   * English: **"Sent"**
-   */
-  sent: string;
-  /**
-   * Pieces usedd
-   *
-   * English: **"Blocks"**
-   */
-  blocks: string;
-  /**
-   * Combo
-   *
-   * English: **"REN"**
-   */
-  ren: string;
-  /**
-   * Game time
-   *
-   * English: **"time"**
-   */
-  gameTime: string;
-  /**
-   * See... (mode leaderboard.)
-   *
-   * English: **"See"**
-   */
-  see: string;
-  /**
-   * (See mode) ...leaderboard.
-   *
-   * English: **"leaderboard"**
-   */
-  leaderboard: string;
-  /**
-   *
-   *
-   * English: **"WARNING"**
-   */
-  warning2: string;
-  /**
-   *
-   *
-   * English: **"Connected"**
-   */
-  connected: string;
-  /**
-   *
-   *
-   * English: **"client"**
-   */
-  client: string;
-  /**
-   *
-   *
-   * English: **"NOT CONNECTED"**
-   */
-  notConnected: string;
-  /**
-   *
-   *
-   * English: **"Connection lost!"**
-   */
-  connLost: string;
-  /**
-   *
-   *
-   * English: **"Last game:"**
-   */
-  lastGame: string;
-  /**
-   *
-   *
-   * English: **"Room settings:"**
-   */
-  roomSettings: string;
-  /**
-   *
-   *
-   * English: **"Attack"**
-   */
-  attack: string;
-  /**
-   *
-   *
-   * English: **"Combo"**
-   */
-  combo: string;
-  /**
-   *
-   *
-   * English: **"Solid"**
-   */
-  solid: string;
-  /**
-   *
-   *
-   * English: **"Clear"**
-   */
-  clear: string;
-  /**
-   *
-   *
-   * English: **"Mode"**
-   */
-  mode: string;
-  /**
-   *
-   *
-   * English: **"Garbage"**
-   */
-  garbage: string;
-  /**
-   *
-   *
-   * English: **"GarbageDelay"**
-   */
-  garbageDelay: string;
-  /**
-   *
-   *
-   * English: **"Messiness"**
-   */
-  messiness: string;
-  /**
-   *
-   *
-   * English: **"Replay"**
-   */
-  replay: string;
-  /**
-   *
-   *
-   * English: **"Rep"**
-   */
-  rep: string;
-  /**
-   *
-   *
-   * English: **"Rec."**
-   */
-  rec: string;
-  /**
-   * Displays in an alert prompting user to enter a DAS value in frames (like in NullpoMino)
-   *
-   * English: **"Enter numeric NullpoMino DAS value:"**
-   */
-  enterNullDAS: string;
-  /**
-   *
-   *
-   * English: **"Suggested DAS is"**
-   */
-  suggestedIs: string;
-  /**
-   *
-   *
-   * English: **"Apply?"**
-   */
-  applyConfirm: string;
-  /**
-   *
-   *
-   * English: **"DAS value is invalid, was not changed!"**
-   */
-  invalidDAS: string;
-  /**
-   *
-   *
-   * English: **"Settings changed during the game. Replay invalidated."**
-   */
-  settingsChanged: string;
-  /**
-   *
-   *
-   * English: **"Segment"**
-   */
-  segment: string;
-  /**
-   *
-   *
-   * English: **"Duration"**
-   */
-  duration: string;
-  /**
-   *
-   *
-   * English: **"It seems the room is full."**
-   */
-  roomFull: string;
-  /**
-   *
-   *
-   * English: **"This chat is shared with {discord}."**
-   */
-  lobbyInfo: string;
-  /**
-   *
-   *
-   * English: **"You are now the host of this room."**
-   */
-  newHost: string;
-  /**
-   *
-   *
-   * English: **"This room no longer exists, joining the Default room!"**
-   */
-  badRoom: string;
-  /**
-   *
-   *
-   * English: **"Setting changed by the host"**
-   */
-  stngsChanged: string;
-  /**
-   *
-   *
-   * English: **"Custom settings"**
-   */
-  stngsCustom: string;
-  /**
-   *
-   *
-   * English: **"Already spectating!"**
-   */
-  aSpec: string;
-  /**
-   *
-   *
-   * English: **"Already playing!"**
-   */
-  aPlay: string;
-  /**
-   * Displays when replay either fails to save or user used `/replay`.
-   *
-   * English: **"Replay failed to save."**
-   */
-  repFail: string;
-  /**
-   * Displays when replay either fails to save or user used `/replay`.
-   *
-   * English: **"Replay file dumped into the chat. To preserve it, copy the text in the box and paste into your favourite text editor."**
-   */
-  repInChat: string;
-  /**
-   *
-   *
-   * English: **"The copied replayfile can be then played in the replayer or possibly resubmitted to the site."**
-   */
-  repTxtInfo: string;
-  /**
-   * Displays when a player achieves their new personal best score/time.
-   *
-   * English: **"YOUR NEW PERSONAL BEST"**
-   */
-  newPB: string;
-  /**
-   * Displays when a player finishes a mode for the first time.
-   *
-   * English: **"This was your first game. Get another PB to track the improvement."**
-   */
-  firstPB: string;
-  /**
-   * Displays when a player beats their previous personal best score/time.
-   *
-   * English: **"Your previous record was {prevPB} achieved {prevAgo}. The improvement is {PBdiff}."**
-   */
-  infoPB: string;
-  /**
-   * Specifies how long ago the PB was achieved.
-   *
-   * English: **"days ago"**
-   */
-  daysAgo: string;
-  /**
-   *
-   *
-   * English: **"THE RACE HAS FINISHED"**
-   */
-  raceFin: string;
-  /**
-   *
-   *
-   * English: **"You can complete the run, but the next round can start at any time."**
-   */
-  raceFinInfo: string;
-  /**
-   * Title of a message displayed when a line clear other than a T-spin Double was performed in 20TSD.
-   *
-   * English: **"NOT TSD"**
-   */
-  notTSD: string;
-  /**
-   * Description of a message displayed when a line clear other than a T-spin Double was performed in 20TSD.
-   *
-   * English: **"Only T-Spin Double is allowed"**
-   */
-  notTSDInfo: string;
-  /**
-   * Title of a message displayed when a 4-line Perfect Clear is not possible in PC Mode.
-   *
-   * English: **"NOT a PC"**
-   */
-  notPC: string;
-  /**
-   * Description of a message displayed when a 4-line Perfect Clear is not possible in PC Mode.
-   *
-   * English: **"Do a Perfect Clear every 10 blocks. Your board is not clearable."**
-   */
-  notPCInfo: string;
-  /**
-   * Title of a message the displays when the player performs a 4-wide in a room with NoFW enabled.
-   *
-   * English: **"FOUR WIDE"**
-   */
-  fwDetect: string;
-  /**
-   * Description of a message the displays when the player performs a 4-wide in a room with NoFW enabled.
-   *
-   * English: **"Attacking yourself!"**
-   */
-  fwDetectInfo: string;
-  /**
-   *
-   *
-   * English: **"Oops!"**
-   */
-  oops: string;
-  /**
-   *
-   *
-   * English: **"Public chatting is not available for guests or users with less than {chReq} hours of gametime."**
-   */
-  chatNA: string;
-  /**
-   *
-   *
-   * English: **"Learn more"**
-   */
-  leMore: string;
-  /**
-   *
-   *
-   * English: **"The maximum amount of open connections for this IP is curently reached. If you need increased limits, contact us via Discord"**
-   */
-  connLimit: string;
-  /**
-   *
-   *
-   * English: **"Disconnected for inactivity! Spectator section was full."**
-   */
-  idleDC: string;
-  /**
-   *
-   *
-   * English: **"Rate limit reached."**
-   */
-  RLreach: string;
-  /**
-   * Displays when the account's access to Live games is permanetly restricted.
-   *
-   * English: **"Your access to the Live games has been permanently restricted. You can still play singleplayer modes."**
-   */
-  ban1: string;
-  /**
-   * Displays when the account is banned.
-   *
-   * English: **"This user account is BANNED. Relogin to the website for more information."**
-   */
-  ban2: string;
-  /**
-   * Displays when the player fails to connect to the servers.
-   *
-   * English: **"Not connected to the game server, try {refr}."**
-   */
-  ncGS: string;
-  /**
-   * Suggests the user to refresh the page.
-   *
-   * English: **"refreshing the page"**
-   */
-  refr: string;
-  /**
-   * Displays when the player beats an unpublished map.
-   *
-   * English: **"Record not saved, the map is not published."**
-   */
-  nsUnpub: string;
-  /**
-   * Displays in chat when the player achieves no T-spin Doubles in 20TSD.
-   *
-   * English: **"Record not saved, not enough T-Spins."**
-   */
-  nsTspins: string;
-  /**
-   * Displays in chat when the player achieves less than 2 Perfect Clears in PC Mode.
-   *
-   * English: **"Record not saved, at least 2 Perfect Clears needed."**
-   */
-  nsLowPC: string;
-  /**
-   * Title of the message that displays in usermodes when a finite queue is depleted.
-   *
-   * English: **"Out of blocks"**
-   */
-  noBlocks: string;
-  /**
-   * Description of the message that displays in usermodes when a finite queue is depleted.
-   *
-   * English: **"All blocks were used"**
-   */
-  noBlocks2: string;
-  /**
-   *
-   *
-   * English: **"No players"**
-   */
-  noPlayers: string;
-  /**
-   *
-   *
-   * English: **"{cnt} more"**
-   */
-  cntMore: string;
-  /**
-   *
-   *
-   * English: **"{cnt} guests"**
-   */
-  cntGuests: string;
-  /**
-   *
-   *
-   * English: **"{cnt} spectating"**
-   */
-  cntSpec: string;
-  /**
-   *
-   *
-   * English: **"Join possible"**
-   */
-  joinPossible: string;
-  /**
-   *
-   *
-   * English: **"Not eligible"**
-   */
-  notEligible: string;
-  /**
-   *
-   *
-   * English: **"G.time"**
-   */
-  gTimeShort: string;
-  /**
-   *
-   *
-   * English: **"On"**
-   */
-  on: string;
-  /**
-   *
-   *
-   * English: **"Off"**
-   */
-  off: string;
-  /**
-   *
-   *
-   * English: **"Friends"**
-   */
-  fr: string;
-  /**
-   *
-   *
-   * English: **"Loading friend list"**
-   */
-  frLoad: string;
-  /**
-   *
-   *
-   * English: **"Log in first to use friend list"**
-   */
-  frLogin: string;
-  /**
-   *
-   *
-   * English: **"Friend list is empty"**
-   */
-  frEmpty: string;
-  /**
-   *
-   *
-   * English: **"Visit user's profile to send friend request."**
-   */
-  frHowAdd: string;
-  /**
-   *
-   *
-   * English: **"Private"**
-   */
-  frPriv: string;
-  /**
-   *
-   *
-   * English: **"Already in!"**
-   */
-  frIn: string;
-  /**
-   *
-   *
-   * English: **"Open chat"**
-   */
-  frChat: string;
-  /**
-   *
-   *
-   * English: **"Reload"**
-   */
-  frRel: string;
-  /**
-   *
-   *
-   * English: **"Message to {name}"**
-   */
-  frMsgTo: string;
-  /**
-   *
-   *
-   * English: **"Send room invite"**
-   */
-  frInv: string;
-  /**
-   *
-   *
-   * English: **"Invite to join {room}"**
-   */
-  frInvTo: string;
-  /**
-   *
-   *
-   * English: **"You are already in!"**
-   */
-  frInvIn: string;
-  /**
-   *
-   *
-   * English: **"by {user}"**
-   */
-  frInvBy: string;
-  /**
-   *
-   *
-   * English: **"ONLINE"**
-   */
-  frOn: string;
-  /**
-   *
-   *
-   * English: **"OFFLINE"**
-   */
-  frOff: string;
-  /**
-   *
-   *
-   * English: **"This is the beginning of chat history with {name}."**
-   */
-  frNewChatH: string;
-  /**
-   *
-   *
-   * English: **"Welcome to the Friends tab"**
-   */
-  frWelc: string;
-  /**
-   *
-   *
-   * English: **"In this area you can access a list of online friends, private chats, and room invites"**
-   */
-  frIntro: string;
-  /**
-   *
-   *
-   * English: **"To send a friend request, visit a user's profile"**
-   */
-  frIntro2: string;
-  /**
-   *
-   *
-   * English: **"To manage friends, visit the {frPage}"**
-   */
-  frIntro3: string;
-  /**
-   *
-   *
-   * English: **"Friends page"**
-   */
-  frPage: string;
-  /**
-   *
-   *
-   * English: **"Close intro"**
-   */
-  frIntroCl: string;
-  /**
-   *
-   *
-   * English: **"PPS"**
-   */
-  PPS: string;
-  /**
-   *
-   *
-   * English: **"APM"**
-   */
-  APM: string;
-  /**
-   *
-   *
-   * English: **"KPP"**
-   */
-  KPP: string;
-  /**
-   *
-   *
-   * English: **"Score"**
-   */
-  score: string;
-  /**
-   *
-   *
-   * English: **"Time"**
-   */
-  roundTime: string;
-  /**
-   *
-   *
-   * English: **"Apply changes"**
-   */
-  applyCh: string;
-  /**
-   *
-   *
-   * English: **"Create"**
-   */
-  create: string;
-  /**
-   *
-   *
-   * English: **"Sprint"**
-   */
-  sprint: string;
-  /**
-   *
-   *
-   * English: **"s"**
-   */
-  s: string;
-  /**
-   *
-   *
-   * English: **"hrs"**
-   */
-  hrs: string;
-  /**
-   *
-   *
-   * English: **"Show more"**
-   */
-  showMore: string;
-  /**
-   *
-   *
-   * English: **"Show less"**
-   */
-  showLess: string;
-  /**
-   *
-   *
-   * English: **"Cheese race"**
-   */
-  cheese: string;
-  /**
-   *
-   *
-   * English: **"Survival"**
-   */
-  survival: string;
-  /**
-   *
-   *
-   * English: **"Ultra"**
-   */
-  ultra: string;
-  /**
-   *
-   *
-   * English: **"Free play"**
-   */
-  freePlay: string;
-  /**
-   *
-   *
-   * English: **"20TSD"**
-   */
-  "20TSD": string;
-  /**
-   *
-   *
-   * English: **"PC Mode"**
-   */
-  PCmode: string;
-  /**
-   *
-   *
-   * English: **"Close"**
-   */
-  close: string;
-  /**
-   *
-   *
-   * English: **"Report user"**
-   */
-  reportU: string;
-  /**
-   *
-   *
-   * English: **"User"**
-   */
-  user: string;
-  /**
-   *
-   *
-   * English: **"Reason"**
-   */
-  reason: string;
-  /**
-   *
-   *
-   * English: **"Spam or unwanted advertising"**
-   */
-  rr0: string;
-  /**
-   *
-   *
-   * English: **"Sexually explicit content"**
-   */
-  rr1: string;
-  /**
-   *
-   *
-   * English: **"Hate speech"**
-   */
-  rr2: string;
-  /**
-   *
-   *
-   * English: **"Harassment or bullying"**
-   */
-  rr3: string;
-  /**
-   *
-   *
-   * English: **"Other (specify)"**
-   */
-  rr4: string;
-  /**
-   *
-   *
-   * English: **"Send report"**
-   */
-  sendReport: string;
-}
+  interface ExportLayoutDefinition {
+    stageMargin: number;
+    holdBS: number;
+    queueBS: number;
+    /** Hold right margin? */
+    holdRM: number;
+    /** Queue left margin? */
+    queueLM: number;
+    font: string;
+    monofont: string;
+    stats: number;
+  }
 
-declare type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
+  interface I18n {
+    /**
+     * Displayed during the "Ready" state of "Ready? Go!" sequence.
+     *
+     * English: **"READY"**
+     */
+    ready: string;
+    /**
+     * Displayed during the "Go" state of "Ready? Go!" sequence.
+     *
+     * English: **"GO!"**
+     */
+    go: string;
+    /**
+     * Title of the "out of focus" message.
+     *
+     * English: **"Out of focus"**
+     */
+    notFocused: string;
+    /**
+     * Description of the "out of focus" message.
+     *
+     * English: **"Click here to focus the game"**
+     */
+    clickToFocus: string;
+    /**
+     * Title of the "spectator mode" message.
+     *
+     * English: **"Spectator mode"**
+     */
+    specMode: string;
+    /**
+     * Description of the "spectator mode" message.
+     *
+     * English: **"You are in spectator mode now."**
+     */
+    specModeInfo: string;
+    /**
+     * Description of the "spectator mode" message if the game is not ongoing.
+     *
+     * English: **"Type /play to join the game"**
+     */
+    endSpec: string;
+    /**
+     * Displays after the player logs into the game.
+     *
+     * English: **"Type /help for available commands."**
+     */
+    typeHelp: string;
+    /**
+     * Displayed after the place ordinal: 1st, 21st, 31st,...
+     *
+     * English: **"st"**
+     */
+    st: string;
+    /**
+     * Displayed after the place ordinal: 2nd, 22ns, 32nd,...
+     *
+     * English: **"nd"**
+     */
+    nd: string;
+    /**
+     * Displayed after the place ordinal: 3rd, 23rd, 33rd,...
+     *
+     * English: **"rd"**
+     */
+    rd: string;
+    /**
+     * Displayed for remaining ordinals, like: 4th, 11th, etc.
+     *
+     * English: **"th"**
+     */
+    th: string;
+    /**
+     * Title of the "Not playing" message.
+     *
+     * English: **"Not playing"**
+     */
+    notPlaying: string;
+    /**
+     * Description of the "Not playing" message if the game is ongoing.
+     *
+     * English: **"Wait until the round ends"**
+     */
+    waitNext: string;
+    /**
+     * Alternative description of the "Not playing" message if the game is ongoing.
+     *
+     * English: **"Please wait for the next round"**
+     */
+    waitNext2: string;
+    /**
+     * Description of the "Not playing" message if no game is ongoing.
+     *
+     * English: **"Press 'New game' to start"**
+     */
+    pressStart: string;
+    /**
+     * Title of the speed limit warning.
+     *
+     * English: **"SLOW DOWN"**
+     */
+    slowDown: string;
+    /**
+     * Description of the speed limit warning.
+     *
+     * English: **"The speed limit is"**
+     */
+    speedLimitIs: string;
+    /**
+     * Connecting message.
+     *
+     * English: **"Connecting..."**
+     */
+    connecting: string;
+    /**
+     * Signing in message.
+     *
+     * English: **"Signing in"**
+     */
+    signingIn: string;
+    /**
+     * Displays when log in fails.
+     *
+     * English: **"Log in failed!"**
+     */
+    loginFail: string;
+    /**
+     * Displays when the player is not logged in and is playing as a guest instead
+     *
+     * English: **"Not logged in! You're playing as a guest called {name}."**
+     */
+    loginFail2: string;
+    /**
+     * Displays when the map is loading.
+     *
+     * English: **"Map loading..."**
+     */
+    mapLoading: string;
+    /**
+     * General warning title.
+     *
+     * English: **"Warning"**
+     */
+    warning: string;
+    /**
+     * Description of a warning describing that spectator mode will activate soon.
+     *
+     * English: **"Spectator mode will be activated. Type in chat to abort."**
+     */
+    inactive1: string;
+    /**
+     * Description of a warning describing that spectator mode will activate after the next game with no inputs.
+     *
+     * English: **"Inactivity detected, next inactive game will activate spectator mode."**
+     */
+    inactive2: string;
+    /**
+     *
+     *
+     * English: **"Type your username to be able to chat!"**
+     */
+    nickFill: string;
+    /**
+     * Set
+     *
+     * English: **"Set"**
+     */
+    setButton: string;
+    /**
+     * Text on a button that sends the chat message.
+     *
+     * English: **"Send"**
+     */
+    sendButton: string;
+    /**
+     *
+     *
+     * English: **"Room name must be filled!"**
+     */
+    rNameReq: string;
+    /**
+     * News user.
+     *
+     * English: **"News"**
+     */
+    newsUser: string;
+    /**
+     * Server user.
+     *
+     * English: **"Server"**
+     */
+    serverUser: string;
+    /**
+     * Guest name, used in places when the auto-generated name is not used.
+     *
+     * English: **"NoNamed"**
+     */
+    noNamed: string;
+    /**
+     * Displays before the list of spectators in the room.
+     *
+     * English: **"Watching"**
+     */
+    watching: string;
+    /**
+     * Displays when someone joins the room.
+     *
+     * English: **"joined the room"**
+     */
+    userJoined: string;
+    /**
+     * Displays in tab title when someone joins the room.
+     *
+     * English: **"joined"**
+     */
+    joined: string;
+    /**
+     * Displays when someone joined as an observer, due to not fulfilling the room requirements.
+     *
+     * English: **"came to watch"**
+     */
+    userCame: string;
+    /**
+     * Displays when someone stops playing and starts spectating.
+     *
+     * English: **"is now spectating"**
+     */
+    isSpectating: string;
+    /**
+     * Spectator.
+     *
+     * English: **"Spectator"**
+     */
+    spectator: string;
+    /**
+     * Displays when someone leaves the room.
+     *
+     * English: **"has left"**
+     */
+    hasLeft: string;
+    /**
+     * Displays in chat when the player logs in.
+     *
+     * English: **"You are signed in as"**
+     */
+    signedAs: string;
+    /**
+     * Greeting message.
+     *
+     * English: **"Welcome,"**
+     */
+    welcome: string;
+    /**
+     * Greeting message for a room.
+     *
+     * English: **"Welcome in"**
+     */
+    welcomeIn: string;
+    /**
+     * There are no spectators in the room.
+     *
+     * English: **"No one is watching right now."**
+     */
+    noSpectators: string;
+    /**
+     * Replay available at.
+     *
+     * English: **"Replay available at"**
+     */
+    replayAvailable: string;
+    /**
+     * Description of a warning about old version of Jstris.
+     *
+     * English: **"You have an old version, use CTRL+F5 to reload to the new version!"**
+     */
+    oldVer: string;
+    /**
+     * Alternative description of a warning about old version of Jstris.
+     *
+     * English: **"You still have the old version! Use {key} to reload your client"**
+     */
+    oldVer2: string;
+    /**
+     * Displays in chat in private rooms.
+     *
+     * English: **"This is your private room where you won't be disturbed while playing. Check the Lobby to see public rooms."**
+     */
+    privateRoom: string;
+    /**
+     *
+     *
+     * English: **"Restart by F4 or set a custom key."**
+     */
+    restartInfo: string;
+    /**
+     * Displays in chat in private rooms.
+     *
+     * English: **"This room is private. Only way someone can join it is using this link:"**
+     */
+    joinLinkInfo: string;
+    /**
+     * Garbage received.
+     *
+     * English: **"Received"**
+     */
+    received: string;
+    /**
+     * Number of finesse faults.
+     *
+     * English: **"Finesse"**
+     */
+    finesse: string;
+    /**
+     * Name of the room.
+     *
+     * English: **"Room name"**
+     */
+    roomName: string;
+    /**
+     * Games played in the room.
+     *
+     * English: **"Games"**
+     */
+    games: string;
+    /**
+     * Players in the room.
+     *
+     * English: **"Players"**
+     */
+    players: string;
+    /**
+     * Name
+     *
+     * English: **"Name"**
+     */
+    name: string;
+    /**
+     * Wins
+     *
+     * English: **"Wins"**
+     */
+    wins: string;
+    /**
+     * Time
+     *
+     * English: **"Time"**
+     */
+    time: string;
+    /**
+     * Sent
+     *
+     * English: **"Sent"**
+     */
+    sent: string;
+    /**
+     * Pieces usedd
+     *
+     * English: **"Blocks"**
+     */
+    blocks: string;
+    /**
+     * Combo
+     *
+     * English: **"REN"**
+     */
+    ren: string;
+    /**
+     * Game time
+     *
+     * English: **"time"**
+     */
+    gameTime: string;
+    /**
+     * See... (mode leaderboard.)
+     *
+     * English: **"See"**
+     */
+    see: string;
+    /**
+     * (See mode) ...leaderboard.
+     *
+     * English: **"leaderboard"**
+     */
+    leaderboard: string;
+    /**
+     *
+     *
+     * English: **"WARNING"**
+     */
+    warning2: string;
+    /**
+     *
+     *
+     * English: **"Connected"**
+     */
+    connected: string;
+    /**
+     *
+     *
+     * English: **"client"**
+     */
+    client: string;
+    /**
+     *
+     *
+     * English: **"NOT CONNECTED"**
+     */
+    notConnected: string;
+    /**
+     *
+     *
+     * English: **"Connection lost!"**
+     */
+    connLost: string;
+    /**
+     *
+     *
+     * English: **"Last game:"**
+     */
+    lastGame: string;
+    /**
+     *
+     *
+     * English: **"Room settings:"**
+     */
+    roomSettings: string;
+    /**
+     *
+     *
+     * English: **"Attack"**
+     */
+    attack: string;
+    /**
+     *
+     *
+     * English: **"Combo"**
+     */
+    combo: string;
+    /**
+     *
+     *
+     * English: **"Solid"**
+     */
+    solid: string;
+    /**
+     *
+     *
+     * English: **"Clear"**
+     */
+    clear: string;
+    /**
+     *
+     *
+     * English: **"Mode"**
+     */
+    mode: string;
+    /**
+     *
+     *
+     * English: **"Garbage"**
+     */
+    garbage: string;
+    /**
+     *
+     *
+     * English: **"GarbageDelay"**
+     */
+    garbageDelay: string;
+    /**
+     *
+     *
+     * English: **"Messiness"**
+     */
+    messiness: string;
+    /**
+     *
+     *
+     * English: **"Replay"**
+     */
+    replay: string;
+    /**
+     *
+     *
+     * English: **"Rep"**
+     */
+    rep: string;
+    /**
+     *
+     *
+     * English: **"Rec."**
+     */
+    rec: string;
+    /**
+     * Displays in an alert prompting user to enter a DAS value in frames (like in NullpoMino)
+     *
+     * English: **"Enter numeric NullpoMino DAS value:"**
+     */
+    enterNullDAS: string;
+    /**
+     *
+     *
+     * English: **"Suggested DAS is"**
+     */
+    suggestedIs: string;
+    /**
+     *
+     *
+     * English: **"Apply?"**
+     */
+    applyConfirm: string;
+    /**
+     *
+     *
+     * English: **"DAS value is invalid, was not changed!"**
+     */
+    invalidDAS: string;
+    /**
+     *
+     *
+     * English: **"Settings changed during the game. Replay invalidated."**
+     */
+    settingsChanged: string;
+    /**
+     *
+     *
+     * English: **"Segment"**
+     */
+    segment: string;
+    /**
+     *
+     *
+     * English: **"Duration"**
+     */
+    duration: string;
+    /**
+     *
+     *
+     * English: **"It seems the room is full."**
+     */
+    roomFull: string;
+    /**
+     *
+     *
+     * English: **"This chat is shared with {discord}."**
+     */
+    lobbyInfo: string;
+    /**
+     *
+     *
+     * English: **"You are now the host of this room."**
+     */
+    newHost: string;
+    /**
+     *
+     *
+     * English: **"This room no longer exists, joining the Default room!"**
+     */
+    badRoom: string;
+    /**
+     *
+     *
+     * English: **"Setting changed by the host"**
+     */
+    stngsChanged: string;
+    /**
+     *
+     *
+     * English: **"Custom settings"**
+     */
+    stngsCustom: string;
+    /**
+     *
+     *
+     * English: **"Already spectating!"**
+     */
+    aSpec: string;
+    /**
+     *
+     *
+     * English: **"Already playing!"**
+     */
+    aPlay: string;
+    /**
+     * Displays when replay either fails to save or user used `/replay`.
+     *
+     * English: **"Replay failed to save."**
+     */
+    repFail: string;
+    /**
+     * Displays when replay either fails to save or user used `/replay`.
+     *
+     * English: **"Replay file dumped into the chat. To preserve it, copy the text in the box and paste into your favourite text editor."**
+     */
+    repInChat: string;
+    /**
+     *
+     *
+     * English: **"The copied replayfile can be then played in the replayer or possibly resubmitted to the site."**
+     */
+    repTxtInfo: string;
+    /**
+     * Displays when a player achieves their new personal best score/time.
+     *
+     * English: **"YOUR NEW PERSONAL BEST"**
+     */
+    newPB: string;
+    /**
+     * Displays when a player finishes a mode for the first time.
+     *
+     * English: **"This was your first game. Get another PB to track the improvement."**
+     */
+    firstPB: string;
+    /**
+     * Displays when a player beats their previous personal best score/time.
+     *
+     * English: **"Your previous record was {prevPB} achieved {prevAgo}. The improvement is {PBdiff}."**
+     */
+    infoPB: string;
+    /**
+     * Specifies how long ago the PB was achieved.
+     *
+     * English: **"days ago"**
+     */
+    daysAgo: string;
+    /**
+     *
+     *
+     * English: **"THE RACE HAS FINISHED"**
+     */
+    raceFin: string;
+    /**
+     *
+     *
+     * English: **"You can complete the run, but the next round can start at any time."**
+     */
+    raceFinInfo: string;
+    /**
+     * Title of a message displayed when a line clear other than a T-spin Double was performed in 20TSD.
+     *
+     * English: **"NOT TSD"**
+     */
+    notTSD: string;
+    /**
+     * Description of a message displayed when a line clear other than a T-spin Double was performed in 20TSD.
+     *
+     * English: **"Only T-Spin Double is allowed"**
+     */
+    notTSDInfo: string;
+    /**
+     * Title of a message displayed when a 4-line Perfect Clear is not possible in PC Mode.
+     *
+     * English: **"NOT a PC"**
+     */
+    notPC: string;
+    /**
+     * Description of a message displayed when a 4-line Perfect Clear is not possible in PC Mode.
+     *
+     * English: **"Do a Perfect Clear every 10 blocks. Your board is not clearable."**
+     */
+    notPCInfo: string;
+    /**
+     * Title of a message the displays when the player performs a 4-wide in a room with NoFW enabled.
+     *
+     * English: **"FOUR WIDE"**
+     */
+    fwDetect: string;
+    /**
+     * Description of a message the displays when the player performs a 4-wide in a room with NoFW enabled.
+     *
+     * English: **"Attacking yourself!"**
+     */
+    fwDetectInfo: string;
+    /**
+     *
+     *
+     * English: **"Oops!"**
+     */
+    oops: string;
+    /**
+     *
+     *
+     * English: **"Public chatting is not available for guests or users with less than {chReq} hours of gametime."**
+     */
+    chatNA: string;
+    /**
+     *
+     *
+     * English: **"Learn more"**
+     */
+    leMore: string;
+    /**
+     *
+     *
+     * English: **"The maximum amount of open connections for this IP is curently reached. If you need increased limits, contact us via Discord"**
+     */
+    connLimit: string;
+    /**
+     *
+     *
+     * English: **"Disconnected for inactivity! Spectator section was full."**
+     */
+    idleDC: string;
+    /**
+     *
+     *
+     * English: **"Rate limit reached."**
+     */
+    RLreach: string;
+    /**
+     * Displays when the account's access to Live games is permanetly restricted.
+     *
+     * English: **"Your access to the Live games has been permanently restricted. You can still play singleplayer modes."**
+     */
+    ban1: string;
+    /**
+     * Displays when the account is banned.
+     *
+     * English: **"This user account is BANNED. Relogin to the website for more information."**
+     */
+    ban2: string;
+    /**
+     * Displays when the player fails to connect to the servers.
+     *
+     * English: **"Not connected to the game server, try {refr}."**
+     */
+    ncGS: string;
+    /**
+     * Suggests the user to refresh the page.
+     *
+     * English: **"refreshing the page"**
+     */
+    refr: string;
+    /**
+     * Displays when the player beats an unpublished map.
+     *
+     * English: **"Record not saved, the map is not published."**
+     */
+    nsUnpub: string;
+    /**
+     * Displays in chat when the player achieves no T-spin Doubles in 20TSD.
+     *
+     * English: **"Record not saved, not enough T-Spins."**
+     */
+    nsTspins: string;
+    /**
+     * Displays in chat when the player achieves less than 2 Perfect Clears in PC Mode.
+     *
+     * English: **"Record not saved, at least 2 Perfect Clears needed."**
+     */
+    nsLowPC: string;
+    /**
+     * Title of the message that displays in usermodes when a finite queue is depleted.
+     *
+     * English: **"Out of blocks"**
+     */
+    noBlocks: string;
+    /**
+     * Description of the message that displays in usermodes when a finite queue is depleted.
+     *
+     * English: **"All blocks were used"**
+     */
+    noBlocks2: string;
+    /**
+     *
+     *
+     * English: **"No players"**
+     */
+    noPlayers: string;
+    /**
+     *
+     *
+     * English: **"{cnt} more"**
+     */
+    cntMore: string;
+    /**
+     *
+     *
+     * English: **"{cnt} guests"**
+     */
+    cntGuests: string;
+    /**
+     *
+     *
+     * English: **"{cnt} spectating"**
+     */
+    cntSpec: string;
+    /**
+     *
+     *
+     * English: **"Join possible"**
+     */
+    joinPossible: string;
+    /**
+     *
+     *
+     * English: **"Not eligible"**
+     */
+    notEligible: string;
+    /**
+     *
+     *
+     * English: **"G.time"**
+     */
+    gTimeShort: string;
+    /**
+     *
+     *
+     * English: **"On"**
+     */
+    on: string;
+    /**
+     *
+     *
+     * English: **"Off"**
+     */
+    off: string;
+    /**
+     *
+     *
+     * English: **"Friends"**
+     */
+    fr: string;
+    /**
+     *
+     *
+     * English: **"Loading friend list"**
+     */
+    frLoad: string;
+    /**
+     *
+     *
+     * English: **"Log in first to use friend list"**
+     */
+    frLogin: string;
+    /**
+     *
+     *
+     * English: **"Friend list is empty"**
+     */
+    frEmpty: string;
+    /**
+     *
+     *
+     * English: **"Visit user's profile to send friend request."**
+     */
+    frHowAdd: string;
+    /**
+     *
+     *
+     * English: **"Private"**
+     */
+    frPriv: string;
+    /**
+     *
+     *
+     * English: **"Already in!"**
+     */
+    frIn: string;
+    /**
+     *
+     *
+     * English: **"Open chat"**
+     */
+    frChat: string;
+    /**
+     *
+     *
+     * English: **"Reload"**
+     */
+    frRel: string;
+    /**
+     *
+     *
+     * English: **"Message to {name}"**
+     */
+    frMsgTo: string;
+    /**
+     *
+     *
+     * English: **"Send room invite"**
+     */
+    frInv: string;
+    /**
+     *
+     *
+     * English: **"Invite to join {room}"**
+     */
+    frInvTo: string;
+    /**
+     *
+     *
+     * English: **"You are already in!"**
+     */
+    frInvIn: string;
+    /**
+     *
+     *
+     * English: **"by {user}"**
+     */
+    frInvBy: string;
+    /**
+     *
+     *
+     * English: **"ONLINE"**
+     */
+    frOn: string;
+    /**
+     *
+     *
+     * English: **"OFFLINE"**
+     */
+    frOff: string;
+    /**
+     *
+     *
+     * English: **"This is the beginning of chat history with {name}."**
+     */
+    frNewChatH: string;
+    /**
+     *
+     *
+     * English: **"Welcome to the Friends tab"**
+     */
+    frWelc: string;
+    /**
+     *
+     *
+     * English: **"In this area you can access a list of online friends, private chats, and room invites"**
+     */
+    frIntro: string;
+    /**
+     *
+     *
+     * English: **"To send a friend request, visit a user's profile"**
+     */
+    frIntro2: string;
+    /**
+     *
+     *
+     * English: **"To manage friends, visit the {frPage}"**
+     */
+    frIntro3: string;
+    /**
+     *
+     *
+     * English: **"Friends page"**
+     */
+    frPage: string;
+    /**
+     *
+     *
+     * English: **"Close intro"**
+     */
+    frIntroCl: string;
+    /**
+     *
+     *
+     * English: **"PPS"**
+     */
+    PPS: string;
+    /**
+     *
+     *
+     * English: **"APM"**
+     */
+    APM: string;
+    /**
+     *
+     *
+     * English: **"KPP"**
+     */
+    KPP: string;
+    /**
+     *
+     *
+     * English: **"Score"**
+     */
+    score: string;
+    /**
+     *
+     *
+     * English: **"Time"**
+     */
+    roundTime: string;
+    /**
+     *
+     *
+     * English: **"Apply changes"**
+     */
+    applyCh: string;
+    /**
+     *
+     *
+     * English: **"Create"**
+     */
+    create: string;
+    /**
+     *
+     *
+     * English: **"Sprint"**
+     */
+    sprint: string;
+    /**
+     *
+     *
+     * English: **"s"**
+     */
+    s: string;
+    /**
+     *
+     *
+     * English: **"hrs"**
+     */
+    hrs: string;
+    /**
+     *
+     *
+     * English: **"Show more"**
+     */
+    showMore: string;
+    /**
+     *
+     *
+     * English: **"Show less"**
+     */
+    showLess: string;
+    /**
+     *
+     *
+     * English: **"Cheese race"**
+     */
+    cheese: string;
+    /**
+     *
+     *
+     * English: **"Survival"**
+     */
+    survival: string;
+    /**
+     *
+     *
+     * English: **"Ultra"**
+     */
+    ultra: string;
+    /**
+     *
+     *
+     * English: **"Free play"**
+     */
+    freePlay: string;
+    /**
+     *
+     *
+     * English: **"20TSD"**
+     */
+    "20TSD": string;
+    /**
+     *
+     *
+     * English: **"PC Mode"**
+     */
+    PCmode: string;
+    /**
+     *
+     *
+     * English: **"Close"**
+     */
+    close: string;
+    /**
+     *
+     *
+     * English: **"Report user"**
+     */
+    reportU: string;
+    /**
+     *
+     *
+     * English: **"User"**
+     */
+    user: string;
+    /**
+     *
+     *
+     * English: **"Reason"**
+     */
+    reason: string;
+    /**
+     *
+     *
+     * English: **"Spam or unwanted advertising"**
+     */
+    rr0: string;
+    /**
+     *
+     *
+     * English: **"Sexually explicit content"**
+     */
+    rr1: string;
+    /**
+     *
+     *
+     * English: **"Hate speech"**
+     */
+    rr2: string;
+    /**
+     *
+     *
+     * English: **"Harassment or bullying"**
+     */
+    rr3: string;
+    /**
+     *
+     *
+     * English: **"Other (specify)"**
+     */
+    rr4: string;
+    /**
+     *
+     *
+     * English: **"Send report"**
+     */
+    sendReport: string;
+  }
 
-declare interface Ruleset {
-  clearDelay: number;
-  rnd: number;
-  showPreviews: number;
-  holdEnabled: boolean;
-  baseBlockSet: number;
-  gravityLvl: number;
-  lockDelay: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
-  mess: number;
-  gapW: number;
-  gInv: boolean;
-  gDelay: number;
-  gblock: number;
-  tsdOnly: boolean;
-  allSpin: number;
-  speedLimit: number;
-  scoreMult: number;
-  ghost: number;
-  DAS: number;
-  ARR: number;
-  clearLines: boolean;
-  sfx: boolean;
-  vsfx: boolean;
-  solidAttack: boolean;
-  ext: number;
-  sgProfile: number[];
-}
+  type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
 
-declare interface RoomConfig {
-  t?: number;
-  p?: boolean;
-  n?: string;
-  pl?: number;
-  m?: number;
-  at?: number[];
-  ct?: number[];
-  gdm?: number;
-  gblock?: number;
-  rnd?: number;
-  bset?: number;
-  pr?: number;
-  gDelay?: number;
-  mess?: number;
-  gapW?: number;
-  sg?: number;
-  hold?: boolean;
-  hostStart?: boolean;
-  noFW?: boolean;
-  sa?: boolean;
-  gInv?: boolean;
-  as?: number;
-  ghost?: number;
-  srv?: string;
-  cd?: number;
-  DAS?: number;
-  ARR?: number;
-  sl?: number;
-  grav?: number;
-  ld?: [number, number, number];
-  sgpA?: number[];
-}
+  type SoundDefinition = { id: string; vol: number };
 
-declare interface RoomModifiedConfig {
-  at?: [
-    zero: number,
-    single: number,
-    double: number,
-    triple: number,
-    jstris: number,
-    TSD: number,
-    TST: number,
-    TSS: number,
-    MTSS: number,
-    PC: number,
-    B2B: number
-  ];
-  ct?: [
-    combo0: number,
-    combo1: number,
-    combo2: number,
-    combo3: number,
-    combo4: number,
-    combo5: number,
-    combo6: number,
-    combo7: number,
-    combo8: number,
-    combo9: number,
-    combo10: number,
-    combo11: number,
-    combo12plus: number
-  ];
-  ld?: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
-  cd?: number;
-  gdm?: number;
-  gblock?: number;
-  ghost?: number;
-  DAS?: number;
-  ARR?: number;
-  rnd?: number;
-  pr?: number;
-  hold?: boolean;
-  bbs?: number;
-  grav?: number;
-  mess?: number;
-  gDelay?: number;
-  hostStart?: boolean;
-  noFW?: boolean;
-  sa?: boolean;
-  gInv?: boolean;
-  gapW?: number;
-  as?: number;
-  asEx?: string;
-  sgp?: number;
-  sgpA?: number[];
+  interface Ruleset {
+    clearDelay: number;
+    rnd: number;
+    showPreviews: number;
+    holdEnabled: boolean;
+    baseBlockSet: number;
+    gravityLvl: number;
+    lockDelay: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
+    mess: number;
+    gapW: number;
+    gInv: boolean;
+    gDelay: number;
+    gblock: number;
+    tsdOnly: boolean;
+    allSpin: number;
+    speedLimit: number;
+    scoreMult: number;
+    ghost: number;
+    DAS: number;
+    ARR: number;
+    clearLines: boolean;
+    sfx: boolean;
+    vsfx: boolean;
+    solidAttack: boolean;
+    ext: number;
+    sgProfile: number[];
+  }
+
+  interface RoomConfig {
+    t?: number;
+    p?: boolean;
+    n?: string;
+    pl?: number;
+    m?: number;
+    at?: number[];
+    ct?: number[];
+    gdm?: number;
+    gblock?: number;
+    rnd?: number;
+    bset?: number;
+    pr?: number;
+    gDelay?: number;
+    mess?: number;
+    gapW?: number;
+    sg?: number;
+    hold?: boolean;
+    hostStart?: boolean;
+    noFW?: boolean;
+    sa?: boolean;
+    gInv?: boolean;
+    as?: number;
+    ghost?: number;
+    srv?: string;
+    cd?: number;
+    DAS?: number;
+    ARR?: number;
+    sl?: number;
+    grav?: number;
+    ld?: [number, number, number];
+    sgpA?: number[];
+  }
+
+  interface RoomModifiedConfig {
+    at?: [
+      zero: number,
+      single: number,
+      double: number,
+      triple: number,
+      jstris: number,
+      TSD: number,
+      TST: number,
+      TSS: number,
+      MTSS: number,
+      PC: number,
+      B2B: number
+    ];
+    ct?: [
+      combo0: number,
+      combo1: number,
+      combo2: number,
+      combo3: number,
+      combo4: number,
+      combo5: number,
+      combo6: number,
+      combo7: number,
+      combo8: number,
+      combo9: number,
+      combo10: number,
+      combo11: number,
+      combo12plus: number
+    ];
+    ld?: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number];
+    cd?: number;
+    gdm?: number;
+    gblock?: number;
+    ghost?: number;
+    DAS?: number;
+    ARR?: number;
+    rnd?: number;
+    pr?: number;
+    hold?: boolean;
+    bbs?: number;
+    grav?: number;
+    mess?: number;
+    gDelay?: number;
+    hostStart?: boolean;
+    noFW?: boolean;
+    sa?: boolean;
+    gInv?: boolean;
+    gapW?: number;
+    as?: number;
+    asEx?: string;
+    sgp?: number;
+    sgpA?: number[];
+  }
 }
 
 /** Specifies translatable strings throughout the game. */
-declare const i18n: I18n;
+declare const i18n: Jstris.I18n;
 
 /**
  * Formats time into minutes, seconds and optionally partial seconds.
@@ -2209,7 +2264,7 @@ declare function arrayUnique<T>(array: T[]): T[];
  * @param matrix The matrix to copy.
  * @returns The matrix copy.
  */
-declare function copyMatrix(matrix: number[][]): number[][];
+declare function copyMatrix<T extends number[][]>(matrix: T): T;
 
 /**
  * Escapes all `&`, `<` and `>` characters in order to sanitize input inserted via `innerHTML`.
@@ -2286,7 +2341,7 @@ declare function includeScript(scriptSource: string, onLoad: (event: Event) => v
  * @param size The skin size in pixels.
  * @param settings Unknown object.
  */
-declare function loadSkin(url: string, size: number, settings?: object): void;
+declare function loadSkin(url: string, size?: number, settings?: object): void;
 
 /**
  * Loads an external ghost skin.
@@ -2300,7 +2355,7 @@ declare function loadGhostSkin(url: string, size: number): void;
  * @param url Skin URL.
  * @param videoOptions Video options.
  */
-declare function loadVideoSkin(url: string, videoOptions: VideoOptions): void;
+declare function loadVideoSkin(url: string, videoOptions: Jstris.VideoOptions): void;
 
 /**
  * Joins a multiplayer room.
@@ -2534,9 +2589,9 @@ declare class Game extends GameCore {
   interval: number | null;
   animator: LineClearAnimator | null;
   RulesetManager: RulesetManager;
-  conf: [Ruleset, Ruleset];
+  conf: [Jstris.Ruleset, Jstris.Ruleset];
   /** Refers to `this.conf[0]`. */
-  R: Ruleset;
+  R: Jstris.Ruleset;
   Settings: Settings;
   Caption: GameCaption;
   Live: Live;
@@ -2611,13 +2666,13 @@ declare class Game extends GameCore {
    * @param matrix The 20x10 matrix to draw.
    * @param redBar The height of red bar (pending garbage).
    */
-  updateLiveMatrix(slot: number, matrix: number[][], redBar: number): void;
+  updateLiveMatrix(slot: number, matrix: Jstris.Matrix, redBar: number): void;
   /**
    * Plays specified sound or sounds.
    * @param soundOrSounds Sound or sounds to play.
    * @param type `1` for regular sounds, `2` for voice samples.
    */
-  playSound(soundOrSounds: string | string[], type: number): void;
+  playSound(soundOrSounds: string | string[], type?: number): void;
   /**
    * Moves the active piece.
    * @param direction The direction to move the piece.
@@ -2669,7 +2724,17 @@ declare class Game extends GameCore {
   setLockDelay(lockDelayArray: [lockDelay: number, maxLockDelayWithoutLock: number, maxWithoutLock: number]): void;
   pageTitle(title: string): void;
   browserTabFocusChange(focusState: number): void;
-  sprintInfoLineContent(mode: number): void;
+  /**
+   * Shows the appropriate sprint info element, or replaces "lines remaining" text.
+   * @param mode Stat to show:
+   * - 0: Lines remaining,
+   * - 1: Time remaining,
+   * - 2: T-spin Doubles,
+   * - 3: Perfect Clears.
+   *
+   * If string is passed, it will replace the "lines remaining" text with the text.
+   */
+  sprintInfoLineContent(modeOrText: 0 | 1 | 2 | 3 | string): void;
   evalPCmodeEnd(): void;
   savePlacementTime(): void;
   getCurrentPPS(): number;
@@ -2681,13 +2746,13 @@ declare class Game extends GameCore {
 declare class GameCore {
   constructor(isGame: boolean);
   ISGAME: boolean;
-  randomizer: Randomizer | null;
+  randomizer: Jstris.Randomizer | null;
   /** A 20 x 10 array specifying blocks in the visible area of the playfield. */
-  matrix: number[][];
+  matrix: Jstris.Matrix;
   /** A 1 x 10 array specifying blocks in the hidden row. */
-  deadline: number[];
+  deadline: Jstris.MatrixRow;
   /** Specifies piece sets used in the game. */
-  blockSets: BlockSets;
+  blockSets: Jstris.BlockSets;
   readonly softDropSpeeds: [
     {
       id: 0;
@@ -2726,12 +2791,12 @@ declare class GameCore {
   };
   queue: Block[];
   queueLength: number;
-  gamedata: GameData;
+  gamedata: Jstris.GameData;
   skins: {
     id: number;
     name: string;
     data: string;
-    w?: number;
+    w: number;
   }[];
   customSkinPath: string | null;
   temporaryBlockSet: number | null;
@@ -2777,8 +2842,8 @@ declare class GameCore {
   readonly multipleNames: ["Single", "Double", "Triple", "Quadruple", "Multiple"];
   excludedBlocksAS: string[];
   Items: Items;
-  R: Ruleset;
-  DEF: Ruleset;
+  R: Jstris.Ruleset;
+  DEF: Jstris.Ruleset;
 
   canvas: HTMLCanvasElement;
   holdCanvas: HTMLCanvasElement;
@@ -3014,9 +3079,9 @@ declare class GameCore {
   };
   last: number;
 
-  randomizerFactory(randomizerID: number, pre_seed: AleaPRNG): Randomizer;
+  randomizerFactory(randomizerID: number, pre_seed: AleaPRNG): Jstris.Randomizer;
   initRandomizer(randomizerID: number): void;
-  getRandomizerBlock(randomizer?: Randomizer): Block;
+  getRandomizerBlock(randomizer?: Jstris.Randomizer): Block;
   generateLiveQueue(): void;
   getBlockFromQueue(): Block;
   checkIntersection(x: number, y: number, pieceState: number): boolean;
@@ -3035,7 +3100,7 @@ declare class GameCore {
   countGarbageHeight(heightLimit?: number): number;
   is4W(rowCheckedFor4W: number): boolean;
   placeBlock(x: number, y: number, timestamp: number): void;
-  getQueuePreview(randomizer: Randomizer): Block[];
+  getQueuePreview(randomizer: Jstris.Randomizer): Block[];
   generateQueue(): void;
   addGarbageFromQueue(timestamp: number): void;
   addGarbage(amountOfLines: number): number;
@@ -3126,8 +3191,8 @@ declare class Replayer extends GameCore {
   linesRemaining: number;
   RNG: AleaPRNG;
   blockRNG: AleaPRNG;
-  r: ReplayInfo;
-  actions: Action[];
+  r: Jstris.ReplayInfo;
+  actions: Jstris.Action[];
   debug: boolean; // Actually a 0 (number), but nothing sets this property in replayer.js, and 0 is falsy.
   Analytics: Analytics;
   Scoring: Scoring;
@@ -3143,7 +3208,7 @@ declare class Replayer extends GameCore {
 
   getRandomizer(replayVersion: number, seed: string): void;
   initReplay(): void;
-  loadMap(matrix: number[][], staticQueue: string | null): void;
+  loadMap(matrix: Jstris.Matrix, staticQueue: string | null): void;
   pullBits(amountOfBits: number): number | null;
   loadBinaryActionsV3(): void;
   initSetOnce(): void;
@@ -3384,7 +3449,7 @@ declare class SlotView {
   ): void;
   drawLine(ctx: CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number): void;
   paintMatrixWithColor(blockID: number): void;
-  updateLiveMatrix(matrix: number[][], redBar: number): void;
+  updateLiveMatrix(matrix: Jstris.Matrix, redBar: number): void;
   updateTextBar(): void;
   /** Empty function. */
   onCreate(): void;
@@ -3414,7 +3479,7 @@ declare class SlotView {
 declare class WebGLView {
   constructor(game: Game);
   g: Game;
-  ctxs: GLContextDefinition[];
+  ctxs: Jstris.GLContextDefinition[];
   readonly MAIN: 0;
   readonly HOLD: 1;
   readonly QUEUE: 2;
@@ -3428,13 +3493,13 @@ declare class WebGLView {
   video: HTMLVideoElement | null;
 
   isAvailable(): boolean;
-  initGLContext(ctx: GLContextDefinition): void;
+  initGLContext(ctx: Jstris.GLContextDefinition): void;
   initRenderer(): void;
-  initRedbarTexture(ctx: GLContextDefinition, id: number): void;
-  initEmptyTexture(ctx: GLContextDefinition, id: number): void;
+  initRedbarTexture(ctx: Jstris.GLContextDefinition, id: number): void;
+  initEmptyTexture(ctx: Jstris.GLContextDefinition, id: number): void;
   loadTexture(id: number, source: string): void;
   drawImage(
-    ctx: GLContextDefinition,
+    ctx: Jstris.GLContextDefinition,
     texture: WebGLTexture,
     textureWidth: number,
     textureHeight: number,
@@ -3456,14 +3521,14 @@ declare class WebGLView {
   drawBrickOverlay(x: number, y: number, isGhost: boolean): void;
   drawBlock(x: number, y: number, blockID: number, ctxID: number): void;
   drawGhostBlock(x: number, y: number, blockID: number): void;
-  redrawRedBar(redBar: number): void;
+  redrawRedBar(shouldClear: boolean): void;
   drawClearLine(row: number, alpha: number): void;
   setAlpha(alpha: number): void;
   clearRect(startX: number, startY: number, endX: number, endY: number): void;
-  setupGif(URL: string, videoOptions: VideoOptions): void;
+  setupGif(URL: string, videoOptions: Jstris.VideoOptions): void;
   realSetupGif(URL: string): void;
   updateGifTexture(ctx: CanvasRenderingContext2D, source: string): void;
-  setupVideo(URL: string, videoOptions: VideoOptions): void;
+  setupVideo(URL: string, videoOptions: Jstris.VideoOptions): void;
   updateTexture(textureInfo: number): void;
   updateTextureFromElem(textureInfo: number, video: HTMLVideoElement, videoWidth: number, videoHeight: number): void;
   createFastFont(): FastFont;
@@ -3500,7 +3565,7 @@ declare class Ctx2DView {
     color: string
   ): void;
   drawLine(ctx: CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number): void;
-  redrawRedBar(redBar: number): void;
+  redrawRedBar(shouldClear: boolean): void;
   drawClearLine(row: number, alpha: number): void;
   setAlpha(alpha: number): void;
   clearRect(startX: number, startY: number, endX: number, endY: number): void;
@@ -3535,7 +3600,7 @@ declare class View {
   ghostEnabled: boolean;
   QueueHoldEnabled: boolean;
 
-  constructor(nameDefinition: ViewNameDefinition);
+  constructor(nameDefinition: Jstris.ViewNameDefinition);
   changeSkin(skinID: number): void;
   changeSFX(sfxSet: SFXsets): void;
   loadSounds(): void;
@@ -3580,6 +3645,123 @@ declare class View {
   onLinesCleared(): void;
   onTimeRemainingChanged(): void;
   onScoreChanged(): void;
+}
+
+/**
+ * Class responsible for drawing the board in export.
+ * Actually named `View` in-game.
+ *
+ * In order to modify this using TypeScript, you need to cast `View` to the type of this class:
+ * ```ts
+ * (View as unknown as typeof ExportView).prototype.myMethod = function () { ... }
+ * ```
+ *
+ * Make sure that you check for whether the `View` is the export one, to not accidentally overwrite the replayer `View`.
+ */
+declare class ExportView {
+  g: Replayer;
+  readonly MAIN: 0;
+  readonly HOLD: 1;
+  readonly QUEUE: 2;
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  /** Block size. */
+  BS: number;
+  drawScale: number;
+  replaySEset: number;
+  tex: HTMLImageElement;
+  ghostSkinId: number;
+  skinId: number;
+  bgs: Jstris.ExportBackgroundDefinition[];
+  bg: Jstris.ExportBackgroundDefinition;
+  redrawBlocked: boolean;
+  ghostEnabled: boolean;
+  title: string;
+  drawOffsetTop: number;
+  drawOffsetLeft: number;
+  QueueHoldEnabled: boolean;
+  layout: Jstris.ExportLayoutDefinition;
+  AP: {
+    HLD: {
+      T: number;
+      L: number;
+      BS: number;
+    };
+    STG: {
+      L: number;
+      T: number;
+      H: number;
+      W: number;
+    };
+    QUE: {
+      L: number;
+      T: number;
+      BS: number;
+      W: number;
+    };
+    TTL: {};
+    STA: {
+      T: number;
+      L: number;
+      W: number;
+      FS: number;
+    };
+    H: number;
+    W: number;
+  };
+
+  block_size?: number;
+
+  constructor(settings: { main: string });
+
+  readSettings(): void;
+  loadBG(id: number): void;
+  setBackgroundOptions(): void;
+  computeAbsolutePositions(): void;
+  changeSkin(skinID: number): void;
+  /**
+   * Draws the grid.
+   * @param gridMode Unused parameter.
+   */
+  drawBgGrid(gridMode?: number): void;
+  redraw(): void;
+  drawGhostAndCurrent(): void;
+  drawMainStage(): void;
+  clearMainCanvas(): void;
+  clearHoldCanvas(): void;
+  clearQueueCanvas(): void;
+  drawBlockOnCanvas(x: number, y: number, blockID: number, ctxID: number): void;
+  drawBlock(x: number, y: number, blockID: number): void;
+  drawGhostBlock(x: number, y: number, blockID: number): void;
+  drawRectangle(
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    color: string
+  ): void;
+  /** Draws an image onto the canvas, with destination offset by `drawOffsetLeft` and `drawOffsetTop`. */
+  drawImage(
+    ctx: CanvasRenderingContext2D,
+    image: CanvasImageSource,
+    sourceX: number,
+    sourceY: number,
+    sourceWidth: number,
+    sourceHeight: number,
+    destX: number,
+    destY: number,
+    destWidth: number,
+    destHeight: number
+  ): void;
+  drawLine(ctx: CanvasRenderingContext2D, startX: number, startY: number, destX: number, destY: number): void;
+  paintMatrixWithColor(blockID: number): void;
+  updateTextBar(): void;
+
+  onCreate(): void;
+
+  setupMode(): void;
+  sprintInfoLineContent(): void;
 }
 
 interface TeamData {
@@ -3703,27 +3885,25 @@ declare class SlotStats {
   update(PPS: number, APM: number): void;
 }
 
-declare type SoundDefinition = { id: string; vol: number };
-
 declare class SoundQueue {
   constructor();
   playingSound: null;
-  queue: SoundDefinition[];
+  queue: Jstris.SoundDefinition[];
 
   add(sound: string, volume: number): void;
   stop(): void;
-  private _playTask(soundDefinition: SoundDefinition): void;
+  private _playTask(soundDefinition: Jstris.SoundDefinition): void;
   private _next(): void;
 }
 
 declare class LineClearAnimator {
-  constructor(matrix: number[][], clearPositions: number[], game: GameCore);
+  constructor(matrix: Jstris.Matrix, clearPositions: number[], game: GameCore);
   g: GameCore;
-  matrix: number[][];
+  matrix: Jstris.Matrix;
   clearPositions: number[];
   clearDelay: number;
   t: number;
-  readonly IS_SOLID: true;
+  IS_SOLID: boolean;
 
   render(timeDelta_ms: number): void;
   finished(): void;
@@ -3733,7 +3913,7 @@ declare class RulesetManager {
   constructor(game: Game);
   p: Game;
   modeMenu: HTMLDivElement;
-  DEF: Ruleset;
+  DEF: Jstris.Ruleset;
   pmodeRuleId: number;
   readonly RULE_KEYS: {
     cd: "clearDelay";
@@ -3831,15 +4011,15 @@ declare class RulesetManager {
   toggleCombo(event: Event, elementToAppendTo: HTMLElement): void;
   registerCombo(): void;
   /** Empty function. */
-  afterRuleChange(ruleset: Ruleset): void;
-  forceApplyChanges(ruleset: Ruleset): void;
+  afterRuleChange(ruleset: Jstris.Ruleset): void;
+  forceApplyChanges(ruleset: Jstris.Ruleset): void;
   /**
    * Applies rule changes to the ruleset.
    * @param ruleChange The object contatining rules to change.
    * @param ruleset The ruleset which should be changed.
    * @param {boolean} [pullFromDefinition=true] Whether the rules should be pulled from the default definition. Defaults to `true` if not provided.
    */
-  applyRule(ruleChange: object, ruleset: Ruleset, pullFromDefinition?: boolean): void;
+  applyRule(ruleChange: object, ruleset: Jstris.Ruleset, pullFromDefinition?: boolean): void;
   /**
    * Applies rule changes from the preset to the ruleset.
    * @param ruleChange The object contatining rules to change.
@@ -3847,13 +4027,13 @@ declare class RulesetManager {
    * @param {boolean} [pullFromDefinition=true] Whether the rules should be pulled from the default definition. Defaults to `true` if not provided.
    * @returns Object containing changed rules.
    */
-  applyPresetRule(ruleChange: object, ruleset: Ruleset, pullFromDefinition?: boolean): object;
+  applyPresetRule(ruleChange: object, ruleset: Jstris.Ruleset, pullFromDefinition?: boolean): object;
   /**
    * Adds/Changes rules to/in a specified ruleset.
    * @param rulesToAppend The object contatining rules to add/change.
    * @param ruleset The ruleset which should be changed.
    */
-  appendRule(rulesToAppend: object, ruleset: Ruleset): void;
+  appendRule(rulesToAppend: object, ruleset: Jstris.Ruleset): void;
 }
 
 declare class Settings {
@@ -3896,7 +4076,7 @@ declare class Settings {
   DMsound: boolean;
   SFXsetID: number;
   VSFSsetID: number;
-  controls: Controls;
+  controls: Jstris.Controls;
 
   init(): void;
   applyDefaults(): void;
@@ -4013,7 +4193,7 @@ declare class GameCaption {
   gamePlace(game: Game): void;
   speedWarning(PPSlimit: number): void;
   _fadeOut(caption: HTMLDivElement, timeoutMs: number, transitionTimerSec?: number, opacity?: number): void;
-  newPB(PBinfo: PersonalBestInfo | boolean): void;
+  newPB(PBinfo: Jstris.PersonalBestInfo | boolean): void;
   /**
    * Displays a loading caption.
    * @param captionText Caption text.
@@ -4044,7 +4224,7 @@ declare class Live {
   /** The user's Supporter tier, `0` if the user is not a Supporter. */
   sTier: number;
   isProxy: boolean;
-  servers: Servers | null;
+  servers: Jstris.Servers | null;
   serverId: string;
   joinRemote: {
     rid: string;
@@ -4053,10 +4233,10 @@ declare class Live {
     t: number;
     ts: number;
   } | null;
-  createRoomRequest: RoomConfig | null;
+  createRoomRequest: Jstris.RoomConfig | null;
   connectionTimeout: number | null;
   wasConnected: boolean;
-  clients: Clients;
+  clients: Jstris.Clients;
   /** Array of CIDs of players. */
   players: number[];
   /** Unkown - this is empty even in a bot match. */
@@ -4075,7 +4255,7 @@ declare class Live {
   rcS: {
     [unknownKey: number]: number;
   };
-  roomConfig: RoomConfig | null;
+  roomConfig: Jstris.RoomConfig | null;
   gid: number | string;
   lastGameId: string;
   currentTarget: number;
@@ -4183,7 +4363,7 @@ declare class Live {
   joinRoom(roomID: string): void;
   onOpen(event: Event): void;
   authorize(response: object): void;
-  getAuthorizedNameLink(clientName: string, clientType: number, client: Client): string;
+  getAuthorizedNameLink(clientName: string, clientType: number, client: Jstris.Client): string;
   getName(CID: number, returnRawName?: boolean): string;
   forgetRoomPlayers(): void;
   createPrivatePracticeRoom(unknownParameter?: boolean): void;
@@ -4199,11 +4379,11 @@ declare class Live {
   startLocalBotPractice(): void;
   tryPlayParam(): boolean;
   onRoomJoined(roomID: string, isPrivate: boolean, roomName: string): void;
-  displayLobby(lobbyList: LobbyList): void;
+  displayLobby(lobbyList: Jstris.LobbyList): void;
   setupLobbyHandlers(): void;
   resetWinCounter(): void;
-  displayResults(resultsList: ResultsList, displayFullStats: boolean): void;
-  displayTeamResults(teamResultsList: TeamResultsList): void;
+  displayResults(resultsList: Jstris.ResultsList, displayFullStats: boolean): void;
+  displayTeamResults(teamResultsList: Jstris.TeamResultsList): void;
   resolveMention(response: object): string;
   chatMajorWarning(warningHTML: string, CSSclass?: string, options?: { closable: boolean }): void;
   getChatLineClassesFor(CID: number): ["infoChl"] | null;
@@ -4221,15 +4401,15 @@ declare class Live {
   getGameSlot(CID: number, rc: number, team: number): boolean;
   onMessage(message: object): void;
   decodeActionsAndPlay(replayData: number[], bits: number): void;
-  updateLiveMatrixViaSnapshot(rc: number, redBar: number, matrix: number[][]): void;
+  updateLiveMatrixViaSnapshot(rc: number, redBar: number, matrix: Jstris.Matrix): void;
   onClose(event: Event): void;
   useProxy(): void;
   changeServer(): void;
   connect(): void;
-  parseBinaryMatrix(unknownParameter: string, trueHeight: number): number[][];
+  parseBinaryMatrix(unknownParameter: string, trueHeight: number): Jstris.Matrix;
   sendReplayConfig(): void;
   sendRepFragment(unknownParameter1: number[], unknownParameter2: boolean): void;
-  sendSnapshot(matrix: number[][]): void;
+  sendSnapshot(matrix: Jstris.Matrix): void;
   safeSend(data: string | ArrayBufferLike | Blob | ArrayBufferView): boolean;
   sendStats(): void;
   sendRestartEvent(): void;
@@ -4263,7 +4443,7 @@ declare class Live {
   spectatorMode(mode?: number): void;
   spectatorModeOff(mode?: number): void;
   onGameEnd(): void;
-  onReplaySaved(replayResponse: ReplayResponse): void;
+  onReplaySaved(replayResponse: Jstris.ReplayResponse): void;
   setResetButton(disabled: boolean): void;
   replayInfoToChat(replayID: number, mode: number, submode: number): void;
   getLeaderboardLink(mode: number, submode: number): string;
@@ -4330,7 +4510,7 @@ declare class Replay {
   afkQueue: unknown[];
   stream: ReplayStream;
   /** Bound to {@link Live.onReplaySaved | `Live.onReplaySaved(replayResponse)`} with `this` object being the `Live` instance. */
-  onSaved: (replayResponse: ReplayResponse) => void | null;
+  onSaved: (replayResponse: Jstris.ReplayResponse) => void | null;
   /** Bound to {@link Game.onMove | `Game.onMove(replayResponse)`} with `this` object being the `Game` instance. */
   onMoveAdded: (replayAction: ReplayAction) => void | null;
 
@@ -4376,7 +4556,7 @@ declare class MapManager {
   /** Function that specifies what to do when the map is ready. */
   onMapReady: (() => void) | null;
   mapId: number | null;
-  matrix: number[][];
+  matrix: Jstris.Matrix;
   mapData: object;
   lowestMapLine: number | null;
   mapLines: number[];
@@ -4429,6 +4609,8 @@ declare class ModeManager {
   fail: boolean;
   isFinished: boolean;
   noQueueRefill: boolean;
+  staticQueue: string;
+  repeatQueue: boolean;
   skinWasChanged: boolean;
   lastAttackGarbageColumn: number;
   mathEvaluate: (expression: string | string[]) => unknown | null;
@@ -4518,7 +4700,7 @@ declare class ModeManager {
   clearNextModeHandler(): void;
   clearUnPauseHandler(): void;
   resetUI(): void;
-  getNamedStatVal(statNameOrID: string | number, gamedata: GameData): [value: number, name: string] | null;
+  getNamedStatVal(statNameOrID: string | number, gamedata: Jstris.GameData): [value: number, name: string] | null;
   initialExecCommands(callback: () => void): void;
   execCommands(commands: object[] | object): void;
   sendForfeit(): void;
@@ -4546,7 +4728,7 @@ declare class ModeManager {
   finalLoader(): void;
   replaceActiveBlock(newPiece: Block): void;
   getBlockFromTextInput(pieceString: string): Block;
-  addStaticQueueToQueue(replaceActivePiece: boolean): void;
+  addStaticQueueToQueue(replaceActivePiece?: boolean): void;
   registerTimeTrigger(time: number | string): ModeTrigger;
   registerCommandTrigger(triggerID: number, value: number): ModeTrigger;
   registerVar(variableName: string): void;
@@ -4628,7 +4810,7 @@ declare class RoomInfo {
     limit: HTMLDivElement;
   };
   roomDetails: {
-    [roomID: string]: RoomDetails;
+    [roomID: string]: Jstris.RoomDetails;
   };
   /** Internationalized names for On and Off. */
   readonly ON_OFF: [string, string];
@@ -4784,9 +4966,9 @@ declare class RoomInfo {
   requestRoomDetail(roomID: string): void;
   acceptRoomDetail(response: object): void;
   displayRoomDetail(id: string): void;
-  displayLimit(roomDetails: RoomDetails): void;
-  displayConfig(roomDetails: RoomDetails): void;
-  displayPlayers(roomDetails: RoomDetails): void;
+  displayLimit(roomDetails: Jstris.RoomDetails): void;
+  displayConfig(roomDetails: Jstris.RoomDetails): void;
+  displayPlayers(roomDetails: Jstris.RoomDetails): void;
   openRoomDetails(event: MouseEvent): void;
   closeRoomDetails(event: MouseEvent): void;
 }
@@ -4808,8 +4990,8 @@ declare class ChatAutocomplete {
   addEmoteSurrounder: ":";
   wipePrevious: boolean;
   onWiped?: (string: string) => void;
-  preProcessEmotes?: (emoteList: EmoteList) => EmoteList;
-  onEmoteObjectReady?: (emoteList: EmoteList) => void;
+  preProcessEmotes?: (emoteList: Jstris.EmoteList) => Jstris.EmoteList;
+  onEmoteObjectReady?: (emoteList: Jstris.EmoteList) => void;
   moreEmotesAdded: boolean;
   selectedIndex: number;
   hintsElem: HTMLDivElement;
@@ -4818,14 +5000,14 @@ declare class ChatAutocomplete {
 
   clearEmotes(): void;
   initEmoteHints(): void;
-  addEmotes(emoteList: EmoteList): void;
+  addEmotes(emoteList: Jstris.EmoteList): void;
   loadEmotesIndex(versionSupporterParam: string): void;
   init(): void;
   moveSelected(moveAmount: number): void;
   setSelected(index: number): void;
-  processHint(currentWord: CurrentWord): void;
+  processHint(currentWord: Jstris.CurrentWord): void;
   ReturnWord(text: string, caretPositio0: number): string;
-  getCurrentWord(): CurrentWord;
+  getCurrentWord(): Jstris.CurrentWord;
   GetCaretPosition(inputElement: HTMLInputElement): number;
   setCaretPosition(position: number): void;
 }
@@ -4848,7 +5030,7 @@ declare class EmoteSelect {
   // Declared in init()
   emoteElem: HTMLDivElement;
   comment: Comment;
-  emoteList: EmoteList;
+  emoteList: Jstris.EmoteList;
   // Declared in initializeContainers()
   searchElem: HTMLFormElement;
   searchBar: HTMLInputElement;
@@ -4857,7 +5039,7 @@ declare class EmoteSelect {
   // Declared in initializeEmotes()
   groupList: string[];
   // Declared in createGroups()
-  emojis: EmoteList;
+  emojis: Jstris.EmoteList;
   groupsFragment: DocumentFragment;
   groupDiv: HTMLDivElement;
   groupName: HTMLHeadingElement;
@@ -4896,11 +5078,11 @@ declare class EmoteSelect {
   initializeEmotes(): void;
   createGroups(groups: string[]): Promise<void>;
   donateInfo(groups: string[]): void;
-  getEmoteSource(emoteObj: Emote): string;
-  createImages(emotes: EmoteList, target: EventTarget): Promise<void>;
+  getEmoteSource(emoteObj: Jstris.Emote): string;
+  createImages(emotes: Jstris.EmoteList, target: EventTarget): Promise<void>;
   selectGroup(): void;
   showName(target: EventTarget): void;
-  searchFunction(list: EmoteList): void;
+  searchFunction(list: Jstris.EmoteList): void;
   setSource(changes: IntersectionObserverEntry[], observer: IntersectionObserver): void;
   chatEmote(target: EventTarget): void;
   getCaretPosition(): number;
@@ -4940,7 +5122,7 @@ declare class ReplayController {
   timestamp(): number;
   toggleAnalytics(show?: 1): void;
   keyInput(event: KeyboardEvent): void;
-  getFinesse(): { finesse: number[]; scoreStamps: ScoreStamp[] };
+  getFinesse(): { finesse: number[]; scoreStamps: Jstris.ScoreStamp[] };
   fixUltraClockPrecision(): void;
   startDownloaders(): void;
 }
@@ -4969,9 +5151,9 @@ declare class Analytics {
 
   i: 0 | 1;
   controller: ReplayController;
-  r: ReplayData;
-  actions: Action[];
-  harddrops: HardDrop[];
+  r: Jstris.ReplayData;
+  actions: Jstris.Action[];
+  harddrops: Jstris.HardDrop[];
   readonly segSize: 10;
   showGlobalAvg: boolean;
   showLocalSpeed: boolean;
@@ -4982,27 +5164,12 @@ declare class Analytics {
   scLayer1: HTMLCanvasElement;
   ctx1: CanvasRenderingContext2D;
   tb: HTMLTableSectionElement;
-  data: { finesse: number[]; scoreStamps: ScoreStamp[] };
+  data: { finesse: number[]; scoreStamps: Jstris.ScoreStamp[] };
   // scoreFilter = [];
 
-  segments: Segment[];
+  segments: Jstris.Segment[];
 }
 
-declare const LZString: {
-  compress: (input: string | null) => string;
-  compressToBase64: (input: string | null) => string;
-  compressToEncodedURIComponent: (input: string | null) => string;
-  compressToUTF16: (input: string | null) => string;
-  compressToUint8Array: (uncompressed: string | null) => Uint8Array;
-  decompress: (compressed: string | null) => string | null | undefined;
-  decompressFromBase64: (compressed: string | null) => string | null | undefined;
-  decompressFromEncodedURIComponent: (input: string | null) => string | null | undefined;
-  decompressFromUTF16: (compressed: string | null) => string | null | undefined;
-  decompressFromUint8Array: (compressed: Uint8Array | null) => string | null | undefined;
-};
+declare const LZString: LZString;
 
-declare function alea(seed: string): () => number & {
-  int32: () => number;
-  double: () => number;
-  quick: () => number;
-}
+declare function alea(seed: string): AleaPRNG;
