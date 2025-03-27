@@ -18,9 +18,9 @@ declare interface LZString {
   decompressFromUint8Array: (compressed: Uint8Array | null) => string | null | undefined;
 }
 
-  type GrowToSize<T, N extends number, A extends T[]> = A["length"] extends N ? A : GrowToSize<T, N, [...A, T]>;
+type GrowToSize<T, N extends number, A extends T[]> = A["length"] extends N ? A : GrowToSize<T, N, [...A, T]>;
 
-  type FixedArray<T, N extends number> = GrowToSize<T, N, []>;
+type FixedArray<T, N extends number> = GrowToSize<T, N, []>;
 
 /** Stores types used throughout Jstris. */
 declare namespace Jstris {
@@ -28,7 +28,7 @@ declare namespace Jstris {
   type KeyCode = number;
 
   /** An array of 10 numbers, which defines a row of a Jstris board. */
-   type MatrixRow = FixedArray<number, 10>;
+  type MatrixRow = FixedArray<number, 10>;
 
   /** A 20x10 matrix, which is a visible part of the Jstris board. */
   type Matrix = FixedArray<MatrixRow, 20>;
@@ -318,7 +318,7 @@ declare namespace Jstris {
         n: string;
         /** Player role and icon */
         type?: number;
-        /** */
+        /** The player's Supporter tier. */
         ti?: number;
       };
       /** */
@@ -494,13 +494,7 @@ declare namespace Jstris {
     CLEAR5 = 14,
   }
 
-  type ScoreStamp = [
-    timestamp: number,
-    scoring: ScoringActions,
-    scoreAdded: number,
-    multiplier: number,
-    alwaysZero: 0
-  ];
+  type ScoreStamp = [timestamp: number, scoring: ScoringActions, scoreAdded: number, multiplier: number, alwaysZero: 0];
 
   type FinesseArray = [stateSpawn: number[], stateCW: number[], state180: number[], stateCCW: number[]];
 
@@ -933,6 +927,41 @@ declare namespace Jstris {
     stats: number;
   }
 
+  interface ComboToneDefinition {
+    url: string;
+    abs: number;
+    set: number;
+    duration?: number;
+    spacing?: number;
+    // How many combo tones there are.
+    cnt?: number;
+  }
+
+  interface ComboTonesJoint {
+    // Relative URL to the combo tone file.
+    url: string;
+    abs: number;
+    set: number;
+    duration: number;
+    spacing: number;
+    // How many combo tones there are.
+    cnt: number;
+  }
+
+  interface SFXDefinition {
+    // Relative URL to the combo tone file.
+    url: string;
+    abs: number;
+    set: number;
+    q?: number;
+  }
+
+  interface SFXSetDefinition {
+    id: number;
+    name: string;
+    data: BaseSFXset;
+  }
+
   interface I18n {
     /**
      * Displayed during the "Ready" state of "Ready? Go!" sequence.
@@ -989,7 +1018,7 @@ declare namespace Jstris {
      */
     st: string;
     /**
-     * Displayed after the place ordinal: 2nd, 22ns, 32nd,...
+     * Displayed after the place ordinal: 2nd, 22nd, 32nd,...
      *
      * English: **"nd"**
      */
@@ -1433,13 +1462,13 @@ declare namespace Jstris {
      */
     enterNullDAS: string;
     /**
-     *
+     * Displays in an alert that informs the user about the DAS value converted to milliseconds.
      *
      * English: **"Suggested DAS is"**
      */
     suggestedIs: string;
     /**
-     *
+     * Displays in an alert that ask the user whether to apply the DAS value or not.
      *
      * English: **"Apply?"**
      */
@@ -1451,19 +1480,19 @@ declare namespace Jstris {
      */
     invalidDAS: string;
     /**
-     *
+     * Displays in chat when settings (like DAS or ARR) are changed mid-game.
      *
      * English: **"Settings changed during the game. Replay invalidated."**
      */
     settingsChanged: string;
     /**
-     *
+     * Replay segment.
      *
      * English: **"Segment"**
      */
     segment: string;
     /**
-     *
+     * Duration of the replay segment.
      *
      * English: **"Duration"**
      */
@@ -1559,13 +1588,13 @@ declare namespace Jstris {
      */
     daysAgo: string;
     /**
-     *
+     * Title of a message displayed when one player finishes a Live race game mode (like Maps or Sprint).
      *
      * English: **"THE RACE HAS FINISHED"**
      */
     raceFin: string;
     /**
-     *
+     * Description of a message when one player finishes a Live race game mode (like Maps or Sprint).
      *
      * English: **"You can complete the run, but the next round can start at any time."**
      */
@@ -1643,7 +1672,7 @@ declare namespace Jstris {
      */
     RLreach: string;
     /**
-     * Displays when the account's access to Live games is permanetly restricted.
+     * Displays when the account's access to Live games is permanently restricted.
      *
      * English: **"Your access to the Live games has been permanently restricted. You can still play singleplayer modes."**
      */
@@ -2060,7 +2089,10 @@ declare namespace Jstris {
 
   type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
 
-  type SoundDefinition = { id: string; vol: number };
+  interface SoundDefinition {
+    id: string;
+    vol: number;
+  }
 
   interface Ruleset {
     clearDelay: number;
@@ -2177,11 +2209,55 @@ declare namespace Jstris {
     sgp?: number;
     sgpA?: number[];
   }
+
+  // Utilities
+  const enum Modes {
+    SPRINT = 1,
+    PRACTICE = 2,
+    CHEESE_RACE = 3,
+    SURVIVAL = 4,
+    ULTRA = 5,
+    MAPS = 6,
+    TSD20 = 7,
+    PC_MODE = 8,
+    USERMODE = 9,
+    BOT = 10,
+  }
 }
 
 /** Specifies translatable strings throughout the game. */
 declare const i18n: Jstris.I18n;
 
+/** */
+declare const Score: Scoring;
+
+declare const Action: Readonly<{
+  MOVE_LEFT: 0;
+  MOVE_RIGHT: 1;
+  DAS_LEFT: 2;
+  DAS_RIGHT: 3;
+  ROTATE_LEFT: 4;
+  ROTATE_RIGHT: 5;
+  ROTATE_180: 6;
+  HARD_DROP: 7;
+  SOFT_DROP_BEGIN_END: 8;
+  GRAVITY_STEP: 9;
+  HOLD_BLOCK: 10;
+  GARBAGE_ADD: 11;
+  SGARBAGE_ADD: 12;
+  REDBAR_SET: 13;
+  ARR_MOVE: 14;
+  AUX: 15;
+}>;
+
+declare const Aux: Readonly<{
+  AFK: 0;
+  BLOCK_SET: 1;
+  MOVE_TO: 2;
+  RANDOMIZER: 3;
+  MATRIX_MOD: 4;
+  WIDE_GARBAGE_ADD: 5;
+}>;
 /**
  * Formats time into minutes, seconds and optionally partial seconds.
  * @param timeSec Time in seconds.
@@ -3699,7 +3775,7 @@ declare class ExportView {
       BS: number;
       W: number;
     };
-    TTL: {};
+    TTL: unknown; // TODO: Find out what this does.
     STA: {
       T: number;
       L: number;
@@ -3979,16 +4055,25 @@ declare class RulesetManager {
     /** The mode description. */
     desc: string;
     /** Extra rules applied to the ruleset. Keys used here are from `PRESET_KEYS` property. */
-    c: object;
+    c: [object];
   }[];
   readonly MODES: {
+    /** Mode ID. */
     id: number;
+    /** Mode name */
     n: string;
+    /** Submodes available for the given mode. */
     modes: {
+      /** Submode ID. */
       id: number;
+      /** Submode name. */
       n: string;
-      fn: string;
+      /** Ruleset IDs in which the submode is available. */
       rs: number[];
+      /** Friendly submode name, appears as a text on a button. */
+      fn?: string;
+      /** Added later by methods in {@link RulesetManager}. */
+      elem?: HTMLDivElement;
     }[];
   }[];
 
@@ -4003,7 +4088,7 @@ declare class RulesetManager {
   /**
    * Changes the game ruleset.
    * @param rulesetID - The ruleset ID.
-   * @param {boolean} [shouldAdjustToValidMode=true] Whether the mode should be adjusted to a valid one. Defaults to `true` if not provided.
+   * @param shouldAdjustToValidMode Whether the mode should be adjusted to a valid one. Defaults to `true` if not provided.
    */
   ruleSetChange(rulesetID: number, shouldAdjustToValidMode?: boolean): void;
   createOptions(): void;
@@ -4017,14 +4102,14 @@ declare class RulesetManager {
    * Applies rule changes to the ruleset.
    * @param ruleChange The object contatining rules to change.
    * @param ruleset The ruleset which should be changed.
-   * @param {boolean} [pullFromDefinition=true] Whether the rules should be pulled from the default definition. Defaults to `true` if not provided.
+   * @param pullFromDefinition Whether the rules should be pulled from the default definition. Defaults to `true` if not provided.
    */
   applyRule(ruleChange: object, ruleset: Jstris.Ruleset, pullFromDefinition?: boolean): void;
   /**
    * Applies rule changes from the preset to the ruleset.
    * @param ruleChange The object contatining rules to change.
    * @param ruleset The ruleset which should be changed.
-   * @param {boolean} [pullFromDefinition=true] Whether the rules should be pulled from the default definition. Defaults to `true` if not provided.
+   * @param pullFromDefinition Whether the rules should be pulled from the default definition. Defaults to `true` if not provided.
    * @returns Object containing changed rules.
    */
   applyPresetRule(ruleChange: object, ruleset: Jstris.Ruleset, pullFromDefinition?: boolean): object;
@@ -4177,6 +4262,7 @@ declare class GameCaption {
   readonly MODE_COMPLETE: 12;
   readonly PAUSED: 13;
   readonly BUTTON: 14;
+  /** *sic!* */
   speedTimout: number | null;
 
   create(): HTMLDivElement;
@@ -4510,9 +4596,9 @@ declare class Replay {
   afkQueue: unknown[];
   stream: ReplayStream;
   /** Bound to {@link Live.onReplaySaved | `Live.onReplaySaved(replayResponse)`} with `this` object being the `Live` instance. */
-  onSaved: (replayResponse: Jstris.ReplayResponse) => void | null;
+  onSaved: (this: Live, replayResponse: Jstris.ReplayResponse) => void | null;
   /** Bound to {@link Game.onMove | `Game.onMove(replayResponse)`} with `this` object being the `Game` instance. */
-  onMoveAdded: (replayAction: ReplayAction) => void | null;
+  onMoveAdded: (this: Game, replayAction: ReplayAction) => void | null;
 
   add(replayAction: ReplayAction): void;
   clear(): void;
@@ -5169,6 +5255,244 @@ declare class Analytics {
 
   segments: Jstris.Segment[];
 }
+
+declare class BaseSFXset {
+  constructor();
+
+  volume: number;
+  comboTones: false | Jstris.ComboTonesJoint | (Jstris.SFXDefinition | null)[];
+  maxCombo: number | null;
+  getSoundURL: (property: string) => string | null;
+  getSoundURLFromObj: (object: Jstris.ComboToneDefinition | null) => string | null;
+  /**
+   * Gets combo SFX for the current combo.
+   *
+   * @returns Combo SFX file name (`c${currentCombo}`), or `linefall` if the sound definition does not provide combo tones.
+   */
+  getComboSFX: (currentCombo: number) => string | "linefall";
+  getScoreSFX: (scoring: number) => string | null;
+  getClearSFX: (scoring: number, scoreToAdd: number, isBackToBack: boolean, currentCombo: number) => string[];
+
+  // These are set to Jstris.SFXDefinition
+  hold: Jstris.SFXDefinition | null;
+  linefall: Jstris.SFXDefinition | null;
+  lock: Jstris.SFXDefinition | null;
+  move: Jstris.SFXDefinition | null;
+  died: Jstris.SFXDefinition | null;
+  ready: Jstris.SFXDefinition | null;
+  go: Jstris.SFXDefinition | null;
+  ding: Jstris.SFXDefinition | null;
+  msg: Jstris.SFXDefinition | null;
+  fault: Jstris.SFXDefinition | null;
+  blank: Jstris.SFXDefinition | null;
+  item: Jstris.SFXDefinition | null;
+  pickup: Jstris.SFXDefinition | null;
+  rotate: Jstris.SFXDefinition | null;
+  success: Jstris.SFXDefinition | null;
+  // These are set to null
+  harddrop: Jstris.SFXDefinition | null;
+  golive: Jstris.SFXDefinition | null;
+  land: Jstris.SFXDefinition | null;
+  garbage: Jstris.SFXDefinition | null;
+  b2b: Jstris.SFXDefinition | null;
+  scoring: FixedArray<Jstris.SFXDefinition | undefined, 15> | null;
+  b2bScoring: FixedArray<Jstris.SFXDefinition | undefined, 15> | null;
+  inherit: Jstris.SFXDefinition | null;
+  spawns: { [piece: string]: Jstris.SFXDefinition } | null;
+
+  author: string | null;
+}
+
+/** SFX set whose all defitions are set to `null`. */
+declare class NullSFXset extends BaseSFXset {
+  constructor();
+
+  hold: null;
+  linefall: null;
+  lock: null;
+  move: null;
+  died: null;
+  ready: null;
+  go: null;
+  ding: null;
+  msg: null;
+  fault: null;
+  item: null;
+  pickup: null;
+  harddrop: null;
+  golive: null;
+  land: null;
+  garbage: null;
+  b2b: null;
+  rotate: null;
+  scoring: null;
+  b2bScoring: null;
+  author: null;
+  inherit: null;
+  spawns: null;
+  success: null;
+}
+
+declare class YotipoSFXset extends BaseSFXset {
+  constructor();
+  volume: number;
+  hold: null;
+  linefall: Jstris.SFXDefinition;
+  lock: Jstris.SFXDefinition;
+  move: null;
+  died: Jstris.SFXDefinition;
+  ready: Jstris.SFXDefinition;
+  go: Jstris.SFXDefinition;
+}
+
+declare class RainforestSFXset extends BaseSFXset {
+  constructor();
+  author: string;
+  volume: number;
+  move: null;
+  hold: null;
+  lock: Jstris.SFXDefinition;
+  died: Jstris.SFXDefinition;
+  comboTones: Jstris.ComboTonesJoint;
+}
+
+declare class TetraSFXset extends BaseSFXset {
+  constructor();
+  author: string;
+  volume: number;
+  comboTones: (Jstris.SFXDefinition | null)[];
+  hold: Jstris.SFXDefinition;
+  move: Jstris.SFXDefinition;
+  ready: Jstris.SFXDefinition | null;
+  go: Jstris.SFXDefinition | null;
+  golive: Jstris.SFXDefinition | null;
+  lock: Jstris.SFXDefinition | null;
+  harddrop: Jstris.SFXDefinition | null;
+  land: Jstris.SFXDefinition | null;
+  garbage: Jstris.SFXDefinition | null;
+  b2b: Jstris.SFXDefinition | null;
+  linefall: null;
+  died: Jstris.SFXDefinition | null;
+  fault: Jstris.SFXDefinition | null;
+  scoring: [
+    SOFT_DROP: undefined,
+    HARD_DROP: undefined,
+    CLEAR1: Jstris.SFXDefinition,
+    CLEAR2: Jstris.SFXDefinition,
+    CLEAR3: Jstris.SFXDefinition,
+    CLEAR4: Jstris.SFXDefinition,
+    TSPIN_MINI: Jstris.SFXDefinition,
+    TSPIN: Jstris.SFXDefinition,
+    TSPIN_MINI_SINGLE: Jstris.SFXDefinition,
+    TSPIN_SINGLE: Jstris.SFXDefinition,
+    TSPIN_DOUBLE: Jstris.SFXDefinition,
+    TSPIN_TRIPLE: Jstris.SFXDefinition,
+    PERFECT_CLEAR: Jstris.SFXDefinition,
+    COMBO: undefined,
+    CLEAR5: Jstris.SFXDefinition
+  ];
+}
+
+declare class VoiceSFXset extends NullSFXset {
+  constructor();
+  author: string;
+  volume: number;
+  died: Jstris.SFXDefinition;
+  b2bScoring: [
+    SOFT_DROP: undefined,
+    HARD_DROP: undefined,
+    CLEAR1: undefined,
+    CLEAR2: undefined,
+    CLEAR3: undefined,
+    CLEAR4: Jstris.SFXDefinition,
+    TSPIN_MINI: undefined,
+    TSPIN: undefined,
+    TSPIN_MINI_SINGLE: undefined,
+    TSPIN_SINGLE: undefined,
+    TSPIN_DOUBLE: Jstris.SFXDefinition,
+    TSPIN_TRIPLE: undefined,
+    PERFECT_CLEAR: undefined,
+    COMBO: undefined,
+    CLEAR5: undefined
+  ];
+  scoring: [
+    SOFT_DROP: undefined,
+    HARD_DROP: undefined,
+    CLEAR1: Jstris.SFXDefinition,
+    CLEAR2: Jstris.SFXDefinition,
+    CLEAR3: Jstris.SFXDefinition,
+    CLEAR4: Jstris.SFXDefinition,
+    TSPIN_MINI: Jstris.SFXDefinition,
+    TSPIN: Jstris.SFXDefinition,
+    TSPIN_MINI_SINGLE: Jstris.SFXDefinition,
+    TSPIN_SINGLE: Jstris.SFXDefinition,
+    TSPIN_DOUBLE: Jstris.SFXDefinition,
+    TSPIN_TRIPLE: Jstris.SFXDefinition,
+    PERFECT_CLEAR: Jstris.SFXDefinition,
+    COMBO: undefined,
+    CLEAR5: undefined
+  ];
+}
+
+declare class SpawnSFXset extends NullSFXset {
+  constructor();
+  author: string;
+  volume: number;
+  spawns: {
+    I: Jstris.SFXDefinition;
+    O: Jstris.SFXDefinition;
+    S: Jstris.SFXDefinition;
+    Z: Jstris.SFXDefinition;
+    T: Jstris.SFXDefinition;
+    L: Jstris.SFXDefinition;
+    J: Jstris.SFXDefinition;
+  };
+}
+
+declare class DalVSFXset extends NullSFXset {
+  constructor();
+  volume: number;
+  died: Jstris.SFXDefinition;
+  b2bScoring: null;
+  b2b: Jstris.SFXDefinition;
+  scoring: [
+    SOFT_DROP: undefined,
+    HARD_DROP: undefined,
+    CLEAR1: undefined,
+    CLEAR2: undefined,
+    CLEAR3: undefined,
+    CLEAR4: Jstris.SFXDefinition,
+    TSPIN_MINI: Jstris.SFXDefinition,
+    TSPIN: Jstris.SFXDefinition,
+    TSPIN_MINI_SINGLE: Jstris.SFXDefinition,
+    TSPIN_SINGLE: Jstris.SFXDefinition,
+    TSPIN_DOUBLE: Jstris.SFXDefinition,
+    TSPIN_TRIPLE: Jstris.SFXDefinition,
+    PERFECT_CLEAR: Jstris.SFXDefinition,
+    COMBO: undefined,
+    CLEAR5: undefined
+  ];
+  success: Jstris.SFXDefinition;
+}
+
+declare class DalSpawnVSFXset extends NullSFXset {
+  constructor();
+  author: string;
+  volume: number;
+  died: Jstris.SFXDefinition;
+  spawns: {
+    I: Jstris.SFXDefinition;
+    O: Jstris.SFXDefinition;
+    S: Jstris.SFXDefinition;
+    Z: Jstris.SFXDefinition;
+    T: Jstris.SFXDefinition;
+    L: Jstris.SFXDefinition;
+    J: Jstris.SFXDefinition;
+  };
+}
+
+declare const SFXsets: Jstris.SFXSetDefinition[];
+declare const VSFXsets: Jstris.SFXSetDefinition[];
 
 declare const LZString: LZString;
 
