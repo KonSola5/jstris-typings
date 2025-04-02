@@ -3867,7 +3867,7 @@ declare class GameSlots {
   nameFontSize: number;
   nameHeight: number;
   redBarWidth: number;
-  slots: [];
+  slots: Slot[];
   targetSlotId: number;
   shownSlots: number;
   readonly extendedView: [1, 2, 4];
