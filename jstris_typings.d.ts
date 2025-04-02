@@ -4486,7 +4486,7 @@ declare class Live {
   showInLobbyChat(response: object): void;
   getGameSlot(CID: number, rc: number, team: number): boolean;
   onMessage(message: object): void;
-  decodeActionsAndPlay(replayData: number[], bits: number): void;
+  decodeActionsAndPlay(replayData: number[], hasTimestamp: boolean): void;
   updateLiveMatrixViaSnapshot(rc: number, redBar: number, matrix: Jstris.Matrix): void;
   onClose(event: Event): void;
   useProxy(): void;
