@@ -1,3 +1,11 @@
+/// <reference types="./bots.d.ts" />
+
+declare global {
+  interface Window {
+    Bots: Bots;
+  }
+}
+
 declare interface AleaPRNG {
   (): number;
   int32: () => number;
@@ -130,6 +138,10 @@ declare namespace Jstris {
     restartPractice: KeyCode,
     restartLive: KeyCode
   ];
+
+  type AttackTable = Jstris.AttackTable;
+
+  type ComboTable = Jstris.ComboTable;
 
   interface GLContextDefinition {
     elem: HTMLCanvasElement;
@@ -492,6 +504,12 @@ declare namespace Jstris {
     PERFECT_CLEAR = 12,
     COMBO = 13,
     CLEAR5 = 14,
+  }
+
+  interface ScoringOptions {
+    type: number;
+    b2b: boolean;
+    cmb: number;
   }
 
   type ScoreStamp = [timestamp: number, scoring: ScoringActions, scoreAdded: number, multiplier: number, alwaysZero: 0];
@@ -927,39 +945,21 @@ declare namespace Jstris {
     stats: number;
   }
 
-  interface ComboToneDefinition {
+  interface SFXDefinition {
     url: string;
-    abs: number;
-    set: number;
+    abs?: number;
+    set?: number;
     duration?: number;
     spacing?: number;
     // How many combo tones there are.
     cnt?: number;
-  }
-
-  interface ComboTonesJoint {
-    // Relative URL to the combo tone file.
-    url: string;
-    abs: number;
-    set: number;
-    duration: number;
-    spacing: number;
-    // How many combo tones there are.
-    cnt: number;
-  }
-
-  interface SFXDefinition {
-    // Relative URL to the combo tone file.
-    url: string;
-    abs: number;
-    set: number;
     q?: number;
   }
 
   interface SFXSetDefinition {
     id: number;
     name: string;
-    data: BaseSFXset;
+    data: typeof BaseSFXset;
   }
 
   interface I18n {
@@ -2123,6 +2123,7 @@ declare namespace Jstris {
   }
 
   interface RoomConfig {
+    mode: number;
     t?: number;
     p?: boolean;
     n?: string;
@@ -2439,7 +2440,7 @@ declare function loadVideoSkin(url: string, videoOptions: Jstris.VideoOptions): 
  */
 declare function joinRoom(roomID: string): void;
 
-declare function loadSFX(sfx: SFXsets | VSFXsets, useVoice: 0 | 1): void;
+declare function loadSFX(sfx: SFXsets | VSFXsets, useVoice?: 0 | 1): void;
 
 declare class Game extends GameCore {
   constructor();
@@ -2474,8 +2475,8 @@ declare class Game extends GameCore {
   ghostTex: HTMLImageElement;
   ghostSkinId: number;
   ghostSkins: { id: number; name: string; data: string; w: number }[];
-  SFXset: { id: number; name: string; data: () => void } | null;
-  VSFXset: { id: number; name: string; data: () => void } | null;
+  SFXset: BaseSFXset | null;
+  VSFXset: BaseSFXset | null;
   play: boolean;
   gameEnded: boolean;
   hdAbort: boolean;
@@ -2580,65 +2581,13 @@ declare class Game extends GameCore {
   totalKeyPresses: number;
   place: number | null;
   redrawBlocked: boolean;
-  linesAttackDef: [
-    zero: number,
-    single: number,
-    double: number,
-    triple: number,
-    jstris: number,
-    TSD: number,
-    TST: number,
-    TSS: number,
-    MTSS: number,
-    PC: number,
-    B2B: number
-  ];
-  linesAttack: [
-    zero: number,
-    single: number,
-    double: number,
-    triple: number,
-    jstris: number,
-    TSD: number,
-    TST: number,
-    TSS: number,
-    MTSS: number,
-    PC: number,
-    B2B: number
-  ];
+  linesAttackDef: Jstris.AttackTable;
+  linesAttack: Jstris.AttackTable;
   cheeseHeight: number;
   ghostEnabled: boolean;
   getPPS(): number;
-  comboAttackDef: [
-    combo0: number,
-    combo1: number,
-    combo2: number,
-    combo3: number,
-    combo4: number,
-    combo5: number,
-    combo6: number,
-    combo7: number,
-    combo8: number,
-    combo9: number,
-    combo10: number,
-    combo11: number,
-    combo12plus: number
-  ];
-  comboAttack: [
-    combo0: number,
-    combo1: number,
-    combo2: number,
-    combo3: number,
-    combo4: number,
-    combo5: number,
-    combo6: number,
-    combo7: number,
-    combo8: number,
-    combo9: number,
-    combo10: number,
-    combo11: number,
-    combo12plus: number
-  ];
+  comboAttackDef: Jstris.ComboTable;
+  comboAttack: Jstris.ComboTable;
   comboCounter: number;
   fourWideFlag: boolean;
   PCdata: {
@@ -2677,14 +2626,14 @@ declare class Game extends GameCore {
   ModeManager: ModeManager;
   GameStats: StatsManager;
   Mobile: Mobile;
-  Bots: object[];
+  Bots: Bots;
 
   rollBigSpawn(): void;
   loadGhostSkin(url: string, size: number): void;
   changeSkin(skinIndex: number): void;
   initSFX(): void;
-  changeSFX(sfx: SFXsets | VSFXsets, useVoice: 0 | 1): void;
-  loadSounds(sfx: SFXsets | VSFXsets, prefix: string): void;
+  changeSFX(sfx: BaseSFXset, useVoice?: 0 | 1): void;
+  loadSounds(sfx: BaseSFXset, prefix: string): void;
   drawGrid(mode: number): void;
   /**
    * Returns the currently played game mode.
@@ -2952,8 +2901,8 @@ declare class GameCore {
   ghostTex: HTMLImageElement;
   ghostSkinId: number;
   ghostSkins: { id: number; name: string; data: string; w: number }[];
-  SFXset: { id: number; name: string; data: () => void } | null;
-  VSFXset: { id: number; name: string; data: () => void } | null;
+  SFXset: BaseSFXset | null;
+  VSFXset: BaseSFXset | null;
   play: boolean;
   gameEnded: boolean;
   hdAbort: boolean;
@@ -3041,65 +2990,13 @@ declare class GameCore {
   totalKeyPresses: number;
   place: number | null;
   redrawBlocked: boolean;
-  linesAttackDef: [
-    zero: number,
-    single: number,
-    double: number,
-    triple: number,
-    jstris: number,
-    TSD: number,
-    TST: number,
-    TSS: number,
-    MTSS: number,
-    PC: number,
-    B2B: number
-  ];
-  linesAttack: [
-    zero: number,
-    single: number,
-    double: number,
-    triple: number,
-    jstris: number,
-    TSD: number,
-    TST: number,
-    TSS: number,
-    MTSS: number,
-    PC: number,
-    B2B: number
-  ];
+  linesAttackDef: Jstris.AttackTable;
+  linesAttack: Jstris.AttackTable;
   cheeseHeight: number;
   ghostEnabled: boolean;
   getPPS(): number;
-  comboAttackDef: [
-    combo0: number,
-    combo1: number,
-    combo2: number,
-    combo3: number,
-    combo4: number,
-    combo5: number,
-    combo6: number,
-    combo7: number,
-    combo8: number,
-    combo9: number,
-    combo10: number,
-    combo11: number,
-    combo12plus: number
-  ];
-  comboAttack: [
-    combo0: number,
-    combo1: number,
-    combo2: number,
-    combo3: number,
-    combo4: number,
-    combo5: number,
-    combo6: number,
-    combo7: number,
-    combo8: number,
-    combo9: number,
-    combo10: number,
-    combo11: number,
-    combo12plus: number
-  ];
+  comboAttackDef: Jstris.ComboTable;
+  comboAttack: Jstris.ComboTable;
   comboCounter: number;
   fourWideFlag: boolean;
   PCdata: {
@@ -3137,7 +3034,7 @@ declare class GameCore {
   ModeManager: ModeManager;
   GameStats: StatsManager | SimpleStatsManager;
   Mobile: Mobile;
-  Bots: object[];
+  Bots: Bots;
   readonly sprintModes: {
     1: 40;
     2: 20;
@@ -3203,7 +3100,7 @@ declare class GameCore {
 
 declare class Replayer extends GameCore {
   constructor(view: View);
-  v: View;
+  v: View | SlotView;
   // temporaryBlockSet = null;
   reachedEnd: boolean;
   pmode: number;
@@ -3235,34 +3132,8 @@ declare class Replayer extends GameCore {
   totalKeyPresses: number;
   // finFaults = null;
   // scoreStamps
-  linesAttack: [
-    zero: number,
-    single: number,
-    double: number,
-    triple: number,
-    jstris: number,
-    TSD: number,
-    TST: number,
-    TSS: number,
-    MTSS: number,
-    PC: number,
-    B2B: number
-  ];
-  comboAttack: [
-    combo0: number,
-    combo1: number,
-    combo2: number,
-    combo3: number,
-    combo4: number,
-    combo5: number,
-    combo6: number,
-    combo7: number,
-    combo8: number,
-    combo9: number,
-    combo10: number,
-    combo11: number,
-    combo12plus: number
-  ];
+  linesAttack: Jstris.AttackTable;
+  comboAttack: Jstris.ComboTable;
   timeRemaining: number;
   linesRemaining: number;
   RNG: AleaPRNG;
@@ -3541,7 +3412,7 @@ declare class SlotView {
    */
   onBlockLocked(): void;
   /** Empty function. */
-  onLinesCleared(): void;
+  onLinesCleared(attack: number, comboBonus: number, scoringOptions: Jstris.ScoringOptions): void;
   /** Empty function. */
   onScoreChanged(): void;
   onResized(): void;
@@ -3668,7 +3539,7 @@ declare class View {
   drawScale: number;
   SEenabled: boolean;
   replaySEset: number;
-  SFXset: SFXsets | null;
+  SFXset: BaseSFXset | null;
   tex: HTMLImageElement;
   skinId: number;
   ghostSkinId: number;
@@ -3678,9 +3549,9 @@ declare class View {
 
   constructor(nameDefinition: Jstris.ViewNameDefinition);
   changeSkin(skinID: number): void;
-  changeSFX(sfxSet: SFXsets): void;
+  changeSFX(sfxSet: BaseSFXset): void;
   loadSounds(): void;
-  loadSounds2(sfxSet: SFXsets, prefix: string): void;
+  loadSounds2(sfxSet: BaseSFXset, prefix: string): void;
   drawBgGrid(unusedParameter?: unknown): void;
   drawGhostAndCurrent(): void;
   redraw(): void;
@@ -3718,7 +3589,8 @@ declare class View {
   onBlockMove(): void;
   onGameOver(): void;
   onBlockLocked(): void;
-  onLinesCleared(): void;
+  // Despite the descriptor not having any parameters, this IS called with parameters.
+  onLinesCleared(attack: number, comboBonus: number, scoringOptions: Jstris.ScoringOptions): void;
   onTimeRemainingChanged(): void;
   onScoreChanged(): void;
 }
@@ -4511,7 +4383,7 @@ declare class Live {
    * @param comboAttack Additional attack sent by combo.
    * @param scoringOptions Additional scoring options.
    */
-  sendAttack(attack: number, comboAttack: number, scoringOptions: { type: number; b2b: boolean; cmb: number }): void;
+  sendAttack(attack: number, comboAttack: number, scoringOptions: Jstris.ScoringOptions): void;
   /**
    * Sends lines to the targetted opponent.
    * @deprecated Unused in Jstris.
@@ -4863,9 +4735,9 @@ declare class StatLine {
 
 declare class Mobile {}
 
-declare class SFXsets {}
+declare const SFXsets: Jstris.SFXSetDefinition[];
 
-declare class VSFXsets {}
+declare const VSFXsets: Jstris.SFXSetDefinition[];
 
 declare class FastFont {}
 
@@ -5260,10 +5132,10 @@ declare class BaseSFXset {
   constructor();
 
   volume: number;
-  comboTones: false | Jstris.ComboTonesJoint | (Jstris.SFXDefinition | null)[];
+  comboTones: false | Jstris.SFXDefinition | (Jstris.SFXDefinition | null)[];
   maxCombo: number | null;
-  getSoundURL: (property: string) => string | null;
-  getSoundURLFromObj: (object: Jstris.ComboToneDefinition | null) => string | null;
+  getSoundUrl: (property: string) => string | null;
+  getSoundUrlFromObj: (object: Jstris.SFXDefinition | null) => string | null;
   /**
    * Gets combo SFX for the current combo.
    *
@@ -5353,7 +5225,7 @@ declare class RainforestSFXset extends BaseSFXset {
   hold: null;
   lock: Jstris.SFXDefinition;
   died: Jstris.SFXDefinition;
-  comboTones: Jstris.ComboTonesJoint;
+  comboTones: Jstris.SFXDefinition;
 }
 
 declare class TetraSFXset extends BaseSFXset {
@@ -5490,9 +5362,6 @@ declare class DalSpawnVSFXset extends NullSFXset {
     J: Jstris.SFXDefinition;
   };
 }
-
-declare const SFXsets: Jstris.SFXSetDefinition[];
-declare const VSFXsets: Jstris.SFXSetDefinition[];
 
 declare const LZString: LZString;
 
