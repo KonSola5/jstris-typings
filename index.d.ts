@@ -669,7 +669,7 @@ declare namespace Jstris {
     name: string;
     /** Spawn offset of the piece. */
     spawn: [x: number, y: number];
-    xp?: [x: number, y: number];
+    xp?: [x: number, y: number] | 0; // why
     yp: [x: number, y: number];
   }
 
