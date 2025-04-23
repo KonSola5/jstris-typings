@@ -3078,6 +3078,12 @@ declare class GameCore {
   addGarbageFromQueue(timestamp: number): void;
   addGarbage(amountOfLines: number): number;
   addToGarbageQueue(garbageToAdd: number): void;
+  /**
+   * Plays specified sound or sounds.
+   * @param soundOrSounds Sound or sounds to play.
+   * @param type `1` for regular sounds, `2` for voice samples.
+   */
+  playSound(soundOrSounds: string | string[], type?: number): void;
   getAPM(): number;
   getKPP(): number;
   getVS(): number;

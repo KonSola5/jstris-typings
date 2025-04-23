@@ -1,7 +1,7 @@
 /// <reference types="./index.d.ts" />
 
 /*
- * Every class declared here is done so via an IIFE and thus not monkey patchable.
+ * Every class declared here is done so via an IIFE and thus not monkey patchable unless speficied otherwise.
  *
  * Only accessible via instances.
  */
@@ -90,6 +90,7 @@ declare namespace JstrisBots {
  */
 declare class Bots {
   constructor(game: Game);
+  p: Game;
   botPlayers: { [index: number]: BotPlayer };
   bots: Bot[];
   room: Room;
@@ -116,8 +117,8 @@ declare class Bots {
   onReset(): void;
 }
 
-declare class Room {
-  private constructor(game: Game, bots: Bots);
+class Room {
+  constructor(game: Game, bots: Bots);
   g: Game;
   bots: Bots;
   players: (Bot | Human)[];
@@ -152,9 +153,9 @@ declare class Room {
   processAttack(player: Bot | Human, attack: number, comboAttack: number): void;
 }
 
-declare class Human {}
+class Human {}
 
-declare class Bot {
+class Bot {
   constructor(bots: Bots, config: JstrisBots.BotConfig);
   readonly IS_BOT: true;
   p: Bots;
@@ -183,10 +184,7 @@ declare class Bot {
   // getGamedata()
 }
 
-declare class BotPlayer {}
-
-declare class Data {}
-
-declare type Configurator = unknown; // Not even attempting to type this class - it uses many polyfills.
-
-declare class UI {}
+class BotPlayer {}
+class Data {}
+type Configurator = unknown; // Not even attempting to type this class - it uses many polyfills.
+class UI {}
