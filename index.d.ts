@@ -139,9 +139,35 @@ declare namespace Jstris {
     restartLive: KeyCode
   ];
 
-  type AttackTable = Jstris.AttackTable;
+  type AttackTable = [
+    zero: number,
+    single: number,
+    double: number,
+    triple: number,
+    jstris: number,
+    TSD: number,
+    TST: number,
+    TSS: number,
+    MTSS: number,
+    PC: number,
+    B2B: number
+  ];
 
-  type ComboTable = Jstris.ComboTable;
+  type ComboTable = [
+    combo0: number,
+    combo1: number,
+    combo2: number,
+    combo3: number,
+    combo4: number,
+    combo5: number,
+    combo6: number,
+    combo7: number,
+    combo8: number,
+    combo9: number,
+    combo10: number,
+    combo11: number,
+    combo12plus: number
+  ];
 
   interface GLContextDefinition {
     elem: HTMLCanvasElement;
