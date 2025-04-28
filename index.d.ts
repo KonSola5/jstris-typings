@@ -211,7 +211,7 @@ declare namespace Jstris {
     [cid: number]: Client;
   }
 
-  interface Client {
+  interface ClientWithOtherIcon {
     /** Whether the user is registered or not. (?) */
     auth: boolean;
     /** The client's CID. */
@@ -219,7 +219,7 @@ declare namespace Jstris {
     /** Nickname color, if set. */
     color: string | null;
     /** Openmoji Supporter icon (applied only when `type` is `999`). */
-    icon: string | null;
+    icon: null;
     /** Whether the user is a moderator. Potentially only `true` when the player is a moderator. */
     mod: boolean;
     /** The client's nickname. */
@@ -227,9 +227,31 @@ declare namespace Jstris {
     /** The replay played live, or `null` if the player is not playing. */
     rep: Replayer | null;
     /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
-    type: number;
+    type: Exclude<number, 999>;
     bold?: boolean;
   }
+
+  interface ClientWithOpenmojiIcon {
+    /** Whether the user is registered or not. (?) */
+    auth: boolean;
+    /** The client's CID. */
+    cid: number;
+    /** Nickname color, if set. */
+    color: string | null;
+    /** Openmoji Supporter icon (applied only when `type` is `999`). */
+    icon: string;
+    /** Whether the user is a moderator. Potentially only `true` when the player is a moderator. */
+    mod: boolean;
+    /** The client's nickname. */
+    name: string;
+    /** The replay played live, or `null` if the player is not playing. */
+    rep: Replayer | null;
+    /** Specifies the role (Champion, Moderator, Supporter) and client's icon. */
+    type: 999;
+    bold?: boolean;
+  }
+
+  type Client = ClientWithOpenmojiIcon | ClientWithOtherIcon;
 
   interface LobbyList {
     /** Standard rooms. */

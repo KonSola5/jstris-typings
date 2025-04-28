@@ -82,7 +82,57 @@ declare namespace JstrisBots {
     comboAttack: Jstris.ComboTable;
     ts: number;
   }
+
+  type BotCommands = "start" | "stop" | "suggest" | "new_piece" | "rules" | "play";
+
+  type Orientations = "north" | "south" | "east" | "west";
+
+  type Pieces = "Z" | "L" | "O" | "S" | "I" | "J" | "T" | "G";
+
+  type SpinTypes = "none" | "mini" | "full";
+
+  interface BotMessage {
+    start: {
+      hold: string;
+      queue: string[];
+      combo: number;
+      back_to_back: boolean;
+      board: string[][];
+    };
+    stop: undefined;
+    suggest: undefined;
+    new_piece: {
+      piece: string;
+    };
+    rules: undefined;
+    play: {
+      move: Move;
+    };
+  }
+
+  interface Move {
+    location: Location;
+    spin: SpinTypes;
+  }
+
+  interface Location {
+    orientation: Orientations;
+    type: Pieces;
+    x: number;
+    y: number;
+  }
 }
+
+declare const States = {
+  NO_INFO: 0,
+  INITIALIZING: 1,
+  STOPPED: 2,
+  READY: 3,
+  SENDING_MOVE: 4,
+} as const;
+
+declare type States = typeof States;
+
 /**
  * Class handling bots.
  *
@@ -153,7 +203,20 @@ class Room {
   processAttack(player: Bot | Human, attack: number, comboAttack: number): void;
 }
 
-class Human {}
+class Human {
+  constructor(game: GameCore)
+  readonly IS_BOT: false;
+  g: GameCore;
+  data: Data;
+
+  receiveAttack(attack: number, comboAttack: number): void;
+  onPlayerRoundPlacement(place: number): void;
+  getRoundTime(): number;
+  getGamedata(): JstrisBots.GameData;
+  getName(): string
+  getAccId(): null;
+  stopTimers(): void;
+}
 
 class Bot {
   constructor(bots: Bots, config: JstrisBots.BotConfig);
@@ -181,10 +244,105 @@ class Bot {
   receiveAttack(attack: number, comboAttack: number): void;
   onBotMove(shouldMove: boolean): void;
   getRoundTime(): number;
-  // getGamedata()
+  getGamedata(): JstrisBots.GameData
 }
 
-class BotPlayer {}
+class BotPlayer {
+  constructor(bots: Bots, cid: number, view: SlotView, bot: Bot);
+  cid: number;
+  bot: Bot;
+  p: Bots;
+  v: SlotView;
+  g: BotGame;
+  // g.p = this;
+  // g.Live.sendAttack = this.sendAttack.bind(this);
+  // v.g = this.g;
+  // g.v = n;
+  worker: Worker;
+  run_id: number;
+  readonly ORIENTATION: Readonly<{
+    north: 0,
+    east: 1,
+    south: 2,
+    west: 3,
+  }>;
+  suggests: number;
+  suggestions: number;
+  ignoreUntil: number | null;
+  readonly BLOCK_COLOR: Readonly<{
+    1: "Z",
+    2: "L",
+    3: "O",
+    4: "S",
+    5: "I",
+    6: "J",
+    7: "T",
+    8: "G",
+  }>;
+  fullName: string | null;
+  state: States[keyof States];
+  internalFailure: boolean;
+  stateChange: number;
+  tbpResetBoardRequired: boolean;
+
+  init(): void;
+  onError(this: BotPlayer, error: Error): void;
+  getBlockDataFromBlock<TBlock extends Block>(piece: TBlock): Jstris.BlockSets[TBlock["set"]]["blocks"][TBlock["id"]];
+  sendAttack(attack: number, comboAttack: number, unusedParameter?: unknown): void;
+  getStringQueue(unusedParameter?: unknown): string[];
+  onMessage(this: BotPlayer, event: MessageEvent): void;
+  startCommand(): void;
+  send<TCommand extends JstrisBots.BotCommands>(command: TCommand, options: JstrisBots.BotMessage[TCommand]): void;
+  gameStart(config: JstrisBots.BotGameConfig): void;
+  forceStopBot(): void;
+  stopBot(): void;
+  botGameOver(): void;
+  move(): void;
+  resetWithUpdatedBoard(): void;
+  rowToBinary(row: Jstris.MatrixRow): number;
+  saveReplayStep(): void;
+  playMove(move: JstrisBots.Move): boolean;
+}
+
+class BotGame extends GameCore {
+  constructor();
+  p: BotPlayer;
+  queue: Block[];
+  Replay: Replay;
+  Scoring: Scoring;
+  ghostPiece: { pos: { x: number; y: number } };
+  incomingGarbage: [garbageInSegment: number, timestamp: number][];
+  redBar: number;
+  solidHeight: number;
+  GameStats: { get: () => { set: () => void } };
+  SFXset: NullSFXset;
+  VSEenabled: boolean;
+  Live: {
+    noFourWide: boolean;
+    liveMode: number;
+    sendAttack: (this: BotPlayer, attack: number, comboAttack: number, unusedParameter: unknown) => void;
+  };
+  ISGAME: boolean;
+
+  refillQueue(): void;
+  redraw(): void;
+  getNextBlock(): void;
+  /** Empty function. */
+  savePlacementTime(): void;
+  isPmode(isLive: boolean): boolean; // For some reason jezevecgame declares this method twice.
+  addGarbageFromQueue(timestamp: number): void;
+  addGarbageFromQueueImmediate(timestamp: number): void;
+  /** Empty function. */
+  checkAutoRepeat(): void;
+  /** Empty function. */
+  playSound(): void;
+  GameOver(): void;
+  restart(): void;
+  cheeseModeStart(): void;
+  practiceModeCompleted(): void;
+  /** Empty function. */
+  setLrem(linesRemaining: number): void;
+}
 class Data {}
 type Configurator = unknown; // Not even attempting to type this class - it uses many polyfills.
 class UI {}
