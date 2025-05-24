@@ -41,6 +41,7 @@ declare namespace Jstris {
   /** A 20x10 matrix, which is a visible part of the Jstris board. */
   type Matrix = FixedArray<MatrixRow, 20>;
 
+  type Tetrominoes = "I" | "O" | "T" | "L" | "J" | "S" | "Z";
   interface ReplayResponse {
     /** The replay ID. */
     id: number;
@@ -4088,6 +4089,33 @@ declare class Settings {
   SFXsetID: number;
   VSFSsetID: number;
   controls: Jstris.Controls;
+  soundEnabled: boolean;
+  DMsound: boolean;
+  /** Move left */
+  ml: Jstris.KeyCode;
+  /** Move right */
+  mr: Jstris.KeyCode;
+  /** Soft drop */
+  sd: Jstris.KeyCode;
+  /** Hard Drop */
+  hd: Jstris.KeyCode;
+  /** Rotate left */
+  rl: Jstris.KeyCode;
+  /** Rotate right */
+  rr: Jstris.KeyCode;
+  /** Hold (**h**old **k**ey)*/
+  hk: Jstris.KeyCode;
+  /** Rotate 180 (**d**ouble **r**otate?) */
+  dr: Jstris.KeyCode;
+  touchControlsEnabled: boolean;
+  touchControls: boolean;
+  gridMode: number;
+  SFXsetID: number;
+  VSFXsetID: number;
+  restartSprintOnFF = false;
+  rescaleNow: boolean;
+  defaultMonochrome: "#5c5c5c";
+  shownStats: number[];
 
   init(): void;
   applyDefaults(): void;
@@ -5189,7 +5217,8 @@ declare class BaseSFXset {
   comboTones: false | Jstris.SFXDefinition | (Jstris.SFXDefinition | null)[];
   maxCombo: number | null;
   getSoundUrl: (property: string) => string | null;
-  getSoundUrlFromObj: (object: Jstris.SFXDefinition | null) => string | null;
+  getSoundUrlFromObj: (object: Jstris.SFXDefinition) => string;
+  getSoundUrlFromObj: (object: null) => null;
   /**
    * Gets combo SFX for the current combo.
    *
@@ -5221,11 +5250,11 @@ declare class BaseSFXset {
   land: Jstris.SFXDefinition | null;
   garbage: Jstris.SFXDefinition | null;
   b2b: Jstris.SFXDefinition | null;
-  scoring: FixedArray<Jstris.SFXDefinition | undefined, 15> | null;
-  b2bScoring: FixedArray<Jstris.SFXDefinition | undefined, 15> | null;
-  inherit: Jstris.SFXDefinition | null;
-  spawns: { [piece: string]: Jstris.SFXDefinition } | null;
-
+  scoring: (Jstris.SFXDefinition | undefined)[] & {length: 15} | null;
+  b2bScoring: (Jstris.SFXDefinition | undefined)[] & {length: 15} | null;
+  /** Unused. */
+  inherit: null;
+  spawns: { [piece in Jstris.Tetrominoes]: Jstris.SFXDefinition } | null;
   author: string | null;
 }
 
