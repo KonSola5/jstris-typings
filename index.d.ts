@@ -3125,7 +3125,7 @@ declare class GameCore {
   getQueuePreview(randomizer: Jstris.Randomizer): Block[];
   generateQueue(): void;
   addGarbageFromQueue(timestamp: number): void;
-  addGarbage(amountOfLines: number): number;
+  addGarbage(amountOfLines: number): number | null;
   addToGarbageQueue(garbageToAdd: number): void;
   /**
    * Plays specified sound or sounds.
