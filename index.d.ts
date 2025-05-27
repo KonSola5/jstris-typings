@@ -4551,7 +4551,7 @@ declare class Replay {
   stream: ReplayStream;
   /** Bound to {@link Live.onReplaySaved | `Live.onReplaySaved(replayResponse)`} with `this` object being the `Live` instance. */
   onSaved: (this: Live, replayResponse: Jstris.ReplayResponse) => void | null;
-  /** Bound to {@link Game.onMove | `Game.onMove(replayResponse)`} with `this` object being the `Game` instance. */
+  /** Bound to {@link Game.onMove | `Game.onMove(replayAction)`} with `this` object being the `Game` instance. */
   onMoveAdded: (this: Game, replayAction: ReplayAction) => void | null;
 
   add(replayAction: ReplayAction): void;
@@ -4825,7 +4825,7 @@ declare class FastFont {}
 
 declare class FastFont2D {}
 
-/** https://github.com/hammerjs/hammer.js*/
+/** https://github.com/hammerjs/hammer.js */
 declare class Hammer {}
 
 /**
