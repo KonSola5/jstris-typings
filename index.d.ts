@@ -2136,6 +2136,103 @@ declare namespace Jstris {
     sendReport: string;
   }
 
+  /** @experimental */
+  declare namespace Replay2 {
+    type PotentialCaptionIDs = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15;
+
+    type PotentialScoringActions = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
+
+    interface MatrixChange {
+      index: number;
+      blockId: number;
+    }
+
+    interface MatrixBitMask {
+      mask: number[];
+      payload: number[];
+    }
+
+    interface Piece {
+      type: number | null;
+      blocksetId: number | null;
+    }
+
+    interface CurrentPiece extends Piece {
+      type: number | null;
+      blocksetId: number | null;
+      state: number | null;
+      positionDelta: number | null;
+    }
+
+    interface Event {
+      type: number;
+      data: EventData | undefined;
+    }
+
+    interface EventData {
+      soundId: number;
+    }
+
+    interface Score {
+      id: number;
+      count: number;
+    }
+
+    interface Ruleset {
+      ghost: number;
+      skinId: number;
+    }
+
+    interface TimestampSavings {
+      fixedBits: number;
+      variableBits: number;
+      savings: number;
+      savingsPercent: number;
+      stats: {
+        small: number;
+        medium: number;
+        large: number;
+      };
+      totalFrames: number;
+    }
+
+    interface PositionSavings {
+      fixedBits: number;
+      deltaBits: number;
+      savings: number;
+      savingsPercent: number;
+      stats: {
+        left: number;
+        right: number;
+        down: number;
+        rotateCW: number;
+        rotateCCW: number;
+        rotate180: number;
+        absolute: number;
+      };
+      totalPositions: number;
+    }
+
+    interface PositionState {
+      x: number;
+      y: number;
+      rotation: number;
+    }
+
+    interface Config {
+      v: 4;
+      softDropId: undefined;
+      gameStart: undefined;
+      gameEnd: undefined;
+      seed: undefined;
+      m: undefined;
+      bs: undefined;
+      se: undefined;
+      das: undefined;
+      arr: undefined;
+    }
+  }
+
   type Randomizer = Bag | Classic | OneBlock | C2Sim | Repeated | BsBlock | BigBlockRand | ConstBlock;
 
   interface SoundDefinition {
@@ -2676,6 +2773,7 @@ declare class Game extends GameCore {
   GameStats: StatsManager;
   Mobile: Mobile;
   Bots: Bots;
+  Replay2: Replay2;
 
   rollBigSpawn(): void;
   loadGhostSkin(url: string, size: number): void;
@@ -3137,7 +3235,7 @@ declare class GameCore {
   getKPP(): number;
   getVS(): number;
   getWasted(): number;
-  score(scoring: number, multipier: number): void;
+  score(scoring: number, multiplier: number): void;
   timestamp(): number;
   getComboAttack(combo: number): number;
   deleteFromGarbageQueue(counteredLines: number): void;
@@ -3236,7 +3334,256 @@ declare class Replayer extends GameCore {
   playUntilTime(timestamp: number): void;
   getPPS(): number;
   timestamp(): number;
-  score(scoring: number, multipier: number): void;
+  score(scoring: number, multiplier: number): void;
+}
+
+/** Written like a static class */
+declare interface Replay2Common {
+  readonly FRAME_TYPE: Readonly<{
+    FULL: 0;
+    DIFF: 1;
+  }>;
+  readonly PROPERTY: Readonly<{
+    MATRIX: 0;
+    MATRIX_CHANGE: 1;
+    MATRIX_BITMASK: 2;
+    CURRENT_BLOCK: 3;
+    CURRENT_BLOCK_STATE: 4;
+    HOLD_BLOCK: 5;
+    QUEUE: 6;
+    QUEUE_SHIFT: 7;
+    RULESET: 8;
+    SOUND_EFFECT: 9;
+    CAPTION_CHANGE: 10;
+    SCORE: 11;
+  }>;
+  readonly RULESET_PROP: Readonly<{
+    GHOST: 0;
+    SKIN_ID: 1;
+  }>;
+  readonly DIFF_FRAME_TIMESTAMP_BITS: 15;
+  readonly DIFF_FRAME_MAX_TIME: 32767;
+  readonly FULL_FRAME_INTERVAL: 32767;
+  readonly TIMESTAMP_SMALL_THRESHOLD: 64;
+  readonly TIMESTAMP_MEDIUM_THRESHOLD: 512;
+  readonly TIMESTAMP_SMALL_BITS: 6;
+  readonly TIMESTAMP_MEDIUM_BITS: 9;
+  readonly TIMESTAMP_LARGE_BITS: 15;
+  readonly TIMESTAMP_SMALL_MAX: 63;
+  readonly TIMESTAMP_MEDIUM_MAX: 511;
+  readonly TIMESTAMP_LARGE_MAX: 32767;
+  readonly POSITION_DELTA: Readonly<{
+    LEFT: 0;
+    RIGHT: 1;
+    DOWN: 2;
+    ROTATE_CW: 3;
+    ROTATE_CCW: 4;
+    ROTATE_180: 5;
+    RESERVED: 6;
+    ABSOLUTE: 7;
+  }>;
+  readonly SCORING_EVENTS_WITH_COUNT: Readonly<{
+    0: true;
+    13: true;
+  }>;
+  readonly CAPTION_POSITION: Readonly<{
+    LREM: 0;
+    SPRINT_INFO: 1;
+  }>;
+  readonly DEFAULT_CONFIG: Readonly<Jstris.Replay2.Config>;
+  // Frame is defined in a namespace - only namespaces can be used to define inner classes.
+  createFrame(type: number, timestamp: number): Replay2Common.Frame;
+
+  encodeVariableLengthTimestamp(stream: ReplayStream2, deltaT: number): void;
+  decodeVariableLengthTimestamp(stream: ReplayStream2): number | null;
+  calculateVariableLengthBits(something: number): number;
+  calculateTimestampSavings(frames: number[]): Jstris.Replay2.TimestampSavings;
+  calculatePositionDelta(
+    beforeX: number,
+    beforeY: number,
+    beforeState: number,
+    afterX: number,
+    afterY: number,
+    afterState: number
+  ): number;
+  decodePositionState(positionState: number): Jstris.Replay2.PositionState;
+  encodePositionState(x: number, y: number, rotationState: number): number;
+  applyPositionDelta(x: number, y: number, rotationState: number, type: number): Jstris.Replay2.PositionState;
+  calculatePositionSavings(positionTypeArray: number[]): Jstris.Replay2.PositionSavings;
+}
+
+/**
+ * @experimental
+ */
+declare namespace Replay2Common {
+  export class Frame {
+    constructor(type: number, timestamp: number);
+    type: number;
+    timestamp: number;
+    matrix: Jstris.Matrix;
+    matrixChanges: Jstris.Replay2.MatrixChange[];
+    matrixBitmask: Jstris.Replay2.MatrixBitMask;
+    currentBlock: Jstris.Replay2.CurrentPiece;
+    holdBlock: Jstris.Replay2.Piece;
+    queue: Jstris.Replay2.Piece[];
+    queueShift: Jstris.Replay2.Piece;
+    events: Jstris.Replay2.Event[];
+    score: Jstris.Replay2.Score[];
+    ruleset: Jstris.Replay2.Ruleset;
+    caption: { [ID in Jstris.Replay2.PotentialCaptionIDs]?: string | null };
+
+    isEmpty(): boolean;
+  }
+}
+
+/** @experimental */
+declare const Replay2Common: Replay2Common;
+
+/** @experimental */
+declare class ReplayStream2 {
+  constructor();
+  data: number[];
+  datapos: number;
+  bitpos: number;
+  wordSize: number;
+  byte: number;
+
+  pushBits(number: number, numberBitWidth: number): void;
+  pullBits(amountOfBits: number): number;
+}
+
+/** @experimental */
+declare class Replay2Decoder {
+  constructor();
+  readonly FRAME_TYPE: Replay2Common["FRAME_TYPE"];
+  readonly PROPERTY: Replay2Common["PROPERTY"];
+  readonly DIFF_FRAME_TIMESTAMP_BITS: 15;
+  readonly DIFF_FRAME_MAX_TIME: 32767;
+  stream: ReplayStream2;
+  frames: Replay2Common.Frame[];
+  lastFullFrameTime: number;
+  verbose: boolean;
+  currentPositionState: Jstris.Replay2.PositionState;
+  config: Jstris.Replay2.Config;
+
+  pushFrame<Frame extends Replay2Common.Frame>(frame: Frame): Frame;
+  logFrameDecoding(param1: unknown, param2: unknown): void;
+  decode(base64String: string): ReturnType<Replay2Decoder["decodeFromBinary"]>;
+  decodeFromBinary(arrayBuffer: ArrayBuffer): Replay2Common.Frame[];
+  decodeFrameProperties(frame: Replay2Common.Frame): void;
+  /**
+   * @param frame The frame.
+   * @param eventType An unsigned 4-bit integer (0 to 15).
+   */
+  decodeEventData(frame: Replay2Common.Frame, eventType: number);
+  /**
+   * @deprecated Work in progress
+   * @experimental
+   */
+  getReplayData(): {
+    frames: Replay2Decoder["frames"];
+    c: Replay2Decoder["config"];
+    format: "replay2";
+  };
+}
+
+/**
+ * @experimental
+ */
+declare class Replay2 {
+  constructor(game: Game);
+  FRAME_TYPE: Replay2Common["FRAME_TYPE"];
+  PROPERTY: Replay2Common["PROPERTY"];
+  readonly DIFF_FRAME_TIMESTAMP_BITS: 15;
+  readonly DIFF_FRAME_MAX_TIME: 32767;
+  readonly FULL_FRAME_INTERVAL: 32767;
+  config: Jstris.Replay2.Config;
+  frames: Replay2Common.Frame[];
+  lastFullFrameTime: number;
+  lastFullFrameIndex: number;
+  stream: ReplayStream2;
+  /** This probably should be a callback, but it's not defined anywhere, not even in Game. */
+  onSaved: null;
+  verbose: boolean;
+  p: Game;
+  currentFrameTimestamp: number;
+  currentFrame: Replay2Common.Frame | null;
+  workingFullState: ReplayState;
+  currentState: ReplayState;
+  scoringQueue: {
+    [scoring in Jstris.Replay2.PotentialScoringActions]: number;
+  };
+
+  // Hooray for jezevec for making constants static!
+  // At least some of them, as there are some other constants that are on every instance of Replay2.
+  static readonly FULL_FRAME_PROPERTIES: Readonly<["matrix", "currentBlock", "holdBlock", "queue"]>;
+  static readonly FULL_FRAME_BANNED_PROPERTIES: Readonly<
+    ["matrixChanges", "matrixBitmask", "positionDelta", "queueShift"]
+  >;
+
+  pushFrame<Frame extends Replay2Common.Frame>(frame: Frame): Frame;
+  /**
+   * Decides whether the timestamp is on a full frame or not.
+   * @param timestamp Timestamp (in milliseconds)
+   */
+  shouldBeFullFrame(timestamp: number): boolean;
+  /**
+   * Creates a new frame
+   * @param timestampSec Timestamp (in **seconds**).
+   */
+  createFrame(timestampSec: number): Replay2Common.Frame;
+  finalizeCurrentFrame(): void;
+  processScoringQueue(): void;
+  getCurrentFrame(timestampSec: number): Replay2Common.Frame;
+  onMatrix(timestampSec: number): void;
+  onHold(timestampSec: number): void;
+  onQueue(timestampSec: number): void;
+  onScore(scoring: number, multiplier: number): void;
+  onRuleset(timestampSec: number, ruleset: { [rule: string]: unknown }): void;
+  onCaption(timestampSec: number, captions: { [caption: string]: string }): void;
+  // TODO
+  trimTextToMaxBytes();
+  canUseQueueShift();
+  onGameStart();
+  setMatrix();
+  addMatrixChange();
+  setCurrentBlock();
+  countMatrixDifferences();
+  getMatrixChangesList();
+  getMatrixBitmask();
+  setHoldBlock();
+  populateFullFrameState();
+  setQueue();
+  addEvent();
+  clear();
+  encodeFrameProperty();
+  encodeEventData();
+  logFrameEncoding();
+  encodeFrame();
+  getRawData(): Uint32Array;
+  getBlobData(): string;
+  getData();
+  postData();
+}
+
+declare class ReplayState {
+  constructor();
+  currentBlockType: number;
+  currentBlockSet: number;
+  currentBlockState: number;
+  currentBlockX: number;
+  currentBlockY: number;
+  currentBlockRotation: number;
+  holdBlockType: number;
+  holdBlockSet: number;
+  matrix: Jstris.Matrix;
+  queue;
+  rulesetGhost;
+  rulesetSkinId;
+  captions;
+
+  /** Mutates the `otherReplayState`. */
+  copyTo(otherReplayState: ReplayState): void;
 }
 
 /** Defines a playable piece. */
@@ -3644,8 +3991,15 @@ declare class View {
   onBlockMove(): void;
   onGameOver(): void;
   onBlockLocked(): void;
-  // Despite the descriptor not having any parameters, this IS called with parameters.
-  onLinesCleared(attack: number, comboBonus: number, scoringOptions: Jstris.ScoringOptions): void;
+  /**
+   * Gets called with parameters in regular replays.
+   *
+   * Gets called witout any parameters in Replay2 format replays.
+   * @param attack Attack due to the line clear.
+   * @param comboBonus Additional attack due to combo.
+   * @param scoringOptions Specifies type of the clear, current combo and whether B2B is present or not.
+   */
+  onLinesCleared(attack?: number, comboBonus?: number, scoringOptions?: Jstris.ScoringOptions): void;
   onTimeRemainingChanged(): void;
   onScoreChanged(): void;
 }
@@ -5250,8 +5604,8 @@ declare class BaseSFXset {
   land: Jstris.SFXDefinition | null;
   garbage: Jstris.SFXDefinition | null;
   b2b: Jstris.SFXDefinition | null;
-  scoring: (Jstris.SFXDefinition | undefined)[] & {length: 15} | null;
-  b2bScoring: (Jstris.SFXDefinition | undefined)[] & {length: 15} | null;
+  scoring: ((Jstris.SFXDefinition | undefined)[] & { length: 15 }) | null;
+  b2bScoring: ((Jstris.SFXDefinition | undefined)[] & { length: 15 }) | null;
   /** Unused. */
   inherit: null;
   spawns: { [piece in Jstris.Tetrominoes]: Jstris.SFXDefinition } | null;
